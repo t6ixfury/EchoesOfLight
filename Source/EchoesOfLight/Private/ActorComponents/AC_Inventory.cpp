@@ -93,7 +93,7 @@ void UAC_Inventory::LoadInventory()
 
 void UAC_Inventory::IntializePlayerEvent(UW_Inventory* InventoryToSet)
 {
-	InventoryWidget = InventoryToSet;
+	InventoryWidget = InventoryToSet; // the problem is here. Nothing is calling this function to set the inventory widget
 	MainCharacter = Cast<AMainCharacter>(GetOwner());
 	if (MainCharacter->GetController())
 	{

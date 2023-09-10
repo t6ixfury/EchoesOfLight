@@ -13,16 +13,6 @@ enum class E_Global_Systems : uint8
 	
 };
 
-UENUM(BlueprintType)
-enum class E_Damage_Type : uint8
-{
-	None UMETA(DisplayName = "None"),
-	Melee UMETA(DisplayName = "Inventory"),
-	Projectile UMETA(DisplayName = "Projectile"),
-	Explosion UMETA(DisplayName = "Explosion"),
-	Enviroment UMETA(DisplayName = "Enviroment")
-	
-};
 
 UENUM(BlueprintType)
 enum class E_UnLock_Type : uint8

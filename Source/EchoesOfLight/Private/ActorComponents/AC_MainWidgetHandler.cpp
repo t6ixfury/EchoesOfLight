@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Components/ActorComponent.h"
 #include "ActorComponents/AC_MainWidgetHandler.h"
+#include "Components/ActorComponent.h"
 #include "Character/MainCharacter.h"
 #include "Widgets/W_Interact.h"
 #include "W_MainGUI.h"
@@ -40,6 +40,7 @@ void UAC_MainWidgetHandler::CreateAllPlayerWidgets()
 void UAC_MainWidgetHandler::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("mainwidgethandler beginplay called"));
 	InitializePlayerWidgetsEvent.AddDynamic(this, &UAC_MainWidgetHandler::CreateAllPlayerWidgets);
 	InitializePlayerWidgetsEvent.Broadcast();
 
@@ -62,6 +63,7 @@ void UAC_MainWidgetHandler::InitializePlayer()
 	if (MainCharacter)
 	{
 		MainCharacterController = Cast<APlayerController>(MainCharacter->GetController());
+		UE_LOG(LogTemp, Warning, TEXT("MainCharacter present"));
 	}
 }
 
@@ -75,14 +77,18 @@ void UAC_MainWidgetHandler::CreateMainWidget()
 
 void UAC_MainWidgetHandler::CreateInventoryWidget()
 {
+	/*
 	if (GUI)
 	{
-		if (MainCharacter->InventoryComponent->InventoryWidget)
+		UE_LOG(LogTemp, Warning, TEXT("GUI is present"));
+		if (MainCharacter->InventoryComponent)
 		{
-			GUI->Inventory = CreateWidget<UW_Inventory>(MainCharacter->InventoryComponent->InventoryWidget);
+			UE_LOG(LogTemp, Warning, TEXT("MainCharacter->InventoryComponent->InventoryWidget present"));
+			GUI->Inventory = CreateWidget<UW_Inventory>(MH_Inventory);
 		}
 
 	}
+	*/
 }
 
 void UAC_MainWidgetHandler::TogglePause()

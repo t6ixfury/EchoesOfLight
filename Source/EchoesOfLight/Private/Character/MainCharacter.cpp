@@ -5,6 +5,8 @@
 #include "EnemyCharacter.h"
 #include "ActorComponents/AC_Inventory.h"
 #include "ActorComponents/AC_MainWidgetHandler.h"
+#include "Structures/S_DamageInfo.h"
+#include "ActorComponents/AC_DamageSystem.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -14,8 +16,9 @@ AMainCharacter::AMainCharacter()
 	ClosestDistance = 100;
 	hasTargetEnemy = false;
 
-	InventoryComponent = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory"));
+	//InventoryComponent = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory"));
 	MainWidgetHandlerComponent = CreateDefaultSubobject<UAC_MainWidgetHandler>(TEXT("Main Widget Handler"));
+	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 
 
 }
@@ -24,6 +27,12 @@ AMainCharacter::AMainCharacter()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	/*
+	if (InventoryComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory components presence"));
+	}
+	*/
 	
 }
 
@@ -37,6 +46,45 @@ void AMainCharacter::ClosestEnemy(AEnemyCharacter* enemyActor)
 		hasTargetEnemy = true;
 	}
 }
+
+// *************** DAMAGABLE INTERFACE IMPLEMENTATION (BEGINNING) **************************//
+float AMainCharacter::GetCurrentHealth_Implementation()
+{
+	if (DamageSystem)
+	{
+		return DamageSystem->Health;
+	}
+	return -1;
+}
+
+float AMainCharacter::GetMaxHealth_Implementation()
+{
+	if (DamageSystem)
+	{
+		return DamageSystem->MaxHealth;
+	}
+
+	return -1;
+}
+
+void AMainCharacter::Heal_Implementation(float amount)
+{
+	if (DamageSystem)
+	{
+		DamageSystem->Heal(amount);
+	}
+}
+
+bool AMainCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
+{
+	if (DamageSystem)
+	{
+		return DamageSystem->TakeDamage(DamageInfo);
+	}
+	return false;
+}
+
+// *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//
 
 
 

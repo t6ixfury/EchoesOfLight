@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enums/Enums.h"
+#include "Enums/E_DamageType.h"
 #include "InputCoreTypes.h"
 #include "Structs.generated.h"
 
@@ -28,7 +29,7 @@ public:
 		E_Global_Systems UsageType;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		E_Damage_Type DamageType;
+		 E_Damage_Type DamageType;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TSubclassOf<AActor> Class;

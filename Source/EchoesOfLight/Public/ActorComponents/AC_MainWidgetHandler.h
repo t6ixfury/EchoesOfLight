@@ -29,6 +29,9 @@ public:
 		UW_MainGUI* GUI;
 
 	UPROPERTY(BlueprintReadOnly)
+		UW_Inventory* MH_Inventory;
+
+	UPROPERTY(BlueprintReadOnly)
 		UW_Interact* Interact;
 
 	UPROPERTY(BlueprintReadOnly)
