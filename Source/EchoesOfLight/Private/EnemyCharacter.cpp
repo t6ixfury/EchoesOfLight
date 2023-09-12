@@ -11,7 +11,11 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	TimeTillDamagable = 0.25f;
+	NormalAttackDamage = 10.f;
+
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
+	CurrentDamageState = E_EnemyDamageStates::ApplyDamage;
 
 }
 
@@ -19,6 +23,14 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if (DamageSystem)
+	{
+		if (DeathMontage)
+		{
+			DamageSystem->On_Death.AddDynamic(this, &AEnemyCharacter::Death);
+
+		}
+	}
 	
 }
 
@@ -66,11 +78,16 @@ void AEnemyCharacter::Heal_Implementation(float amount)
 
 bool AEnemyCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
 {
-	if (DamageSystem)
+	bool hasTakenDamage = false;
+	if (DamageSystem && !DamageSystem->bisInvincible)
 	{
-		return DamageSystem->TakeDamage(DamageInfo);
+		hasTakenDamage = DamageSystem->TakeDamage(DamageInfo);
+		DamageSystem->bisInvincible = true;
+		GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemyCharacter::SetDamagable, TimeTillDamagable, false);
+		
+
 	}
-	return false;
+	return hasTakenDamage;
 }
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//
 
@@ -88,5 +105,33 @@ float AEnemyCharacter::NormalAttack_Implementation(UAnimMontage* MontageToPlay)
 	}
 	return MontageDuration;
 }
+void AEnemyCharacter::Death_Implementation()
+{
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 
-// *************** ENEMYAI INTERFACE IMPLEMENTATION (BEGINNING) **************************//
+	if (EnemyAnimInstance)
+	{
+		EnemyAnimInstance->StopAllMontages(0.f);
+		float MontageDuration = EnemyAnimInstance->Montage_Play(DeathMontage);
+
+		GetWorldTimerManager().SetTimer(DeathTimer, this, &AEnemyCharacter::RemoveActor, MontageDuration, false);
+	}
+	
+}
+// *************** ENEMYAI INTERFACE IMPLEMENTATION (End) **************************//
+
+
+void AEnemyCharacter::SetDamagable()
+{
+	if (DamageSystem)
+	{
+		DamageSystem->bisInvincible = false;
+	}
+}
+
+void AEnemyCharacter::RemoveActor()
+{
+	this->K2_DestroyActor();
+}
+

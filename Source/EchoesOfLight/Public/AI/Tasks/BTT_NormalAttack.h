@@ -20,19 +20,4 @@ public:
 		class UAnimMontage* NormalAttack;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-
-private:
-
-	UFUNCTION()
-		void OnAttackFinish();
-
-	UPROPERTY()
-	FTimerHandle AttackTimerHandle;
-
-	UPROPERTY()
-	UBehaviorTreeComponent* CachedOwnerComp;
-
-
-	
 };

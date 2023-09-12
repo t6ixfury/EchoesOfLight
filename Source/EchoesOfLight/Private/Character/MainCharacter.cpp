@@ -16,6 +16,8 @@ AMainCharacter::AMainCharacter()
 	ClosestDistance = 100;
 	hasTargetEnemy = false;
 
+	TimeTillDamagable = 0.35f;
+
 	//InventoryComponent = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory"));
 	MainWidgetHandlerComponent = CreateDefaultSubobject<UAC_MainWidgetHandler>(TEXT("Main Widget Handler"));
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
@@ -33,7 +35,6 @@ void AMainCharacter::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Inventory components presence"));
 	}
 	*/
-	
 }
 
 void AMainCharacter::ClosestEnemy(AEnemyCharacter* enemyActor)
@@ -77,11 +78,24 @@ void AMainCharacter::Heal_Implementation(float amount)
 
 bool AMainCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
 {
+	bool hasTakenDamage = false;
+	if (DamageSystem && !DamageSystem->bisInvincible)
+	{
+		hasTakenDamage = DamageSystem->TakeDamage(DamageInfo);
+		DamageSystem->bisInvincible = true;
+		GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::SetDamagable, TimeTillDamagable, false);
+
+
+	}
+	return hasTakenDamage;
+}
+
+void AMainCharacter::SetDamagable()
+{
 	if (DamageSystem)
 	{
-		return DamageSystem->TakeDamage(DamageInfo);
+		DamageSystem->bisInvincible = false;
 	}
-	return false;
 }
 
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//

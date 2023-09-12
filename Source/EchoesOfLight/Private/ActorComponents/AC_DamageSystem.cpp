@@ -16,6 +16,7 @@ UAC_DamageSystem::UAC_DamageSystem()
 	bisBlocking = false;
 	bisInterruptible = false;
 	bisInterruptible = false;
+	bisInvincible = false;
 	bCanBeParried = false;
 	DamageState = E_Damage_State::None;
 
@@ -62,7 +63,7 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 
 		if (newHealth <= 0)
 		{
-
+			UE_LOG(LogTemp, Warning, TEXT("inside health check"));
 			bisDead = true;
 			On_Death.Broadcast();
 		}
@@ -119,4 +120,5 @@ float UAC_DamageSystem::SetHealth(float amount)
 
 	return Health;
 }
+
 

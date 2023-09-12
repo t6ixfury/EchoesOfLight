@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Enums/E_EnemyStates.h"
 #include "Interfaces/Interface_Damagable.h"
 #include "Interfaces/Interface_EnemyAi.h"
 #include "EnemyCharacter.generated.h"
@@ -20,6 +21,25 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UAC_DamageSystem* DamageSystem;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage State")
+		E_EnemyDamageStates CurrentDamageState;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		FTimerHandle AttackTimer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		FTimerHandle DeathTimer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		float TimeTillDamagable;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage properties")
+		float NormalAttackDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montages")
+		class UAnimMontage* DeathMontage;
+		
 
 protected:
 	// Called when the game starts or when spawned
@@ -59,6 +79,20 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
 		float NormalAttack(class UAnimMontage* MontageToPlay);
 		virtual float NormalAttack_Implementation(class UAnimMontage* MontageToPlay) override;
+
+		UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
+			void Death();
+			virtual void Death_Implementation() override;
+
+
+private:
+
+	//This function set the bisInvincible variable in damage system back to false;
+	UFUNCTION()
+		void SetDamagable();
+
+	UFUNCTION()
+		void RemoveActor();
 
 
 };

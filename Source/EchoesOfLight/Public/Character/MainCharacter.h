@@ -32,6 +32,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 		bool hasTargetEnemy;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		FTimerHandle AttackTimer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		float TimeTillDamagable;
+
 
 // For Functions
 public:	
@@ -66,4 +72,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
 		bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo);
 		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
+
+private:
+
+	void SetDamagable();
 };
