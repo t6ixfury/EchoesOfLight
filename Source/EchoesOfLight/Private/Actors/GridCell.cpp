@@ -10,9 +10,6 @@ AGridCell::AGridCell()
 
 	CellSize = 0;
 
-	IsCellOccupied = false;
-
-
 }
 
 

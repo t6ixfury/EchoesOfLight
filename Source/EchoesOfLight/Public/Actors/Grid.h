@@ -6,12 +6,41 @@
 #include "GameFramework/Actor.h"
 #include "Grid.generated.h"
 
-class AGridCell;
+
+
+USTRUCT()
+struct FGridCellAttributes
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+		int32 x = 0;
+
+	UPROPERTY()
+		int32 y = 0;
+
+	UPROPERTY()
+		int32 z = 0;
+
+	UPROPERTY()
+		bool bIsCellOccupied = false;
+
+	UPROPERTY()
+		FVector CellPositionInWorld = FVector(x, y, z);
+
+	UPROPERTY()
+		FVector CellPositionToSpawnInTheLevel = FVector((CellPositionInWorld.X -400), (CellPositionInWorld.Y - 400), z);
+
+	UPROPERTY()
+		class ADungeonGridCell* Cell;
+
+};
 
 UCLASS()
 class ECHOESOFLIGHT_API AGrid : public AActor
 {
 	GENERATED_BODY()
+
 
 //FOR VARIABLES
 public:
@@ -28,12 +57,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid Properties")
 		int32 NumberOfGridCells;
 
-
-		TArray<TArray<AGridCell*>> GridCellArray;
-
-
 	UPROPERTY(EditAnywhere, Category = "Grid")
-		class UStaticMesh* GridCellMesh;
+		TArray<FGridCellAttributes> Grid;
+
 
 
 // FOR FUNCTIONS

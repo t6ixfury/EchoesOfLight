@@ -4,6 +4,7 @@
 #include "Actors/Grid.h"
 #include "Actors/GridCell.h"
 #include "Engine/StaticMesh.h"
+#include "Actors/Dungeon/DungeonGridCell.h"
 
 
 // Sets default values
@@ -14,14 +15,15 @@ AGrid::AGrid()
 	GridHeight = 0;
 	GridWidth = 0;
 	GridSize = 0;
-	NumberOfGridCells = 5;
+	NumberOfGridCells = 0;
+	FGridCellAttributes defaultAttributes;
+	Grid.Init(defaultAttributes, NumberOfGridCells);
 
 }
 
 void AGrid::BeginPlay()
 {
 	Super::BeginPlay();
-	CreateGrid(100);
 }
 
 void AGrid::CreateGrid(int32 CellSize)
@@ -30,18 +32,16 @@ void AGrid::CreateGrid(int32 CellSize)
 	{
 		for (int j = 0; j < NumberOfGridCells; j++)
 		{
-			FVector CellPosition = FVector(i * CellSize, j * CellSize, 0);
-			UE_LOG(LogTemp, Warning, TEXT("CellPosition: X=%f, Y=%f, Z=%f"), CellPosition.X, CellPosition.Y, CellPosition.Z);
-			AGridCell* GridCell = GetWorld()->SpawnActor<AGridCell>(CellPosition, FRotator::ZeroRotator);
-			UStaticMeshComponent* MeshComponent = NewObject<UStaticMeshComponent>(GridCell);
-			MeshComponent->RegisterComponent();
-			GridCell->AddOwnedComponent(MeshComponent);
-			MeshComponent->SetVisibility(true);
-			MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			MeshComponent->SetStaticMesh(GridCellMesh);
-			MeshComponent->SetRelativeScale3D(FVector(CellSize, CellSize, 1));
-			GridCell->SetRootComponent(MeshComponent);
-			GridCell->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+			Grid[i].x = i * CellSize;
+
+			Grid[i].y = i * CellSize;
+
+			Grid[i].z = 0;
+
+			Grid[i].bIsCellOccupied = false;
+
+			Grid[i].Cell = nullptr;
+
 
 		}
 	}

@@ -3,3 +3,8 @@
 
 #include "Actors/Dungeon/DungeonGridCell.h"
 
+ADungeonGridCell::ADungeonGridCell()
+{
+	CellSize = 800;
+}
+

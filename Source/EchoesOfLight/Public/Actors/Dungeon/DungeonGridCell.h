@@ -13,5 +13,10 @@ UCLASS()
 class ECHOESOFLIGHT_API ADungeonGridCell : public AGridCell
 {
 	GENERATED_BODY()
+
+public:
+
+	ADungeonGridCell();
+
 	
 };

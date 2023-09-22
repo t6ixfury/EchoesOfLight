@@ -19,15 +19,8 @@ public:
 		int32 CellSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grid Cell Properties")
-		bool IsCellOccupied;
+		FGridCellProperties CellProperties;
 
-	FGridCellProperties Leftside;
-
-	FGridCellProperties RightSide;
-
-	FGridCellProperties TopSide;
-
-	FGridCellProperties BottomSide;
 
 
 
