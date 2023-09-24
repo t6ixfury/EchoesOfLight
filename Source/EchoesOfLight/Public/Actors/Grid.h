@@ -14,25 +14,44 @@ struct FGridCellAttributes
 	GENERATED_BODY()
 
 	UPROPERTY()
-		int32 x = 0;
+		int32 UniqueID = 0;
 
 	UPROPERTY()
-		int32 y = 0;
+		float x = 0;
 
 	UPROPERTY()
-		int32 z = 0;
+		float y = 0;
+
+	UPROPERTY()
+		float z = 0;
 
 	UPROPERTY()
 		bool bIsCellOccupied = false;
 
 	UPROPERTY()
-		FVector CellPositionInWorld = FVector(x, y, z);
+		bool bIsBorderCell = false;
 
 	UPROPERTY()
-		FVector CellPositionToSpawnInTheLevel = FVector((CellPositionInWorld.X -400), (CellPositionInWorld.Y - 400), z);
+		FVector CellPositionInWorld;
+
+	UPROPERTY()
+		FVector CellPositionToSpawnInTheLevel;
+
 
 	UPROPERTY()
 		class ADungeonGridCell* Cell;
+
+	bool operator==(const FGridCellAttributes& Other) const
+	{
+		// Compare based on UniqueID
+		return UniqueID == Other.UniqueID;
+	}
+
+	FGridCellAttributes()
+	{
+		CellPositionInWorld = FVector(x, y, z);
+		CellPositionToSpawnInTheLevel = FVector(x - 400, y - 400, 0);
+	}
 
 };
 
@@ -60,6 +79,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Grid")
 		TArray<FGridCellAttributes> Grid;
 
+	UPROPERTY(EditAnywhere, Category = "Grid")
+		TArray<FGridCellAttributes> Grid_SpawnAble;
+
+
 
 
 // FOR FUNCTIONS
@@ -71,6 +94,6 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = "TEST")
-	void CreateGrid(int32 CellSize);
+	void CreateGrid(float cellsize);
 
 };

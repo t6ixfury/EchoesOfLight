@@ -5,6 +5,7 @@
 
 ADungeonGridCell::ADungeonGridCell()
 {
+	ProbabilityToBeSpawn = 0.f;
 	CellSize = 800;
 }
 

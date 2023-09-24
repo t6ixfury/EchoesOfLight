@@ -13,7 +13,7 @@ class ADungeonGridCell;
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class ECHOESOFLIGHT_API AProceduralDungeon : public AGrid
 {
 	GENERATED_BODY()
@@ -24,21 +24,20 @@ class ECHOESOFLIGHT_API AProceduralDungeon : public AGrid
 public:
 
 	//Array containing the types of hallways to be placed and is set in blueprints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Cell Properties")
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
 		TArray<TSubclassOf<ADungeonGridCell>> Hallways;
 
 	//Array containing the types of MainRooms to be placed and is set in blueprints
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Cell Properties")
+	UPROPERTY(VisibleAnyWhere, BlueprintReadonly, Category = "Dungeon Cell Properties")
 		TArray<TSubclassOf<ADungeonGridCell>> MainRooms;
 
 	//Set the size of the grid like so (GridCellSize X GridCellSize)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
-		int32 GridCellSize;
+		float GridCellSize;
 
 	//this array gets the name of the Main rooms in the order they are in and will be set in blueprints.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
 		TArray<FName> MainRooms_ClassName;
-
 
 
 
@@ -49,29 +48,30 @@ public:
 
 
 	AProceduralDungeon();
+
+	virtual void BeginPlay() override;
 	
 	UFUNCTION()
-	bool PlaceMainRoom();
+		bool PlaceMainRoom(int32 RoomsToSpawn);
 
 	UFUNCTION()
-	void SpawnRoomDungeonCell(FGridCellAttributes GridCellToInitialize);
+		int32 SpawnRoomDungeonCell(FGridCellAttributes& GridCellToInitialize, TSubclassOf<ADungeonGridCell> RoomClassToSpawn);
 
 	UFUNCTION()
-	void InitializeDungeonCell(FGridCellAttributes GridCell);
+		void InitializeDungeonCell(FGridCellAttributes &GridCell);
 
+	UFUNCTION()
+		void SetMainRoomsAndHallways();
 
+	void TestGridValues();
 
-//FOR STRUCTS
-public:
+	UFUNCTION()
+	TSubclassOf<ADungeonGridCell> ChooseRoomToSpawn();
 
-	struct DoorCoordinates
-	{
-		Coordinate x = 0;
+	UFUNCTION()
+		FGridCellAttributes ChooseGridToSpawnRoom();
 
-		Coordinate y = 0;
-
-		Coordinate z = 0;
-
-	};
+	UFUNCTION()
+		bool CanRoomBeSpawned(TSubclassOf<ADungeonGridCell> RoomToSpawn, FGridCellAttributes& GridCell);
 
 };
