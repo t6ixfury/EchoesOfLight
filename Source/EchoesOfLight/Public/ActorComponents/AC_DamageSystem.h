@@ -61,6 +61,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool TakeDamage(struct FS_DamageInfo DamageInfo);
 
+	//void ApplyDamage(struct FS_DamageInfo DamageInfo);
+
 private:
 	E_Damage_State CanBeDamaged(bool shouldDamageInvincible, bool canBeBlocked);
 

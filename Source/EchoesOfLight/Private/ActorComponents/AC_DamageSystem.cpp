@@ -53,7 +53,7 @@ float UAC_DamageSystem::Heal(float amount)
 
 bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 {
-	CanBeDamaged(DamageInfo.bShouldDamageInvincible, DamageInfo.bCanBeBlocked);
+	DamageState = CanBeDamaged(DamageInfo.bShouldDamageInvincible, DamageInfo.bCanBeBlocked);
 	
 	switch (DamageState)
 	{
@@ -90,6 +90,7 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 
 
 }
+
 
 E_Damage_State UAC_DamageSystem::CanBeDamaged(bool shouldDamageInvincible, bool canBeBlocked)
 {

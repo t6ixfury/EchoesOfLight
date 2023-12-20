@@ -10,11 +10,13 @@ typedef int32 Coordinate;
 
 class ADungeonGridCell;
 
+class AGrid;
+
 /**
  * 
  */
 UCLASS(Blueprintable, BlueprintType)
-class ECHOESOFLIGHT_API AProceduralDungeon : public AGrid
+class ECHOESOFLIGHT_API AProceduralDungeon : public AActor
 {
 	GENERATED_BODY()
 
@@ -24,12 +26,15 @@ class ECHOESOFLIGHT_API AProceduralDungeon : public AGrid
 public:
 
 	//Array containing the types of hallways to be placed and is set in blueprints
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dungeon Cell Properties")
 		TArray<TSubclassOf<ADungeonGridCell>> Hallways;
 
 	//Array containing the types of MainRooms to be placed and is set in blueprints
-	UPROPERTY(VisibleAnyWhere, BlueprintReadonly, Category = "Dungeon Cell Properties")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dungeon Cell Properties")
 		TArray<TSubclassOf<ADungeonGridCell>> MainRooms;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Dungeon Cell Properties")
+		TArray<ADungeonGridCell*> roomOnGrid;
 
 	//Set the size of the grid like so (GridCellSize X GridCellSize)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
@@ -38,6 +43,20 @@ public:
 	//this array gets the name of the Main rooms in the order they are in and will be set in blueprints.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
 		TArray<FName> MainRooms_ClassName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Cell Properties")
+		int32 RoomSpacing;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
+		AGrid* DungeonGrid;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
+		float gridSize;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid")
+		int32 numberOfRoomsToSpawn;
+
+
 
 
 
@@ -50,28 +69,31 @@ public:
 	AProceduralDungeon();
 
 	virtual void BeginPlay() override;
-	
-	UFUNCTION()
-		bool PlaceMainRoom(int32 RoomsToSpawn);
-
-	UFUNCTION()
-		int32 SpawnRoomDungeonCell(FGridCellAttributes& GridCellToInitialize, TSubclassOf<ADungeonGridCell> RoomClassToSpawn);
-
-	UFUNCTION()
-		void InitializeDungeonCell(FGridCellAttributes &GridCell);
-
-	UFUNCTION()
-		void SetMainRoomsAndHallways();
 
 	void TestGridValues();
 
-	UFUNCTION()
-	TSubclassOf<ADungeonGridCell> ChooseRoomToSpawn();
+	void DrawOccupiedCells();
+
 
 	UFUNCTION()
-		FGridCellAttributes ChooseGridToSpawnRoom();
+		void SetMainRoomsAndHallways();
+	
+	UFUNCTION()
+		TSubclassOf<ADungeonGridCell> MainRoomToSpawn();
 
 	UFUNCTION()
-		bool CanRoomBeSpawned(TSubclassOf<ADungeonGridCell> RoomToSpawn, FGridCellAttributes& GridCell);
+		void PlaceRoomsOnGrid();
+
+	UFUNCTION()
+		void SpawnRoom(TSubclassOf<ADungeonGridCell> roomToSpawn, FGridCellAttributes currentCell);
+
+	UFUNCTION()
+		int32 GridCellToSpawnOn(TSubclassOf<ADungeonGridCell> roomToSpawn);
+
+	UFUNCTION()
+		bool CanRoomFitAtGridCell(TSubclassOf<ADungeonGridCell> roomToSpawn, int32 index);
+
+	UFUNCTION()
+		void MarkCellsAsUsed(TSubclassOf<ADungeonGridCell> roomToSpawn, int32 index);
 
 };

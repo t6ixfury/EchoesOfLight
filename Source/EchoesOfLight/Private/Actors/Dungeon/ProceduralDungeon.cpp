@@ -3,108 +3,36 @@
 
 #include "Actors/Dungeon/ProceduralDungeon.h"
 #include "Actors/Dungeon/DungeonGridCell.h"
+#include "DrawDebugHelpers.h"
 #include "Math/UnrealMathUtility.h"
+#include "Actors/Grid.h"
 
 
 
 //Constructor Function.
 AProceduralDungeon::AProceduralDungeon()
 {
-	NumberOfGridCells = 50;
-	GridCellSize = 800.f;
+	RoomSpacing = 1;
+	numberOfRoomsToSpawn = FMath::RandRange(7, 10);
+	gridSize = 50;
 	SetMainRoomsAndHallways();
-	CreateGrid(GridCellSize);
-	Grid_SpawnAble = Grid;
-	//PlaceMainRoom(8);
-	//TestGridValues();
-
+	DungeonGrid = CreateDefaultSubobject<AGrid>(TEXT("Dungeon Grid"));
+	DungeonGrid->SetGridSize(gridSize);
+	DungeonGrid->CreateGrid();
+	GridCellSize = DungeonGrid->GetGridCellSize();
 }
 
 void AProceduralDungeon::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlaceRoomsOnGrid();
+
+	DrawOccupiedCells();
+//	TestGridValues();
 }
 
-// Randomly Places rooms through dungeon grid.
-bool AProceduralDungeon::PlaceMainRoom(int32 RoomsToSpawn)
-{
-	bool bisRoomsPlaced = false;
-	int32 Attempts = 50;
 
-	int32 SpawnedRooms = 0;
-
-
-	while (SpawnedRooms <= RoomsToSpawn)
-	{
-		TSubclassOf<ADungeonGridCell> ChosenRoom = ChooseRoomToSpawn();
-
-		FGridCellAttributes ChosenGridCell = ChooseGridToSpawnRoom();
-
-		if (CanRoomBeSpawned(ChosenRoom, ChosenGridCell))
-		{
-			SpawnedRooms += SpawnRoomDungeonCell(ChosenGridCell, ChosenRoom);
-			InitializeDungeonCell(ChosenGridCell);
-		}
-
-		else
-		{
-			Attempts--;
-		}
-		Attempts--;
-	}
-
-	if (RoomsToSpawn == 0)
-	{
-		bisRoomsPlaced = true;
-	}
-	
-	return bisRoomsPlaced;
-
-}
-
-// Spawns the ADungeonCell Actor and passes the reference to the grid of whats occupying the cell.
-int32 AProceduralDungeon::SpawnRoomDungeonCell(FGridCellAttributes &GridCellToInitialize, TSubclassOf<ADungeonGridCell> RoomClassToSpawn)
-{
-	int32 roomSpawned = 0;
-
-	UWorld* level = GetWorld();
-
-	if ((level != nullptr) && (RoomClassToSpawn != nullptr))
-	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
-
-		// spawn needs to be changed to the bp class of the main room.
-		ADungeonGridCell* NewDungeonCell = level->SpawnActor<ADungeonGridCell>(RoomClassToSpawn, GridCellToInitialize.CellPositionToSpawnInTheLevel, FRotator(0, 0, 0), SpawnParams);
-
-		GridCellToInitialize.Cell = NewDungeonCell;
-
-		roomSpawned = 1;
-	}
-	
-	return roomSpawned;
-}
-//This function sets the reference of the edge locations for the grid to the cell.
-void AProceduralDungeon::InitializeDungeonCell(FGridCellAttributes &GridCell)
-{
-	if (GridCell.Cell)
-	{
-		FVector Location = GridCell.CellPositionInWorld;
-
-		GridCell.Cell->CellProperties.Top_EdgeLocation.Start = FVector(Location.X, Location.Y, 0);
-		GridCell.Cell->CellProperties.Top_EdgeLocation.End = FVector((Location.X + 1), Location.Y, 0);
-
-		GridCell.Cell->CellProperties.Bottom_EdgeLocation.Start = FVector(Location.X, (Location.Y + GridCellSize), 0);
-		GridCell.Cell->CellProperties.Bottom_EdgeLocation.End = FVector((Location.X + 1), (Location.Y +GridCellSize), 0);
-
-		GridCell.Cell->CellProperties.Left_EdgeLocation.Start = FVector(Location.X, Location.Y, 0);
-		GridCell.Cell->CellProperties.Left_EdgeLocation.End = FVector(Location.X, (Location.Y + GridCellSize), 0);
-
-		GridCell.Cell->CellProperties.Right_EdgeLocation.Start = FVector((Location.X + 1), Location.Y, 0);
-		GridCell.Cell->CellProperties.Right_EdgeLocation.End = FVector((Location.X + 1), (Location.Y + GridCellSize), 0);
-	}
-}
 
 // Set the Values for the Hallways and MainRooms array.
 void AProceduralDungeon::SetMainRoomsAndHallways()
@@ -115,7 +43,7 @@ void AProceduralDungeon::SetMainRoomsAndHallways()
 	//Adds the bp_hallway
 	static ConstructorHelpers::FClassFinder<ADungeonGridCell> HallwayBPClass(TEXT("/Game/Dungeon/Dungeon_Pieces/Hallways(1x1)/BP_Hallway.BP_Hallway_C"));
 	if (HallwayBPClass.Succeeded())
-	{
+	{	
 		Hallways.Add(HallwayBPClass.Class);
 	}
 	//addsthe bp_rightturn hallway
@@ -240,159 +168,194 @@ void AProceduralDungeon::SetMainRoomsAndHallways()
 
 }
 
+//Selects a room to spawn out of the MainRooms
+TSubclassOf<ADungeonGridCell> AProceduralDungeon::MainRoomToSpawn()
+{
+	int32 index = FMath::RandRange(0, MainRooms.Num() - 1);
+
+	return MainRooms[index];
+}
+
+void AProceduralDungeon::PlaceRoomsOnGrid()
+{
+	int32 attempts = 50;
+
+	//UE_LOG(LogTemp, Warning, TEXT("index: %d"), index);
+
+	while (numberOfRoomsToSpawn > 0 && attempts > 0)
+	{
+		TSubclassOf<ADungeonGridCell> roomToSpawn = MainRoomToSpawn();
+
+		int32 index = GridCellToSpawnOn(roomToSpawn);
+
+		if (index != -1)
+		{
+			SpawnRoom(roomToSpawn, DungeonGrid->Grid[index]);
+			numberOfRoomsToSpawn--;
+		}
+
+		attempts--;
+	}
+	
+}
+
+void AProceduralDungeon::SpawnRoom(TSubclassOf<ADungeonGridCell> roomToSpawn, FGridCellAttributes currentCell)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return; // or handle the error
+	}
+
+	
+	if (roomToSpawn)
+	{
+		FActorSpawnParameters spawnParameter;
+
+		spawnParameter.Owner = this;
+
+		currentCell.Cell = World->SpawnActor<ADungeonGridCell>(roomToSpawn, currentCell.CellPositionToSpawnInTheLevel, FRotator(0, 0, 0), spawnParameter);
+	}
+
+}
+
+int32 AProceduralDungeon::GridCellToSpawnOn(TSubclassOf<ADungeonGridCell> roomToSpawn)
+{
+	int32 index = FMath::RandRange(0, DungeonGrid->Grid.Num() - 1);
+
+
+
+	bool hasIndex = true;
+
+	int32 attempts = 1000;
+
+
+	while (hasIndex)
+	{
+		if (CanRoomFitAtGridCell(roomToSpawn, index))
+		{
+			MarkCellsAsUsed(roomToSpawn, index);
+
+			return index;
+		}
+		else
+		{
+			index = FMath::RandRange(0, DungeonGrid->Grid.Num() - 1);
+		}
+
+		if (attempts < 0)
+		{
+			hasIndex = false;
+		}
+
+		attempts--;
+	}
+	return -1;
+}
+
+bool AProceduralDungeon::CanRoomFitAtGridCell(TSubclassOf<ADungeonGridCell> roomToSpawn, int32 index)
+{
+	if (DungeonGrid->Grid[index].bIsCellOccupied || index < 0 || index > DungeonGrid->Grid.Num())
+	{
+		return false;
+	}
+
+
+	if (roomToSpawn)
+	{
+		ADungeonGridCell* roomToPlace = roomToSpawn->GetDefaultObject<ADungeonGridCell>();
+
+
+		if (roomToPlace)
+		{
+
+			int32 width = roomToPlace->Room_X_Dimensions + RoomSpacing;
+			int32 length = roomToPlace->Room_Y_Dimensions + RoomSpacing;
+
+			int32 indexRef = index;
+
+			for (int32 w = 0; w < width; w++)
+			{
+				for (int32 l = 0; l < length; l++)
+				{
+					if ((indexRef > DungeonGrid->Grid.Num() - 1 || indexRef < 0) || DungeonGrid->Grid[indexRef].bIsCellOccupied || (DungeonGrid->Grid[indexRef].bIsBorderCell && (l + 1) < length))
+					{
+						return false;
+					}
+					indexRef++; // move to the next cell in the same column
+				}
+				indexRef += 50 - length; // move to the starting cell of the next column
+			}
+
+		}
+	}
+
+	return true;
+}
+
+void AProceduralDungeon::MarkCellsAsUsed(TSubclassOf<ADungeonGridCell> roomToSpawn, int32 index)
+{
+	if (roomToSpawn)
+	{
+		ADungeonGridCell* roomToPlace = roomToSpawn->GetDefaultObject<ADungeonGridCell>();
+
+
+		if (roomToPlace)
+		{
+
+			int32 width = roomToPlace->Room_X_Dimensions + RoomSpacing;
+			int32 length = roomToPlace->Room_Y_Dimensions + RoomSpacing;
+
+			int32 indexRef = index;
+
+			for (int32 w = 0; w < width; w++)
+			{
+				for (int32 l = 0; l < length; l++)
+				{
+					DungeonGrid->Grid[indexRef].bIsCellOccupied = true;
+					indexRef++; // move to the next cell in the same column
+				}
+				indexRef += 50 - length; // move to the starting cell of the next column
+			}
+		}
+	}
+}
 void AProceduralDungeon::TestGridValues()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Grid Size: %f"), Grid.Num());
 
-	for (int i = 0; i < Grid.Num(); i++)
+	for (int i = 0; i < DungeonGrid->Grid.Num(); i++)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Grid X: %f"), Grid[i].x);
 		//UE_LOG(LogTemp, Warning, TEXT("Grid Y: %f"), Grid[i].y);
 		//UE_LOG(LogTemp, Warning, TEXT("Grid Z: %f"), Grid[i].z);
-		//UE_LOG(LogTemp, Warning, TEXT("Grid  X = %f, Y = %f, Z = %f"), Grid[i].CellPositionToSpawnInTheLevel.X, Grid[i].CellPositionToSpawnInTheLevel.Y, Grid[i].CellPositionToSpawnInTheLevel.Z);
+		UE_LOG(LogTemp, Warning, TEXT("Grid  X = %f, Y = %f, Z = %f"), DungeonGrid->Grid[i].CellPositionToSpawnInTheLevel.X, DungeonGrid->Grid[i].CellPositionToSpawnInTheLevel.Y, DungeonGrid->Grid[i].CellPositionToSpawnInTheLevel.Z);
 
-		if (Grid[i].bIsBorderCell)
+		UE_LOG(LogTemp, Warning, TEXT("Cell Occupied State: %s"), DungeonGrid->Grid[i].bIsCellOccupied ? TEXT("True") : TEXT("False"));
+
+
+		if (DungeonGrid->Grid[i].bIsBorderCell)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Grid border: %d"), i);
 		}
 	}
 }
 
-TSubclassOf<ADungeonGridCell> AProceduralDungeon::ChooseRoomToSpawn()
+
+void AProceduralDungeon::DrawOccupiedCells()
 {
-	int32 RandomValue = FMath::RandRange(0, MainRooms.Num() - 1);
+	if (!DungeonGrid) return;  // Ensure DungeonGrid is valid
 
-	return MainRooms[RandomValue];
-}
+	const float SphereRadius = 50.0f;  // Adjust this value as needed
+	const FColor SphereColor = FColor::Red;
+	const float Duration = 30.0f;  // How long the sphere will be visible
 
-FGridCellAttributes AProceduralDungeon::ChooseGridToSpawnRoom()
-{
-	int32 RandomValue = FMath::RandRange(0, Grid_SpawnAble.Num() - 1);
-
-	return Grid_SpawnAble[RandomValue];
-}
-//This Function check if the grid cell chosen can have the room that was chosen spawn by checking the space the room takes up is available.
-bool AProceduralDungeon::CanRoomBeSpawned(TSubclassOf<ADungeonGridCell> RoomToSpawn, FGridCellAttributes &GridCell)
-{
-	bool bCanSpawnRoom = false;
-	const ADungeonGridCell* Room = GetDefault<ADungeonGridCell>(RoomToSpawn);
-
-	int32 IndexOfGridCell = Grid.Find(GridCell);
-
-	if (Room)
+	for (int32 i = 0; i < DungeonGrid->Grid.Num(); i++)
 	{
-		//If the the room is only 1 grid in size return true
-		if (!Room->CellProperties.bDoesTakeMultipleCells)
+		if (DungeonGrid->Grid[i].bIsCellOccupied)
 		{
-			GridCell.bIsCellOccupied = true;
-			bCanSpawnRoom = true;
-			return bCanSpawnRoom;
+			FVector CellLocation = DungeonGrid->Grid[i].CellPositionToSpawnInTheLevel;  // Assuming your grid cells have a Location member variable
+			DrawDebugSphere(GetWorld(), CellLocation, SphereRadius, 12, SphereColor, false, Duration);
 		}
-		//if the room takes multiple grids and the grid cell chosen is a border cell returns false
-		else if(Room->CellProperties.bDoesTakeMultipleCells && GridCell.bIsBorderCell)
-		{
-			bCanSpawnRoom = false;
-			return bCanSpawnRoom;
-		}
-		else
-		{
-			bCanSpawnRoom = true;
-			// Start checking in the x direction going to the left of the possible spawn grid cell.
-			for (int i = 0; i < Room->CellProperties.Room_X_Dimensions; i++)
-			{
-				//moves the index to the left by 1 grid cell size
-				int32 newIndex = IndexOfGridCell - (NumberOfGridCells * i);
-
-				//makes sure the index is inbounds of the grid array
-				if ((newIndex > Grid.Num()) && (newIndex < 0))
-				{
-					bCanSpawnRoom = false;
-					return bCanSpawnRoom;
-				}
-				else
-				{
-					// if the grid cell is occupied it returns false.
-					if (Grid[newIndex].bIsCellOccupied)
-					{
-						bCanSpawnRoom = false;
-						return bCanSpawnRoom;
-					}
-				}
-
-				for (int j = 0; i < Room->CellProperties.Room_Y_Dimensions; j++)
-				{
-					//moves the index up by 1 grid cell
-					int32 newY_Index = newIndex - j;
-
-					//makes sure the index is inbounds of the grid arra
-					if ((newY_Index > Grid.Num()) && (newY_Index < 0))
-					{
-						bCanSpawnRoom = false;
-						return bCanSpawnRoom;
-					}
-					else
-					{
-						// if the grid cell is occupied it returns false.
-						if (Grid[newIndex].bIsCellOccupied)
-						{
-							bCanSpawnRoom = false;
-							return bCanSpawnRoom;
-						}
-					}
-				}
-		
-			}
-
-		}
-		if (bCanSpawnRoom)
-		{
-			for (int i = 0; i < Room->CellProperties.Room_X_Dimensions; i++)
-			{
-				int32 newIndex = IndexOfGridCell - (NumberOfGridCells * i);
-
-				if ((newIndex > Grid.Num()) && (newIndex < 0))
-				{
-					bCanSpawnRoom = false;
-					return bCanSpawnRoom;
-				}
-				else
-				{
-					//if the cell is not occupied then set it to occupied and remove it from the possible spawning grid cells
-					if (Grid[newIndex].bIsCellOccupied == false)
-					{
-						Grid[newIndex].bIsCellOccupied = true;
-
-						Grid_SpawnAble.RemoveAt(newIndex);
-					}
-				}
-
-				for (int j = 0; i < Room->CellProperties.Room_Y_Dimensions; j++)
-				{
-					int32 newY_Index = newIndex - j;
-
-					if ((newY_Index > Grid.Num()) && (newY_Index < 0))
-					{
-						bCanSpawnRoom = false;
-						return bCanSpawnRoom;
-					}
-					else
-					{
-						//if the cell is not occupied then set it to occupied and remove it from the possible spawning grid cells
-						if (Grid[newY_Index].bIsCellOccupied == false)
-						{
-							Grid[newY_Index].bIsCellOccupied = true;
-
-							Grid_SpawnAble.RemoveAt(newY_Index);
-						}
-					}
-				}
-
-			}
-		}
-
-
 	}
-
-	return bCanSpawnRoom;
 }
-

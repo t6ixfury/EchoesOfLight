@@ -7,7 +7,7 @@
 #include "Structures/GridEdgeProperties.h"
 #include "GridCell.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class ECHOESOFLIGHT_API AGridCell : public AActor
 {
 	GENERATED_BODY()

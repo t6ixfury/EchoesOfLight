@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Structures/GridEdgeProperties.h"
 #include "Grid.generated.h"
 
 
@@ -32,7 +33,17 @@ struct FGridCellAttributes
 		bool bIsBorderCell = false;
 
 	UPROPERTY()
-		FVector CellPositionInWorld;
+		FEdgePoints Left_EdgeLocation;
+
+	UPROPERTY()
+		FEdgePoints Right_EdgeLocation;
+
+	UPROPERTY()
+		FEdgePoints Top_EdgeLocation;
+
+	UPROPERTY()
+		FEdgePoints Bottom_EdgeLocation;
+
 
 	UPROPERTY()
 		FVector CellPositionToSpawnInTheLevel;
@@ -49,8 +60,7 @@ struct FGridCellAttributes
 
 	FGridCellAttributes()
 	{
-		CellPositionInWorld = FVector(x, y, z);
-		CellPositionToSpawnInTheLevel = FVector(x - 400, y - 400, 0);
+		CellPositionToSpawnInTheLevel = FVector(x, y, z);
 	}
 
 };
@@ -64,25 +74,19 @@ class ECHOESOFLIGHT_API AGrid : public AActor
 //FOR VARIABLES
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid Properties")
-		int32 GridWidth;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid Properties")
-		int32 GridHeight;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid Properties")
-		int32 GridSize;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Grid Properties")
-		int32 NumberOfGridCells;
-
 	UPROPERTY(EditAnywhere, Category = "Grid")
 		TArray<FGridCellAttributes> Grid;
 
-	UPROPERTY(EditAnywhere, Category = "Grid")
-		TArray<FGridCellAttributes> Grid_SpawnAble;
+	//UPROPERTY(EditAnywhere, Category = "Grid")
+		//TArray<FGridCellAttributes> Grid_SpawnAble;
 
+private:
 
+	UPROPERTY(VisibleAnywhere, Category = "Grid Properties")
+		int32 NumberOfGridCells;
+
+	UPROPERTY(VisibleAnywhere, Category = "Grid Properties")
+		float GridCellSize;
 
 
 // FOR FUNCTIONS
@@ -93,7 +97,15 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable, Category = "TEST")
-	void CreateGrid(float cellsize);
+	UFUNCTION()
+	void CreateGrid();
+
+	UFUNCTION()
+	void SetGridSize(int32 gridsize);
+
+	UFUNCTION()
+	float GetGridCellSize() { return GridCellSize;};
+
+	bool isTopBorderCell(int x);
 
 };

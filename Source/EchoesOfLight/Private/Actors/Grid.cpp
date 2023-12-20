@@ -4,6 +4,7 @@
 #include "Actors/Grid.h"
 #include "Actors/GridCell.h"
 #include "Engine/StaticMesh.h"
+#include "DrawDebugHelpers.h"
 #include "Actors/Dungeon/DungeonGridCell.h"
 
 
@@ -11,12 +12,8 @@
 AGrid::AGrid()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	GridHeight = 0;
-	GridWidth = 0;
-	GridSize = 0;
 	NumberOfGridCells = 0;
-	Grid_SpawnAble = Grid;
+	GridCellSize = 800;
 	//FGridCellAttributes Attributes;
 	//Grid.Init(Attributes, (NumberOfGridCells*NumberOfGridCells));
 
@@ -27,35 +24,40 @@ void AGrid::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AGrid::CreateGrid(float cellsize)
+void AGrid::CreateGrid()
 {
 	Grid.Empty();
 
 	int32 GridCellIndex = 0;
+
+	UWorld* World = GetWorld();
 
 	for (int i = 0; i < NumberOfGridCells; i++)
 	{
 		for (int j = 0; j < NumberOfGridCells; j++)
 		{
 			Grid.Add(FGridCellAttributes());
-			
-			//UE_LOG(LogTemp, Warning, TEXT("Grid is %s"), Grid.IsEmpty() ? TEXT("empty") : TEXT("not empty"));
-			//UE_LOG(LogTemp, Warning, TEXT("Grid size: %d"), Grid.Num());
-			//UE_LOG(LogTemp, Warning, TEXT("index = : %d"), GridCellIndex);
 
+			Grid[GridCellIndex].x = i * GridCellSize;
 
-			//UE_LOG(LogTemp, Warning, TEXT("i = : %d"), i);
-			Grid[GridCellIndex].x = i * cellsize;
-			//UE_LOG(LogTemp, Warning, TEXT("x * i = : %d"), Grid[GridCellIndex].x);
-		//  UE_LOG(LogTemp, Warning, TEXT("j = : %d"), j);
-			Grid[GridCellIndex].y = j * cellsize;
-			//UE_LOG(LogTemp, Warning, TEXT("y * i = : %d"), Grid[GridCellIndex].y);
+			Grid[GridCellIndex].y = j * GridCellSize;
 
 			Grid[GridCellIndex].z = 0;
 
-			Grid[GridCellIndex].CellPositionToSpawnInTheLevel = FVector(Grid[GridCellIndex].x - 400, Grid[GridCellIndex].y - 400, Grid[GridCellIndex].z);
+			Grid[GridCellIndex].CellPositionToSpawnInTheLevel = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
 
-			Grid[GridCellIndex].CellPositionInWorld = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
+			Grid[GridCellIndex].Top_EdgeLocation.Start = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y + GridCellSize, Grid[GridCellIndex].z);
+			Grid[GridCellIndex].Top_EdgeLocation.End = FVector(Grid[GridCellIndex].x + GridCellSize + GridCellSize, Grid[GridCellIndex].y + GridCellSize, Grid[GridCellIndex].z);
+
+			Grid[GridCellIndex].Bottom_EdgeLocation.Start = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
+			Grid[GridCellIndex].Bottom_EdgeLocation.End = FVector(Grid[GridCellIndex].x + GridCellSize, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
+
+			Grid[GridCellIndex].Right_EdgeLocation.Start = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y + GridCellSize, Grid[GridCellIndex].z);
+			Grid[GridCellIndex].Right_EdgeLocation.End = FVector(Grid[GridCellIndex].x + GridCellSize, Grid[GridCellIndex].y + GridCellSize, Grid[GridCellIndex].z);
+
+			Grid[GridCellIndex].Left_EdgeLocation.Start = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
+			Grid[GridCellIndex].Left_EdgeLocation.End = FVector(Grid[GridCellIndex].x, Grid[GridCellIndex].y + GridCellSize, Grid[GridCellIndex].z);
+
 
 			Grid[GridCellIndex].bIsCellOccupied = false;
 
@@ -64,20 +66,41 @@ void AGrid::CreateGrid(float cellsize)
 			Grid[GridCellIndex].UniqueID = GridCellIndex;
 			
 			//This sets wether or not a grid is a border cell.
-			if (((j + 1) >= NumberOfGridCells) || (GridCellIndex < NumberOfGridCells) || (GridCellIndex % NumberOfGridCells == 0) || ((i + 1) >= NumberOfGridCells))
+			if ((GridCellIndex >= ((NumberOfGridCells * NumberOfGridCells) - NumberOfGridCells)) || (GridCellIndex < NumberOfGridCells) || (GridCellIndex % NumberOfGridCells == 0) || isTopBorderCell(GridCellIndex))
 			{
 				Grid[GridCellIndex].bIsBorderCell = true;
+
+				//UE_LOG(LogTemp, Warning, TEXT("Attribute FVector: X = %f, Y = %f, Z = %f"), Grid[GridCellIndex].x, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
 			}
 
-			//UE_LOG(LogTemp, Warning, TEXT("Attribute FVector: X = %f, Y = %f, Z = %f"), Grid[GridCellIndex].x, Grid[GridCellIndex].y, Grid[GridCellIndex].z);
+			if (World)
+			{
+				FVector BottomLeft = Grid[GridCellIndex].CellPositionToSpawnInTheLevel;
+				FVector BottomRight = BottomLeft + FVector(GridCellSize, 0, 0);
+				FVector TopLeft = BottomLeft + FVector(0, GridCellSize, 0);
+				FVector TopRight = BottomLeft + FVector(GridCellSize, GridCellSize, 0);
 
+				DrawDebugLine(World, BottomLeft, BottomRight, FColor::Green, true, -1, 0, 10);
+				DrawDebugLine(World, BottomLeft, TopLeft, FColor::Green, true, -1, 0, 10);
+				DrawDebugLine(World, TopLeft, TopRight, FColor::Green, true, -1, 0, 10);
+				DrawDebugLine(World, BottomRight, TopRight, FColor::Green, true, -1, 0, 10);
+			}
 			GridCellIndex++;
-
 		}
 	}
+	//Grid_SpawnAble = Grid;
 
 
 }
+
+void AGrid::SetGridSize(int32 gridsize)
+{
+	NumberOfGridCells = gridsize;
+}
+
+//UE_LOG(LogTemp, Warning, TEXT("Grid is %s"), Grid.IsEmpty() ? TEXT("empty") : TEXT("not empty"));
+//UE_LOG(LogTemp, Warning, TEXT("Grid size: %d"), Grid.Num());
+//UE_LOG(LogTemp, Warning, TEXT("index = : %d"), GridCellIndex);
 
 
 void AGrid::Tick(float DeltaTime)
@@ -86,3 +109,6 @@ void AGrid::Tick(float DeltaTime)
 
 }
 
+bool AGrid::isTopBorderCell(int x) {
+	return (x - (NumberOfGridCells-1)) % NumberOfGridCells == 0 && x >= (NumberOfGridCells-1) && x <= ((NumberOfGridCells*NumberOfGridCells)-1);
+}

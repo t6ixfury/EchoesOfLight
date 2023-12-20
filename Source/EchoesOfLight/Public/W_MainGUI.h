@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/Interface_Damagable.h"
 #include "Blueprint/UserWidget.h"
 #include "W_MainGUI.generated.h"
 
@@ -21,6 +22,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UW_Inventory* Inventory;
+
+	UPROPERTY(BlueprintReadOnly)
+		TScriptInterface<IInterface_Damagable> DamagableInterface;
 
 
 	

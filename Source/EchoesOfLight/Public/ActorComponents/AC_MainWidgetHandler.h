@@ -25,7 +25,10 @@ public:
 	// Sets default values for this component's properties
 	UAC_MainWidgetHandler();
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
+		TSubclassOf<UW_MainGUI> HealthBar;
+
+	UPROPERTY(BlueprintReadWrite)
 		UW_MainGUI* GUI;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -36,6 +39,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 		UW_PauseMenu* PauseMenu;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
+		TSubclassOf<AMainCharacter> CharacterClass ;
 
 	UPROPERTY(BlueprintReadOnly)
 		AMainCharacter* MainCharacter;

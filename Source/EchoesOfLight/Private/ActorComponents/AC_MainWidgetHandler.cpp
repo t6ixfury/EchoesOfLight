@@ -33,7 +33,7 @@ void UAC_MainWidgetHandler::CreateAllPlayerWidgets()
 {
 	InitializePlayer();
 	CreateMainWidget();
-	CreateInventoryWidget();
+	//CreateInventoryWidget();
 }
 
 // Called when the game starts
@@ -58,8 +58,9 @@ void UAC_MainWidgetHandler::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UAC_MainWidgetHandler::InitializePlayer()
 {
+
 	MainCharacter = Cast<AMainCharacter>(GetOwner());
-	
+	UE_LOG(LogTemp, Warning, TEXT("Maincharacter set"))
 	if (MainCharacter)
 	{
 		MainCharacterController = Cast<APlayerController>(MainCharacter->GetController());
@@ -69,9 +70,16 @@ void UAC_MainWidgetHandler::InitializePlayer()
 
 void UAC_MainWidgetHandler::CreateMainWidget()
 {
-	if (MainCharacterController)
+	if (MainCharacterController && HealthBar)
 	{
-		GUI = CreateWidget<UW_MainGUI>(MainCharacterController, UW_MainGUI::StaticClass());
+		GUI = CreateWidget<UW_MainGUI>(MainCharacterController, HealthBar);
+		if (GUI)
+		{
+			GUI->DamagableInterface = MainCharacter;
+			GUI->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("Gui added to view port"))
+		}
+
 	}
 }
 

@@ -31,6 +31,7 @@ void AMainCharacter::BeginPlay()
 	Super::BeginPlay();
 	/*
 	if (InventoryComponent)
+
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Inventory components presence"));
 	}
@@ -78,6 +79,7 @@ void AMainCharacter::Heal_Implementation(float amount)
 
 bool AMainCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Take Damage called main character."))
 	bool hasTakenDamage = false;
 	if (DamageSystem && !DamageSystem->bisInvincible)
 	{

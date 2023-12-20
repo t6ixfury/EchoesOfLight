@@ -17,25 +17,25 @@ public:
 	// Sets default values for this character's properties
 	AMainCharacter();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 		class UAC_MainWidgetHandler* MainWidgetHandlerComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		class UAC_DamageSystem* DamageSystem;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		float ClosestDistance;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		 AEnemyCharacter* TargetEnemy;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		bool hasTargetEnemy;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
 		FTimerHandle AttackTimer;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
 		float TimeTillDamagable;
 
 
@@ -56,6 +56,7 @@ public:
 /*
 	INTERFACES IMPLEMENTATION
 */
+	
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
 		float GetCurrentHealth();
@@ -73,6 +74,21 @@ public:
 		bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo);
 		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
 
+	/*
+	UFUNCTION()
+	virtual float GetCurrentHealth_Implementation() override;
+
+	UFUNCTION()
+	virtual float GetMaxHealth_Implementation() override;
+
+	UFUNCTION()
+	virtual void Heal_Implementation(float amount) override;
+
+	UFUNCTION()
+	virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
+	*/
+
+	/*DamageInterface end*/
 private:
 
 	void SetDamagable();

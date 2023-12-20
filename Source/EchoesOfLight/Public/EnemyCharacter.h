@@ -39,6 +39,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montages")
 		class UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
+		FS_DamageInfo BaseAttackInfo;
 		
 
 protected:
@@ -73,6 +76,8 @@ public:
 		bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo);
 		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
 
+
+
 	/*
 	ENEMYAI INTERFACE
 	*/
@@ -80,9 +85,13 @@ public:
 		float NormalAttack(class UAnimMontage* MontageToPlay);
 		virtual float NormalAttack_Implementation(class UAnimMontage* MontageToPlay) override;
 
-		UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-			void Death();
-			virtual void Death_Implementation() override;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
+		void Death();
+		virtual void Death_Implementation() override;
+
+
+		UFUNCTION()
+			void CapsuleTraceForEnemy();
 
 
 private:
