@@ -28,7 +28,6 @@ void UAC_DamageSystem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
 	
 }
 
@@ -64,7 +63,6 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 		if (newHealth <= 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("inside health check"));
-			bisDead = true;
 			On_Death.Broadcast();
 		}
 		else

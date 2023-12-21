@@ -34,11 +34,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
 		float TimeTillDamagable;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage properties")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Damage properties")
 		float NormalAttackDamage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Montages")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* BaseAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
 		FS_DamageInfo BaseAttackInfo;
@@ -82,16 +88,21 @@ public:
 	ENEMYAI INTERFACE
 	*/
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		float NormalAttack(class UAnimMontage* MontageToPlay);
-		virtual float NormalAttack_Implementation(class UAnimMontage* MontageToPlay) override;
+		float NormalAttack();
+	UFUNCTION()
+		virtual float NormalAttack_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
 		void Death();
+
+	UFUNCTION()
 		virtual void Death_Implementation() override;
 
+	UFUNCTION()
+		void CapsuleTraceForEnemy();
 
-		UFUNCTION()
-			void CapsuleTraceForEnemy();
+	UFUNCTION()
+		void SetDeath();
 
 
 private:

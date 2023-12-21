@@ -21,7 +21,7 @@ public:
 		 FS_DamageInfo BaseAttackInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
-		float BaseWeaponDamage = 10;
+		float BaseWeaponDamage = 50.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UAC_DamageSystem* DamageSystem;

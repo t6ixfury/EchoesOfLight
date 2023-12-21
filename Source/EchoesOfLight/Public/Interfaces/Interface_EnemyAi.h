@@ -24,7 +24,7 @@ class ECHOESOFLIGHT_API IInterface_EnemyAi
 public:  
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Attacks")
-		float NormalAttack(class UAnimMontage* MontageToPlay);
+		float NormalAttack();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "States")
 		void Death();
