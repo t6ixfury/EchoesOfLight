@@ -73,7 +73,7 @@ void ABase_Sword::BaseAttack()
             ETraceTypeQuery::TraceTypeQuery1,
             false,
             ActorsToIgnore,
-            EDrawDebugTrace::ForDuration,
+            EDrawDebugTrace::None,
             HitResult,
             true,
             FLinearColor::Red, // Trace color

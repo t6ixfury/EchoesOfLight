@@ -32,11 +32,65 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		bool hasTargetEnemy;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		bool isAttacking = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		bool isMontagePlaying = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		bool isWeaponEquipped = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		int32 meleeAttackIndex = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		int32 meleeSpecialAttackIndex = 0;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
 		FTimerHandle AttackTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
+		FTimerHandle CanDamageTimer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
 		float TimeTillDamagable;
+
+	///montages////
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* baseDualMeleeAttack_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* baseDualMeleeAttack_2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* baseDualMeleeAttack_3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* baseDualMeleeAttackSpecial_1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* baseDualMeleeAttackSpecial_2;
+
+
+
+	/*
+	INPUT ACTION MAPPINGS
+	*/
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputMappingContext* inputMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* MeleeAttackIA;
+
+	/*
+	INPUT ACTION MAPPINGS
+
+		END
+	*/
+
 
 
 // For Functions
@@ -52,6 +106,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void ClosestEnemy(class AEnemyCharacter* enemyActor);
+
+	UFUNCTION()
+		void MeleeAttack();
 
 /*
 	INTERFACES IMPLEMENTATION
@@ -74,22 +131,10 @@ public:
 		bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo);
 		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
 
-	/*
-	UFUNCTION()
-	virtual float GetCurrentHealth_Implementation() override;
-
-	UFUNCTION()
-	virtual float GetMaxHealth_Implementation() override;
-
-	UFUNCTION()
-	virtual void Heal_Implementation(float amount) override;
-
-	UFUNCTION()
-	virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
-	*/
-
 	/*DamageInterface end*/
 private:
 
 	void SetDamagable();
+
+	void setIsMontagePlaying();
 };
