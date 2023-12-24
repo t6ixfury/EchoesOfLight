@@ -4,10 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Logging/LogMacros.h"
 #include "Interfaces/Interface_Damagable.h"
 #include "MainCharacter.generated.h"
 
-UCLASS()
+
+class USpringArmComponent;
+class UCameraComponent;
+class UInputMappingContext;
+class UInputAction;
+struct FInputActionValue;
+
+
+
+DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+
+UCLASS(config=game)
 class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Damagable
 {
 	GENERATED_BODY()
@@ -75,15 +87,27 @@ public:
 
 
 
+
+
 	/*
 	INPUT ACTION MAPPINGS
 	*/
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputMappingContext* inputMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* MeleeAttackIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* JumpIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* LookIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* MoveIA;
 
 	/*
 	INPUT ACTION MAPPINGS
@@ -107,9 +131,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void ClosestEnemy(class AEnemyCharacter* enemyActor);
 
-	UFUNCTION()
-		void MeleeAttack();
-
 /*
 	INTERFACES IMPLEMENTATION
 */
@@ -132,9 +153,37 @@ public:
 		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
 
 	/*DamageInterface end*/
+
+
+protected:
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
+
+	UFUNCTION()
+		void MeleeAttack();
+
+
+
 private:
 
 	void SetDamagable();
 
 	void setIsMontagePlaying();
+
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		UCameraComponent* FollowCamera;
+
+public:
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 };
