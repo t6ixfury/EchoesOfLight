@@ -8,6 +8,8 @@
 
 #include "W_InventorySlot.generated.h"
 
+class AItem;
+
 /**
  * 
  */
@@ -17,23 +19,32 @@ class ECHOESOFLIGHT_API UW_InventorySlot : public UUserWidget
 	GENERATED_BODY()
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
-		FDataTableRowHandle SlotItem;
-
-	UFUNCTION(BlueprintCallable, Category = "Initialization")
-		void SetItem(const FDataTableRowHandle& InSlotItem);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D* Texture;
-
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UImage* InventorySlotImage;
 
-	class UBFL_Utility* Utility;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Item Reference")
+		AItem* ItemInslot;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+		bool bHasItem = false;
+
+	UPROPERTY(VisibleAnywhere)
+		UTexture2D* Texture;
+
+
+	
+	
+
+
 
 public:
 
 	virtual void NativeConstruct() override;
+
+	void SetItemIconImage(UTexture2D* TextureToSet);
+
+	void setItemInSlot(AItem* ItemToSet);
+
 
 
 

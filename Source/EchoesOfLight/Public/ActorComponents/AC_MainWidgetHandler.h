@@ -32,7 +32,7 @@ public:
 		UW_MainGUI* GUI;
 
 	UPROPERTY(BlueprintReadOnly)
-		UW_Inventory* MH_Inventory;
+		UW_Inventory* Inventory;
 
 	UPROPERTY(BlueprintReadOnly)
 		UW_Interact* Interact;

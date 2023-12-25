@@ -11,6 +11,7 @@ struct FDataTableRowHandle;
 class AMainCharacter;
 class APlayerController;
 class USave_Inventory;
+class AItem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ECHOESOFLIGHT_API UAC_Inventory : public UActorComponent
@@ -30,7 +31,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-		void AddItems(TArray<FDataTableRowHandle> items);
+		void AddItems(AItem* ItemToAdd);
 
 	UFUNCTION(BlueprintCallable)
 		void UpdateInventory();
@@ -44,7 +45,7 @@ public:
 public:
 
 	UPROPERTY(BlueprintReadOnly)
-		TArray<FDataTableRowHandle> Inventory;
+		TArray<AItem*> InventoryItems;
 
 	UPROPERTY(BlueprintReadOnly)
 		UW_Inventory* InventoryWidget;

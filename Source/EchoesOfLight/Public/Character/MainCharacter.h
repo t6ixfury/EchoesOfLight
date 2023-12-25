@@ -14,6 +14,8 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class UAC_CurrencySystem;
+class UAC_ExperieceSystem;
 
 
 
@@ -34,6 +36,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		class UAC_DamageSystem* DamageSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UAC_CurrencySystem* CurrencySystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		class UAC_ExperieceSystem* ExperienceSystem;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		float ClosestDistance;

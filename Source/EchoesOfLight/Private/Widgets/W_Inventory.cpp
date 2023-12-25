@@ -2,8 +2,11 @@
 
 
 #include "Widgets/W_Inventory.h"
+#include "Widgets/W_InventorySlot.h"
+#include "Actors/Items/Item.h"
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
+#include "Widgets/Layout/SUniformGridPanel.h"
 #include "ActorComponents/AC_Inventory.h"
 #include "Widgets/W_InventorySlot.h"
 
@@ -18,53 +21,83 @@ void UW_Inventory::NativeConstruct()
 
 void UW_Inventory::OnUpdate()
 {
-	CurrentColumn = 0;
-	CurrentRow = 0;
-
-	if (InventoryGrid)
-	{
-		InventoryGrid->ClearChildren();
-	}
-	UAC_Inventory* Inventory = Cast<UAC_Inventory>(GetOwningPlayer()->GetPawn()->GetComponentByClass(AC_Inventory));
-
-	if (Inventory)
-	{
-		for (int item = 0; item < Inventory->Inventory.Num(); item++)
-		{
-			UW_InventorySlot* SlotWidget = CreateWidget<UW_InventorySlot>(GetOwningPlayer(), InventorySlot);
-
-			// Set the item for the slot
-			if (SlotWidget)
-			{
-				SlotWidget->SetItem(Inventory->Inventory[item]);
-
-				// Add the slot to the grid or any other container
-				UUniformGridSlot* GridSlot = InventoryGrid->AddChildToUniformGrid(SlotWidget, CurrentRow, CurrentColumn);
-
-				if (GridSlot)
-				{
-					GridSlot->SetRow(CurrentRow);
-					GridSlot->SetColumn(CurrentColumn);
-					
-				}
-			}
-			CalculateNewColumnAndRow();
-
-		}
-		
-	}
 }
 
-void UW_Inventory::CalculateNewColumnAndRow()
+//Adds item to the Inventory widget and sets image and reference to the item.
+void UW_Inventory::AddItemToInventoryWidget(AItem* Item)
 {
-	if ((CurrentColumn + 1) > (MaxNumberOfColumns - 1))
+	//Checks if the inventory has space
+	if (bIsInventoryFull == false)
 	{
-		CurrentColumn = 0;
-		CurrentRow += 1;
+		//Finds the closest open index
+		Index = FindOpenSlot();
+
+		//check that the index is inbounds and pointers are not null.
+		if (InventoryGrid && Item && Index >= 0 && bIsInventoryFull == false)
+		{
+			//cast the slot to the inventory slot class
+			UW_InventorySlot* CurrentSlot = Cast<UW_InventorySlot>(InventoryGrid->GetChildAt(Index));
+			if (CurrentSlot)
+			{
+				//Sets the reference, item picture, hasItem, and Index on grid.
+				CurrentSlot->setItemInSlot(Item);
+				CurrentSlot->SetItemIconImage(Item->ItemInfo.Picture);
+				CurrentSlot->ItemInslot->indexInInventoryGrid = Index;
+				CurrentSlot->bHasItem = true;
+			}
+		}
+
 	}
-	else
+}
+
+
+//Finds a open slot on the inventory widget and returns -1 if the no slot was found.
+int32 UW_Inventory::FindOpenSlot()
+{
+	int32 newIndex = 0;
+
+	// iterates through each slot in the grid till one is found that has not been uses.
+	for (int32 i = 0; i < InventoryGrid->GetChildrenCount(); i++)
 	{
-		CurrentColumn += 1;
+		UW_InventorySlot* CurrentSlot = Cast<UW_InventorySlot>(InventoryGrid->GetChildAt(i));
+		if (CurrentSlot)
+		{
+			if (CurrentSlot->bHasItem == false)
+			{
+				newIndex = i;
+
+				return newIndex;
+			}
+		}
+		else
+		{
+			newIndex = -1;
+		}
+	}
+	//After the iteration and no index is found. The inventory is full and set the boolean value is set accordingly.
+	if (newIndex == -1)
+	{
+		bIsInventoryFull = true;
 	}
 
+
+	return newIndex;
 }
+
+//Removes an item from the Inventory widget.
+void UW_Inventory::RemoveItemFromInventoryWidget(AItem* Item)
+{
+	if (Item)
+	{
+		//get Inventory slot at its location
+		UW_InventorySlot* CurrentSlot = Cast<UW_InventorySlot>(InventoryGrid->GetChildAt(Item->indexInInventoryGrid));
+		if (CurrentSlot)
+		{
+			//remove the Picture, set has item to fasle and remove the reference to the Item.
+			CurrentSlot->Texture = nullptr;
+			CurrentSlot->bHasItem = false;
+			CurrentSlot->ItemInslot = nullptr;
+		}
+	}
+}
+

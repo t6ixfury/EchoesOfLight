@@ -15,7 +15,9 @@
 #include "Structures/S_DamageInfo.h"
 #include "ActorComponents/AC_DamageSystem.h"
 #include "ActorComponents/AC_Inventory.h"
+#include "ActorComponents/AC_CurrencySystem.h"
 #include "ActorComponents/AC_MainWidgetHandler.h"
+#include "ActorComponents/AC_ExperieceSystem.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
@@ -68,6 +70,8 @@ AMainCharacter::AMainCharacter()
 	//InventoryComponent = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory"));
 	MainWidgetHandlerComponent = CreateDefaultSubobject<UAC_MainWidgetHandler>(TEXT("Main Widget Handler"));
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
+	CurrencySystem = CreateDefaultSubobject<UAC_CurrencySystem>(TEXT("Currenct System"));
+	ExperienceSystem = CreateDefaultSubobject<UAC_ExperieceSystem>(TEXT("Experience System"));
 
 
 }

@@ -16,6 +16,9 @@ public:
 	// Sets default values for this component's properties
 	UAC_CurrencySystem();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Currency")
+		int64 Currency = 0;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

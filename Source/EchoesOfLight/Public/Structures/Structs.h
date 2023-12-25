@@ -45,13 +45,14 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		bool isWeapon;
-
+/*Might Delete*/
+	/*
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		UStaticMesh* Mesh;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		USkeletalMesh* WeaponSkMesh;
-
+*/
 
 
 };

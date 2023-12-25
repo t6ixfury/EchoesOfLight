@@ -7,6 +7,7 @@
 #include "AC_ExperieceSystem.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+
 class ECHOESOFLIGHT_API UAC_ExperieceSystem : public UActorComponent
 {
 	GENERATED_BODY()
@@ -20,7 +21,7 @@ public:
 		float ExpToNextLevel;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
-		float CurrentExp;
+		float CurrentExp = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
 		int32 CurrentLevel;

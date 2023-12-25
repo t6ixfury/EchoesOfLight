@@ -2,22 +2,33 @@
 
 
 #include "Widgets/W_InventorySlot.h"
-#include "Libraries/BFL_Utility.h"
+#include "Actors/Items/Item.h"
 #include "Components/Image.h"
 
 
-void UW_InventorySlot::SetItem(const FDataTableRowHandle& InSlotItem)
-{
-	SlotItem = InSlotItem;
-}
 
 void UW_InventorySlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Texture = Utility->BPL_GetItemInfo(SlotItem).Picture;
-
 	InventorySlotImage->SetBrushFromTexture(Texture);
 
+}
+
+void UW_InventorySlot::SetItemIconImage(UTexture2D* TextureToSet)
+{
+	if (TextureToSet)
+	{
+		Texture = TextureToSet;
+
+	}
+}
+
+void UW_InventorySlot::setItemInSlot(AItem* ItemToSet)
+{
+	if (ItemToSet)
+	{
+		ItemInslot = ItemToSet;
+	}
 }
 

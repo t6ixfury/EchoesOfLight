@@ -12,26 +12,23 @@
 class UAC_Inventory;
 class W_InventorySlot;
 
+
 UCLASS()
 class ECHOESOFLIGHT_API UW_Inventory : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-	int32 CurrentColumn;
-
-	int32 CurrentRow;
-
-	int32 MaxNumberOfColumns;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 		class UUniformGridPanel* InventoryGrid;
 
-	TSubclassOf<UAC_Inventory> AC_Inventory;
+	UPROPERTY(BlueprintReadWrite)
+		int32 Index = 0;
 
-	TSubclassOf<UUserWidget> InventorySlot;
+	UPROPERTY(BlueprintReadWrite)
+		bool bIsInventoryFull = false;
 
-	
 	virtual void NativeConstruct() override;
 
 public:
@@ -41,9 +38,15 @@ public:
 
 	UFUNCTION()
 	void OnUpdate();
-	
+
 	UFUNCTION()
-		void CalculateNewColumnAndRow();
+		void AddItemToInventoryWidget(AItem* Item);
+
+	UFUNCTION()
+		int32 FindOpenSlot();
+
+	UFUNCTION()
+		void RemoveItemFromInventoryWidget(AItem* Item);
 
 
 

@@ -2,6 +2,8 @@
 
 
 #include "ActorComponents/AC_Inventory.h"
+#include "ActorComponents/AC_MainWidgetHandler.h"
+#include "Actors/Items/Item.h"
 #include "Engine/DataTable.h"
 #include "Save/Save_Inventory.h"
 #include "Character/MainCharacter.h"
@@ -40,13 +42,20 @@ void UAC_Inventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
-void UAC_Inventory::AddItems(TArray<FDataTableRowHandle> items)
+void UAC_Inventory::AddItems(AItem* ItemToAdd)
 {
-	for (int item = 0; item < items.Num(); item++)
+	if (ItemToAdd)
 	{
-		Inventory.Add(items[item]);
+		InventoryItems.Add(ItemToAdd);
+		AMainCharacter* Character = Cast<AMainCharacter>(GetOwner());
+
+		if (Character)
+		{
+			if (Character->MainWidgetHandlerComponent->Inventory->InventoryGrid)
+			{
+			}
+		}
 	}
-	UpdateInventory();
 }
 
 void UAC_Inventory::UpdateInventory()
@@ -63,6 +72,7 @@ void UAC_Inventory::UpdateInventory()
 
 void UAC_Inventory::SaveInventory()
 {
+	/*
 	if (UGameplayStatics::DoesSaveGameExist(InventorySlot, 0))
 	{
 		USave_Inventory* InventoryInfo = Cast<USave_Inventory>(UGameplayStatics::LoadGameFromSlot(InventorySlot, 0));
@@ -77,10 +87,12 @@ void UAC_Inventory::SaveInventory()
 			SaveGame = Cast<USave_Inventory>(UGameplayStatics::CreateSaveGameObject(Save->StaticClass()));
 		}
 	}
+	*/
 }
 
 void UAC_Inventory::LoadInventory()
 {
+	/*
 	if (UGameplayStatics::DoesSaveGameExist(InventorySlot, 0))
 	{
 		USave_Inventory* InventoryInfo = Cast<USave_Inventory>(UGameplayStatics::LoadGameFromSlot(InventorySlot, 0));
@@ -89,6 +101,7 @@ void UAC_Inventory::LoadInventory()
 			Inventory = InventoryInfo->sInventory;
 		}
 	}
+	*/
 }
 
 void UAC_Inventory::IntializePlayerEvent(UW_Inventory* InventoryToSet)
