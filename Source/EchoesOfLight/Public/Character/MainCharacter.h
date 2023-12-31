@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Interfaces/Interface_Damagable.h"
+#include "Interfaces/Interface_Interaction.h"
+#include "Structures/Structs.h"
 #include "MainCharacter.generated.h"
 
 
@@ -16,6 +18,8 @@ class UInputAction;
 struct FInputActionValue;
 class UAC_CurrencySystem;
 class UAC_ExperieceSystem;
+class AHUD_MainCharacter;
+class UItemBase;
 
 
 
@@ -26,10 +30,16 @@ class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Da
 {
 	GENERATED_BODY()
 
-// For Variables
+//---------------------------------------------------------------------------------------------------------------------------
+//	PROPERTIES AND VARIABLES
+//---------------------------------------------------------------------------------------------------------------------------
+
 public:
-	// Sets default values for this character's properties
-	AMainCharacter();
+	UPROPERTY()
+		AHUD_MainCharacter* HUD;
+
+
+//------------------------------Components--------------------------------------------------------------------------
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 		class UAC_MainWidgetHandler* MainWidgetHandlerComponent;
@@ -42,6 +52,22 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 		class UAC_ExperieceSystem* ExperienceSystem;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+		class UAC_Inventory* PlayerInventory;
+
+private:
+
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		UCameraComponent* FollowCamera;
+
+//------------------------------Combat Variables--------------------------------------------------------------------------
+public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		float ClosestDistance;
@@ -76,7 +102,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
 		float TimeTillDamagable;
 
-	///montages////
+//------------------------------Montages--------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* baseDualMeleeAttack_1;
@@ -93,14 +119,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* baseDualMeleeAttackSpecial_2;
 
+//------------------------------Interaction Variables--------------------------------------------------------------------------
+
+	/// <Start>
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
+	TScriptInterface<IInterface_Interaction> TargetInteractable;
+
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
+	float InteractionCheckFrequency;
+
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
+	float InteractionCheckDistance;
+
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
+	FTimerHandle TimerHandle_Interaction;
+
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
+	FInteractionData InteractionData;
 
 
 
-
-	/*
-	INPUT ACTION MAPPINGS
-	*/
-
+//------------------------------INPUT ACTION MAPPINGS--------------------------------------------------------------------------
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputMappingContext* inputMappingContext;
@@ -117,16 +156,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* MoveIA;
 
-	/*
-	INPUT ACTION MAPPINGS
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* InventoryIA;
 
-		END
-	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* InteractIA;
+
+//---------------------------------------------------------------------------------------------------------------------------
+//	FUNCTIONS
+//---------------------------------------------------------------------------------------------------------------------------
 
 
 
-// For Functions
-public:	
+
+//------------------------------Engine Functions--------------------------------------------------------------------------
+public:
+	// Sets default values for this character's properties
+	AMainCharacter();
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -136,31 +182,94 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
+//------------------------------Combat Functions--------------------------------------------------------------------------
+
+public:
+	// Calculates the distance from the passed in enemy actor and if the distance is the closest to the actor it set hasTargetEnemy to true;
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 		void ClosestEnemy(class AEnemyCharacter* enemyActor);
 
-/*
-	INTERFACES IMPLEMENTATION
-*/
+	//Damagable interface
+
+	//Returns the current health of a player
+	UFUNCTION( Category = "Damagable Interface Functions")
+	virtual float GetCurrentHealth_Implementation() override;
+
+	//Returns the Max Health of the player.
+	UFUNCTION( Category = "Damagable Interface Functions")
+	virtual float GetMaxHealth_Implementation() override;
+
+	//Heals player by the amount passed in.
+	UFUNCTION( Category = "Damagable Interface Functions")
+	virtual void Heal_Implementation(float amount) override;
+
+	//Handles the incoming damage of an enemy
+	UFUNCTION( Category = "Damagable Interface Functions")
+	virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
+
+protected:
+	//Performs the basic attack of the character.
+	UFUNCTION()
+		void MeleeAttack();
+
+private:
+
+	//This Function changes the characters damage system variable bIsvincible to false; (change this)
+	UFUNCTION()
+	void SetDamagable();
+
+	//This Function set isMontagePlaying to false (change this)
+	UFUNCTION()
+	void setIsMontagePlaying();
+
+
+//------------------------------Interaction Functions--------------------------------------------------------------------------
+public:
+
+
+	UFUNCTION()
+	//Updates HUD Interaction widget.
+	void UpdateInteractionWidget() const;
+
+	//Interface
+
+	//Performs a line trace to see if an item is in our view and what to do if there is.
+	UFUNCTION()
+		void PerformInteractionCheck();
+
+	//Resets TargetInteractable to the new interactable we are looking at if it is differents. The updates interaction widget and set focus.
+	UFUNCTION()
+		void FoundInteractable(AActor* NewInteractable);
 	
+	//Clears the interaction timer and Removes focus from last interaction and updates the UI and hides the Interaction widget.
+	UFUNCTION()
+		void NoInteractableFound();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		float GetCurrentHealth();
-		virtual float GetCurrentHealth_Implementation() override;
+	//Make sure the item found has not changed and start interaction timer.
+	UFUNCTION()
+		void BeginInteract();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		float GetMaxHealth();
-		virtual float GetMaxHealth_Implementation() override;
+	//clears the interaction timer and calls endInteract on the item.
+	UFUNCTION()
+		void EndInteract();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		void Heal(float amount);
-		virtual void Heal_Implementation(float amount) override;
+	//clears the interaction timer and calls Interact on the item.
+	UFUNCTION()
+		void Interact();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo);
-		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
 
-	/*DamageInterface end*/
+//------------------------------Inventory Functions--------------------------------------------------------------------------
+public:
+
+	//Drops Item from Inventory
+	UFUNCTION()
+		void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
+
+protected:
+	//Brings Up the Inventory ui
+	UFUNCTION()
+		void ToggleInventory();
 
 
 protected:
@@ -170,28 +279,18 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-	UFUNCTION()
-		void MeleeAttack();
 
-
-
-private:
-
-	void SetDamagable();
-
-	void setIsMontagePlaying();
-
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		UCameraComponent* FollowCamera;
+//------------------------------INLINE Functions--------------------------------------------------------------------------
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
+	//Returns true if Character is still interacting with the same item.
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction);};
+
+	// Returns the Characters Inventory.
+	FORCEINLINE UAC_Inventory* GetInventory() const { return PlayerInventory; };
 };

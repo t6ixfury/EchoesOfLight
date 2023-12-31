@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enums/E_DamageResponse.h"
-#include "Enums/E_DamageType.h"
+#include "Enums/Enums.h"
 #include "S_DamageInfo.generated.h"
 
 

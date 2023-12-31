@@ -20,9 +20,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 		class UProgressBar* HealthBar;
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
-		class UW_Inventory* Inventory;
-
 	UPROPERTY(BlueprintReadOnly)
 		TScriptInterface<IInterface_Damagable> DamagableInterface;
 

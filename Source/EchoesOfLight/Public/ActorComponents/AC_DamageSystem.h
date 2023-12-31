@@ -4,9 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Enums/E_DamageType.h"
-#include "Enums/E_DamageResponse.h"
-#include "Enums/E_DamageStates.h"
+#include "Enums/Enums.h"
 #include "Interfaces/Interface_Damagable.h"
 #include "AC_DamageSystem.generated.h"
 

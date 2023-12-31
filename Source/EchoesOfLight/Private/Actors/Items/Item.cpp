@@ -5,6 +5,7 @@
 #include "Character/MainCharacter.h"
 #include "ActorComponents/AC_CurrencySystem.h"
 #include "ActorComponents/AC_ExperieceSystem.h"
+#include "ActorComponents/AC_Inventory.h"
 #include "Enums/Enums.h"
 
 // Sets default values
@@ -62,10 +63,45 @@ void AItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 
 			break;
 
+		case E_Global_Systems::Inventory:
+			//Character->InventorySystem->AddItems(this);
+
 		default:
 			break;
 		}
 	}
+}
+
+void AItem::BeginFocus()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Begin focus called"))
+	if (ItemMesh)
+	{
+		ItemMesh->SetRenderCustomDepth(true);
+	}
+}
+
+void AItem::EndFocus()
+{
+	if (ItemMesh)
+	{
+		ItemMesh->SetRenderCustomDepth(true);
+	}
+}
+
+void AItem::BeginInteract()
+{
+	UE_LOG(LogTemp,Warning, TEXT("Calling begin Interact on Interface Item"))
+}
+
+void AItem::EndInteract()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Calling end Interact on Interface Item"))
+}
+
+void AItem::Interact(AMainCharacter* PlayerCharacter)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Calling Interact on Interface Item"))
 }
 
 

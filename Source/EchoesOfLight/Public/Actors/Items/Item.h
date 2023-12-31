@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Structures/Structs.h"
+#include "Interfaces/Interface_Interaction.h"
 #include "Item.generated.h"
 
 UCLASS()
-class ECHOESOFLIGHT_API AItem : public AActor
+class ECHOESOFLIGHT_API AItem : public AActor, public IInterface_Interaction
 {
 	GENERATED_BODY()
 	
@@ -41,4 +42,17 @@ public:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-};
+	UFUNCTION()
+	virtual void BeginFocus() override;
+	UFUNCTION()
+	virtual void EndFocus() override;
+	UFUNCTION()
+	virtual void BeginInteract() override;
+	UFUNCTION()
+	virtual void EndInteract() override;
+	UFUNCTION()
+	virtual void Interact(AMainCharacter* PlayerCharacter) override;
+
+
+}; 
+

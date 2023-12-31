@@ -5,13 +5,11 @@
 #include "Character/MainCharacter.h"
 #include "Widgets/W_Interact.h"
 #include "W_MainGUI.h"
-#include "Widgets/W_PauseMenu.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
 #include "Structures/Structs.h"
 #include "Libraries/BFL_Utility.h"
-#include "Widgets/W_Inventory.h"
 #include "W_MainGUI.h"
 #include "ActorComponents/AC_Inventory.h"
 
@@ -33,7 +31,6 @@ void UAC_MainWidgetHandler::CreateAllPlayerWidgets()
 {
 	InitializePlayer();
 	CreateMainWidget();
-	//CreateInventoryWidget();
 }
 
 // Called when the game starts
@@ -83,59 +80,9 @@ void UAC_MainWidgetHandler::CreateMainWidget()
 	}
 }
 
-void UAC_MainWidgetHandler::CreateInventoryWidget()
-{
-	/*
-	if (GUI)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GUI is present"));
-		if (MainCharacter->InventoryComponent)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MainCharacter->InventoryComponent->InventoryWidget present"));
-			GUI->Inventory = CreateWidget<UW_Inventory>(MH_Inventory);
-		}
-
-	}
-	*/
-}
 
 void UAC_MainWidgetHandler::TogglePause()
 {
-	if (PauseMenu)
-	{
-		if (PauseMenu->IsInViewport())
-		{
-			PauseMenu->RemoveFromParent();
-			UGameplayStatics::SetGamePaused(GetWorld(), false);
-			if (MainCharacterController)
-			{
-				MainCharacterController->bPlayerIsWaiting = false;
-				MainCharacterController->bShowMouseCursor = false;
-			}
-			
 
-		}
-		else
-		{
-			PauseMenu->AddToViewport();
-			if (Utility->BPL_GetGameSettingsInfo(GameSetting).bStopGameTimeWhenPauseMenu)
-			{
-				UGameplayStatics::SetGamePaused(GetWorld(), true);
-				if (MainCharacterController)
-				{
-					FInputModeUIOnly InputMode;
-					InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock); 
-					MainCharacterController->SetInputMode(InputMode);
-					MainCharacterController->bShowMouseCursor = true;
-				
-				}
-
-			}
-
-
-		}
-
-	}
-	
 }
 

@@ -8,9 +8,7 @@
 
 #include "AC_MainWidgetHandler.generated.h"
 
-class UW_Inventory;
 class UW_Interact;
-class UW_PauseMenu;
 class UW_MainGUI;
 class AMainCharacter;
 class UBFL_Utility;
@@ -32,13 +30,8 @@ public:
 		UW_MainGUI* GUI;
 
 	UPROPERTY(BlueprintReadOnly)
-		UW_Inventory* Inventory;
-
-	UPROPERTY(BlueprintReadOnly)
 		UW_Interact* Interact;
 
-	UPROPERTY(BlueprintReadOnly)
-		UW_PauseMenu* PauseMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 		TSubclassOf<AMainCharacter> CharacterClass ;
@@ -90,9 +83,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void CreateMainWidget();
-
-	UFUNCTION(BlueprintCallable)
-		void CreateInventoryWidget();
 
 	UFUNCTION(BlueprintCallable)
 		void TogglePause();

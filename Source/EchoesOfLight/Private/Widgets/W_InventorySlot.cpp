@@ -1,34 +1,138 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+//game
 #include "Widgets/W_InventorySlot.h"
-#include "Actors/Items/Item.h"
+#include "Actors/Items/ItemBase.h"
+#include "Widgets/InventoryToolTip.h"
+#include "Widgets/DragItemVisual.h"
+#include "Widgets/ItemDragDropOperation.h"
+
+//engine
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
+#include "Components/Border.h"
 
 
+
+
+void UW_InventorySlot::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+
+	if (ToolTipClass)
+	{
+		UInventoryToolTip* ToolTip = CreateWidget<UInventoryToolTip>(this, ToolTipClass);
+		ToolTip->InventorySlotBeingHovered = this;
+
+		SetToolTip(ToolTip);
+	};
+}
 
 void UW_InventorySlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	InventorySlotImage->SetBrushFromTexture(Texture);
+	if (ItemReference)
+	{
+		//set border of Item slot item based on quality.
+		switch (ItemReference->ItemQuality)
+		{
+		case EItemQuality::Shoddy:
+			ItemBorder->SetBrushColor(FLinearColor::Gray);
+			break;
+
+		case EItemQuality::Common:
+			ItemBorder->SetBrushColor(FLinearColor::Green);
+			break;
+
+		case EItemQuality::Quality:
+			ItemBorder->SetBrushColor(FLinearColor::Blue);
+			break;
+
+		case EItemQuality::Masterwork:
+			ItemBorder->SetBrushColor(FLinearColor(0.5f, 0.0f, 0.5f, 1.0f));//purple
+			break;
+
+		case EItemQuality::GrandMaster:
+			ItemBorder->SetBrushColor(FLinearColor(1.0f, 0.84f, 0.0f, 1.0f));//gold
+			break;
+
+		default:
+			break;
+		}
+		//set Item icon image
+		ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
+		
+		//if item is stackable, update quantity.
+		if (ItemReference->ItemNumericaData.bisStackable)
+		{
+			ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
+		}
+		else
+		{
+			//if not stackable, hide quantity.
+			ItemQuantity->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
 
 }
 
-void UW_InventorySlot::SetItemIconImage(UTexture2D* TextureToSet)
+FReply UW_InventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (TextureToSet)
+	FReply Reply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		Texture = TextureToSet;
+		return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+	}
+
+	//sub menu on right click happens here.
+	
+	return Reply.Unhandled();
+
+
+}
+
+void UW_InventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+}
+
+void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	if (DragItemVisualClass)
+	{
+		// Create widget
+		const TObjectPtr<UDragItemVisual> DragVisual = CreateWidget< UDragItemVisual>(this, DragItemVisualClass);
+
+		//set visuals of drag widget.
+		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
+		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
+		DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
+
+		//creates a object out of the dragged Item
+		UItemDragDropOperation* DragItemOperation = NewObject<UItemDragDropOperation>();
+
+		// gives the dragged object the reference to the item clicked on in inventory.
+		DragItemOperation->SourceItem = ItemReference;
+
+		// give the dragged object reference to the player inventory.
+		DragItemOperation->SourceInventory = ItemReference->OwningInventory;
+
+		//set the drag visual.
+		DragItemOperation->DefaultDragVisual = DragVisual;
+
+		//set where the dragged item icon is attached to the mouse when dragging.
+		DragItemOperation->Pivot = EDragPivot::MouseDown;
+		OutOperation = DragItemOperation;
 
 	}
 }
 
-void UW_InventorySlot::setItemInSlot(AItem* ItemToSet)
+bool UW_InventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	if (ItemToSet)
-	{
-		ItemInslot = ItemToSet;
-	}
+	return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 }
 

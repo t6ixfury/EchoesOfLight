@@ -1,8 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+//game
 #include "Character/MainCharacter.h"
 #include "EnemyCharacter.h"
+#include "Structures/S_DamageInfo.h"
+#include "ActorComponents/AC_DamageSystem.h"
+#include "ActorComponents/AC_Inventory.h"
+#include "ActorComponents/AC_CurrencySystem.h"
+#include "ActorComponents/AC_MainWidgetHandler.h"
+#include "ActorComponents/AC_ExperieceSystem.h"
+#include "Widgets/HUD_MainCharacter.h"
+#include "Actors/Items/Pickup.h"
+
+//engine
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -12,14 +22,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Structures/S_DamageInfo.h"
-#include "ActorComponents/AC_DamageSystem.h"
-#include "ActorComponents/AC_Inventory.h"
-#include "ActorComponents/AC_CurrencySystem.h"
-#include "ActorComponents/AC_MainWidgetHandler.h"
-#include "ActorComponents/AC_ExperieceSystem.h"
 
-// Sets default values
+#include "DrawDebugHelpers.h"
+
+
 AMainCharacter::AMainCharacter()
 {
 
@@ -55,32 +61,41 @@ AMainCharacter::AMainCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-
+	BaseEyeHeight = 100.0f;
 
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	//combat variables
 	ClosestDistance = 100;
 	hasTargetEnemy = false;
-
 	TimeTillDamagable = 0.35f;
 
-	//InventoryComponent = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory"));
+	//Actor Components intialized
 	MainWidgetHandlerComponent = CreateDefaultSubobject<UAC_MainWidgetHandler>(TEXT("Main Widget Handler"));
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 	CurrencySystem = CreateDefaultSubobject<UAC_CurrencySystem>(TEXT("Currenct System"));
 	ExperienceSystem = CreateDefaultSubobject<UAC_ExperieceSystem>(TEXT("Experience System"));
+	PlayerInventory = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory System"));
+
+	//Set the Weight and capacity of the Inventory.
+	PlayerInventory->SetWeightCapacity(50.0f);
+	PlayerInventory->SetSlotsCapacity(20);
+
+	//Interaction
+	InteractionCheckFrequency = 0.1;
+	InteractionCheckDistance = 400.0f;
+
 
 
 }
 
-// Called when the game starts or when spawned
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Set the player input mapping context.
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -89,65 +104,108 @@ void AMainCharacter::BeginPlay()
 		}
 	}
 
-	/*
-	if (InventoryComponent)
-
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Inventory components presence"));
-	}
-	*/
+	//Initialize the HUD for the character.
+	HUD = Cast< AHUD_MainCharacter>(GetWorld()->GetFirstPlayerController()->GetHUD());
 }
 
-// Called every frame
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// creates a delay on the line trace for looking at the Item to be performed at the rate set in InteractionCheckFrequency.
+	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckingTime) > InteractionCheckFrequency)
+	{
+		PerformInteractionCheck();
+	}
+
 }
 
-// Called to bind functionality to input
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	//set up gameplay keybindings (Maybe delete later)
-	if (PlayerInputComponent)
-	{
-		PlayerInputComponent->BindAction("Melee Attack",IE_Pressed, this, &AMainCharacter::MeleeAttack);
-		PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMainCharacter::Jump);
-		PlayerInputComponent->BindAction("Look", IE_Pressed, this, &AMainCharacter::Jump);
-
-	}
-	// Enhanced Input Logic
+	//Get the Enhanced Input component to set player actions.
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent)
 	{
+		//Action for performing base attack
 		EnhancedInputComponent->BindAction(MeleeAttackIA, ETriggerEvent::Triggered, this, &AMainCharacter::MeleeAttack);
+
+		//Action to perform a Jump
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Triggered, this, &AMainCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpIA, ETriggerEvent::Completed, this, &AMainCharacter::StopJumping);
 
 		// Moving
-		EnhancedInputComponent->BindAction(MoveIA, ETriggerEvent::Triggered, this, &AMainCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveIA, ETriggerEvent::Triggered, this, &AMainCharacter::Move); 
 
+		//Looking
 		EnhancedInputComponent->BindAction(LookIA, ETriggerEvent::Triggered, this, &AMainCharacter::Look);
 
+		//Action for toggle Inventory.
+		EnhancedInputComponent->BindAction(InventoryIA, ETriggerEvent::Triggered, this, &AMainCharacter::ToggleInventory);
 
-
-		UE_LOG(LogTemp, Warning, TEXT("Enhanced input set"))
+		//Action to pickup Items.
+		EnhancedInputComponent->BindAction(InteractIA, ETriggerEvent::Completed, this, &AMainCharacter::BeginInteract);
 	}
 
 }
 
 
-
 void AMainCharacter::ClosestEnemy(AEnemyCharacter* enemyActor)
 {
+	//Calculate the distance between the charcter and the passed in enemyActor.
 	float Distance = FVector::Dist(GetActorLocation(), enemyActor->GetActorLocation());
 
+	// If the distance between the character and the passed in actor is less than closest distance.
 	if (Distance <= ClosestDistance)
 	{
+		//Set Target enemy to that actor
 		TargetEnemy = enemyActor;
+
 		hasTargetEnemy = true;
+	}
+}
+
+void AMainCharacter::UpdateInteractionWidget() const
+{
+	//make sure the item is still in the world
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		//update Interaction widget.
+		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	}
+}
+
+void AMainCharacter::DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop)
+{
+
+	if (PlayerInventory->FindMatchingItem(ItemToDrop))
+	{
+		//spawning the drop items params
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.bNoFail = true;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		//location of spawn
+		const FVector SpawnLocation{ GetActorLocation() + (GetActorForwardVector() * 50) };
+
+		//transform of the spawned item.
+		const FTransform SpawnTransform(GetActorRotation(), SpawnLocation);
+
+		const int32 RemoveQuantity = PlayerInventory->RemoveAmountOfItem(ItemToDrop, QuantityToDrop);
+		
+		//spawned item
+		APickup* Pickup = GetWorld()->SpawnActor<APickup>(APickup::StaticClass(), SpawnTransform, SpawnParams);
+
+		//creates a reference to the pickup created.
+		Pickup->InitializeDrop(ItemToDrop, RemoveQuantity);
+
+		//remove Item from inventory
+		PlayerInventory->RemoveSingleInstanceOfItem(ItemToDrop);
+
+		//update inventory ui
+		PlayerInventory->OnInventoryUpdated.Broadcast();
 	}
 }
 
@@ -197,7 +255,7 @@ void AMainCharacter::MeleeAttack()
 
 	float timeTillNextAttack = 0.5f;
 
-	if (CharacterAnimInstance)
+	if (CharacterAnimInstance && !HUD->bIsMenuVisible)
 	{
 		isAttacking = true;
 
@@ -286,10 +344,19 @@ void AMainCharacter::MeleeAttack()
 
 }
 
+void AMainCharacter::ToggleInventory()
+{
+	HUD->ToggleMenu();
+}
+
 
 
 
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (BEGINNING) **************************//
+
+
+
+
 float AMainCharacter::GetCurrentHealth_Implementation()
 {
 	if (DamageSystem)
@@ -319,14 +386,19 @@ void AMainCharacter::Heal_Implementation(float amount)
 
 bool AMainCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Take Damage called main character."))
+
+	// boolean to store the result wether damage was taken or not.
 	bool hasTakenDamage = false;
+
+	//DamageSystem is present and the character is not invincible.
 	if (DamageSystem && !DamageSystem->bisInvincible)
 	{
+		// get the result of wether the player took damage or not.
 		hasTakenDamage = DamageSystem->TakeDamage(DamageInfo);
+		
+		//set the player to be invincible till the candamagetimer is up then set it back to false.
 		DamageSystem->bisInvincible = true;
 		GetWorldTimerManager().SetTimer(CanDamageTimer, this, &AMainCharacter::SetDamagable, TimeTillDamagable, false);
-
 
 	}
 	return hasTakenDamage;
@@ -346,4 +418,163 @@ void AMainCharacter::setIsMontagePlaying()
 }
 
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//
+
+
+void AMainCharacter::PerformInteractionCheck()
+{
+	// getting the time in seconds and setting variable
+	InteractionData.LastInteractionCheckingTime = GetWorld()->GetTimeSeconds();
+
+	//Gets the look location of the third person character.
+	FVector TraceStart{ GetPawnViewLocation() };
+	// Gets the view rotation vector and multiplies it by the desired check distance
+	FVector TraceEnd{ TraceStart + (GetViewRotation().Vector() * InteractionCheckDistance) };
+
+	//make sure the actor is looking at the object and not behind it.
+	float LookDirection = FVector::DotProduct(GetActorForwardVector(),GetViewRotation().Vector());
+
+	if (LookDirection > 0)
+	{
+		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
+
+		FCollisionQueryParams QueryParams;
+
+		QueryParams.AddIgnoredActor(this);
+
+		FHitResult TraceHit;
+
+		// if the trace hits an item
+		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+		{
+			//checks to see the object we are looking at is implementing the interaction interface
+			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInterface_Interaction::StaticClass()))
+			{
+
+				//this make sure that we will not interact with an item outside a specific bound. InteractionCheckDistance in this case.
+				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Hit actor found"))
+					FoundInteractable(TraceHit.GetActor());
+					return;
+				}
+				//checks if we are still looking at the same interactable item and not to run anything. 
+				if (TraceHit.GetActor() == InteractionData.CurrentInteractable)
+				{
+					return;
+				}
+
+			}
+		}
+	}
+
+	
+	//called if not object is found on the trace
+	NoInteractableFound();
+}
+
+void AMainCharacter::FoundInteractable(AActor* NewInteractable)
+{
+	//checks if we found a new interactable while interacting with a timed object which will end the interact sequence
+	if (IsInteracting())
+	{
+		EndInteract();
+	}
+	//Removes the focus from the last interactable we interacted with
+	if (InteractionData.CurrentInteractable)
+	{
+		TargetInteractable = InteractionData.CurrentInteractable;
+
+		TargetInteractable->EndFocus();
+	}
+
+	InteractionData.CurrentInteractable = NewInteractable;
+	TargetInteractable = NewInteractable;
+
+	//this will show the interaction widget on screen and update it simultaneously
+	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+
+	TargetInteractable->BeginFocus();
+
+}
+
+void AMainCharacter::NoInteractableFound()
+{
+	if (IsInteracting())
+	{
+		//clear interaction timer
+		GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+	}
+	if (InteractionData.CurrentInteractable)
+	{
+		//this make sure the interactable is still in the world and not destroyed before it calls end focus so it will stop it calling the function when there is not an object
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			TargetInteractable->EndFocus();
+		}
+
+		HUD->HideInteractionWidget();
+
+		//reset currentinteractable and target interactable to null
+		InteractionData.CurrentInteractable = nullptr;
+		TargetInteractable = nullptr;
+	}
+}
+
+void AMainCharacter::BeginInteract()
+{
+	//Verify nothing has changed with the interaction state since beginning of interaction.
+	PerformInteractionCheck();
+
+	if (InteractionData.CurrentInteractable)
+	{
+		//this make sure the interactable is still in the world and not destroyed before it calls end focus so it will stop it calling the function when there is not an object
+		if (IsValid(TargetInteractable.GetObject()))
+		{
+			//calls the items Begin iteract function
+			TargetInteractable->BeginInteract();
+			
+			//use to create timed interaction. Current set to happen in 0.1 seconds.
+			if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f))
+			{
+				Interact();
+			}
+			else
+			{
+				//use to set timer for interaction delay
+				GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AMainCharacter::Interact, TargetInteractable->InteractableData.InteractionDuration, false);
+			}
+		}
+	}
+}
+
+void AMainCharacter::EndInteract()
+{
+	//clear timer
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	//if the item is still in the world
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		//in item, call endInteract.
+		TargetInteractable->EndInteract();
+	}
+
+}
+
+void AMainCharacter::Interact()
+{
+	//clear timer
+	GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+
+	//if the item is still in the world
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		//in item, call Interact and pass a ref of maincharacter.
+		TargetInteractable->Interact(this);
+	}
+}
+
+
+
+
 

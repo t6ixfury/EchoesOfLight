@@ -42,3 +42,72 @@ enum class E_Item_Type : uint8
 
 };
 
+UENUM(BlueprintType)
+enum class E_CharacterDamageStates : uint8
+{
+	Damaged UMETA(DisplayName = "Character has been damaged"),
+	NoDamage UMETA(DisplayName = "Character has not recieved damage")
+};
+
+UENUM(BlueprintType)
+enum class E_Damage_Response : uint8
+{
+	None UMETA(DisplayName = "None"),
+	HitReaction UMETA(DisplayName = "Hit Reaction"),
+	Stagger UMETA(DisplayName = "Stagger"),
+	Stun UMETA(DisplayName = "Stun"),
+	KnockBack UMETA(DisplayName = "KnockBack")
+
+};
+
+UENUM(BlueprintType)
+enum class E_Damage_State : uint8
+{
+	DoDamage UMETA(DisplayName = "Do Damage"),
+	OnBlockDamage UMETA(DisplayName = "On Block Damage"),
+	OnParry UMETA(DisplayName = "On Parry"),
+	NoDamage UMETA(DisplayName = "No Damage"),
+	None UMETA(DisplayName = "None")
+
+};
+UENUM(BlueprintType)
+enum class E_Damage_Type : uint8
+{
+	None UMETA(DisplayName = "None"),
+	Melee UMETA(DisplayName = "Inventory"),
+	Projectile UMETA(DisplayName = "Projectile"),
+	Explosion UMETA(DisplayName = "Explosion"),
+	Enviroment UMETA(DisplayName = "Enviroment")
+
+};
+
+/*
+
+ITEM ENUMS
+*/
+UENUM()
+enum class EItemQuality : uint8
+{
+	Shoddy UMETA(DisplayName = "Shoddy"),
+	Common UMETA(DisplayName = "Common"),
+	Quality UMETA(DisplayName = "Quality"),
+	Masterwork UMETA(DisplayName = "Masterwork"),
+	GrandMaster UMETA(DisplayName = "GrandMaster")
+};
+
+
+UENUM()
+enum class EItemType : uint8
+{
+	Armor UMETA(DisplayName = "Armor"),
+	Weapon UMETA(DisplayName = "Weapon"),
+	Shield UMETA(DisplayName = "Shield"),
+	Spell UMETA(DisplayName = "Spell"),
+	Consumable UMETA(DisplayName = "Consumable"),
+	Quest UMETA(DisplayName = "Quest"),
+	Mudane UMETA(DisplayName = "Mudane")
+};
+
+/*
+END OF ITEM ENUMS
+*/
