@@ -446,6 +446,7 @@ void AMainCharacter::PerformInteractionCheck()
 		// if the trace hits an item
 		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
+			//TODO: Trace hit enemy actor and crashed the game.
 			//checks to see the object we are looking at is implementing the interaction interface
 			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInterface_Interaction::StaticClass()))
 			{

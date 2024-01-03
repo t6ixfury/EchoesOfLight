@@ -147,8 +147,8 @@ struct ECHOESOFLIGHT_API FItemTextData
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditAnywhere)
-		FText Name;
+	UPROPERTY(EditAnywhere)
+	FText Name;
 
 	UPROPERTY(EditAnywhere)
 		FText Description;
@@ -216,7 +216,7 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 		FItemAssData ItemAssetData;
-
+	
 };
 
 /// <Iteraction Structs>

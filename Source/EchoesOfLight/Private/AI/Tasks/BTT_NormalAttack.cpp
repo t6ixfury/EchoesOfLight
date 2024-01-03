@@ -7,26 +7,63 @@
 #include "AIController.h"
 #include "EnemyCharacter.h"
 #include "AI/Controllers/EnemyBaseController.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+
 
 
 EBTNodeResult::Type UBTT_NormalAttack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+    AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+    OwnerCompRef = &OwnerComp;
 
-	if (Enemy)
-	{
-		IInterface_EnemyAi* Interface = Cast< IInterface_EnemyAi>(Enemy);
-		if (Interface)
-		{
-			float MontageDuration = Interface->Execute_NormalAttack(Enemy);
+    if (Enemy)
+    {
+        //binds the OnEnemyhit to be called if the hit reaction montage plays.
+        Enemy->OnHit.BindUObject(this, &UBTT_NormalAttack::OnEnemyHit);
 
-			UE_LOG(LogTemp, Warning, TEXT("MontageDuration returned: %f"), MontageDuration);
+        //get the interface of the enemy 
+        IInterface_EnemyAi* Interface = Cast<IInterface_EnemyAi>(Enemy);
+        if (Interface)
+        {
+            //call the normal attack and set timer to call SetMontageFinished to end the task.
+            float MontageDuration = Interface->NormalAttack();
+            Enemy->GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &UBTT_NormalAttack::SetMontageFinished, MontageDuration, false);
+        }
+    }
 
-			return EBTNodeResult::Succeeded;
-
-			
-		}
-	}
-
-	return EBTNodeResult::Failed;
+    return EBTNodeResult::InProgress;
 }
+
+void UBTT_NormalAttack::SetMontageFinished()
+{
+    if (OwnerCompRef)
+    {
+        FinishLatentTask(*OwnerCompRef, EBTNodeResult::Succeeded);
+    }
+}
+
+void UBTT_NormalAttack::OnEnemyHit()
+{
+    if (OwnerCompRef)
+    {
+        FinishLatentTask(*OwnerCompRef, EBTNodeResult::Failed);
+    }
+}
+
+EBTNodeResult::Type UBTT_NormalAttack::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+    // Clean up: Unbind the hit event and invalidate the timer
+    AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OwnerComp.GetAIOwner()->GetPawn());
+    if (Enemy)
+    {
+        Enemy->OnHit.Unbind();
+    }
+
+    if (Enemy && Enemy->GetWorld())
+    {
+        Enemy->GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+    }
+
+    return EBTNodeResult::Aborted;
+}
+

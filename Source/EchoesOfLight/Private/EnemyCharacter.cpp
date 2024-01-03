@@ -8,7 +8,7 @@
 #include "Structures/S_DamageInfo.h"
 #include "Interfaces/Interface_Damagable.h"
 #include "ActorComponents/AC_DamageSystem.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -17,6 +17,8 @@ AEnemyCharacter::AEnemyCharacter()
 
 	TimeTillDamagable = 0.25f;
 	NormalAttackDamage = 10.f;
+	TimeTillHitReactAction = 1.5f;
+	bCanPlayhitReact = true;
 
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 	CurrentDamageState = E_EnemyDamageStates::ApplyDamage;
@@ -25,6 +27,7 @@ AEnemyCharacter::AEnemyCharacter()
 	BaseAttackInfo.bCanBeBlocked = true;
 	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
 	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
+
 
 }
 
@@ -36,7 +39,6 @@ void AEnemyCharacter::BeginPlay()
 	{
 		if (DeathMontage)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Set ON_Death"))
 			DamageSystem->On_Death.AddDynamic(this, &AEnemyCharacter::SetDeath);
 
 		}
@@ -48,6 +50,8 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	MovementSpeed = GetVelocity().Size();
 
 }
 
@@ -92,22 +96,22 @@ void AEnemyCharacter::Heal_Implementation(float amount)
 bool AEnemyCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
 {
 	bool hasTakenDamage = false;
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+
 	if (DamageSystem && !DamageSystem->bisInvincible)
 	{
+		if (EnemyAnimInstance && bCanPlayhitReact)
+		{
+			float MontageDuration = EnemyAnimInstance->Montage_Play(HitReactMontage);
+			bCanPlayhitReact = false;
+			GetWorldTimerManager().SetTimer(HitReactTimer, this, &AEnemyCharacter::CanPlayHitReactMontage, TimeTillHitReactAction, false);
+			OnHit.ExecuteIfBound();
+		}
 		hasTakenDamage = DamageSystem->TakeDamage(DamageInfo);
 		DamageSystem->bisInvincible = true;
 		GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemyCharacter::SetDamagable, TimeTillDamagable, false);
-		USkeletalMeshComponent* MeshComp = GetMesh();
-		UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
-		
-		if (EnemyAnimInstance)
-		{
-			// Stop all other montages that might be playing
-			EnemyAnimInstance->Montage_Stop(0.1); 
-			float MontageDuration = EnemyAnimInstance->Montage_Play(HitReactMontage);
-
-		}
-
 	}
 	return hasTakenDamage;
 }
@@ -116,13 +120,13 @@ bool AEnemyCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo
 
 
 // *************** ENEMYAI INTERFACE IMPLEMENTATION (BEGINNING) **************************//
-float AEnemyCharacter::NormalAttack_Implementation()
+float AEnemyCharacter::NormalAttack()
 {
 	float MontageDuration = 0;
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 
-	if (EnemyAnimInstance && !EnemyAnimInstance->Montage_IsPlaying(HitReactMontage))
+	if (EnemyAnimInstance)
 	{
 		MontageDuration = EnemyAnimInstance->Montage_Play(BaseAttack);
 		CapsuleTraceForEnemy();
@@ -131,7 +135,7 @@ float AEnemyCharacter::NormalAttack_Implementation()
 }
 
 
-void AEnemyCharacter::Death_Implementation()
+void AEnemyCharacter::Death()
 {
 	UE_LOG(LogTemp, Warning, TEXT("DeathImplementation Called"))
 	USkeletalMeshComponent* MeshComp = GetMesh();
@@ -168,6 +172,11 @@ void AEnemyCharacter::RemoveActor()
 	this->K2_DestroyActor();
 }
 
+void AEnemyCharacter::CanPlayHitReactMontage()
+{
+	bCanPlayhitReact = true;
+}
+
 void AEnemyCharacter::CapsuleTraceForEnemy()
 {
 	TArray<AActor*> ActorsToIgnore;
@@ -188,25 +197,21 @@ void AEnemyCharacter::CapsuleTraceForEnemy()
 			ETraceTypeQuery::TraceTypeQuery2,
 			false,
 			ActorsToIgnore,
-			EDrawDebugTrace::None,
+			EDrawDebugTrace::Persistent,
 			HitResult,
 			true,
-			FLinearColor::Red, // Trace color
-			FLinearColor::Green, // Hit color
+			FLinearColor::Red, 
+			FLinearColor::Green,
 			5.0f
 		);
 
-		//UE_LOG(LogTemp, Warning, TEXT("BaseAttack from enemy has been called"))
-
 			if (HitResult.GetActor())
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("Hit Actor from enemy: %s"), *HitResult.GetActor()->GetName());
 				IInterface_Damagable* HitActor = Cast<IInterface_Damagable>(HitResult.GetActor());
 
 				if (HitActor)
 				{
 					HitActor->Execute_TakeIncomingDamage(HitResult.GetActor(), BaseAttackInfo);
-					//UE_LOG(LogTemp, Warning, TEXT("hit actor found enemy"))
 				}
 
 			}
@@ -223,6 +228,12 @@ void AEnemyCharacter::SetDeath()
 		UE_LOG(LogTemp, Warning, TEXT("AIController called"))
 			AIController->SetStateAsDeath();
 	}
+}
+
+void AEnemyCharacter::SetMovementSpeed(float NewMaxSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NewMaxSpeed;
+
 }
 
 

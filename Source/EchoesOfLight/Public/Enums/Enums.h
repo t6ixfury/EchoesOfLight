@@ -33,16 +33,6 @@ enum class E_Task_Type : uint8
 };
 
 UENUM(BlueprintType)
-enum class E_Item_Type : uint8
-{
-	Food UMETA(DisplayName = "Food"),
-	Experience UMETA(DisplayName = "Experience"),
-	Weapon UMETA(DisplayName = "Weapon"),
-	Miscellanous UMETA(DisplayName = "Miscellanous")
-
-};
-
-UENUM(BlueprintType)
 enum class E_CharacterDamageStates : uint8
 {
 	Damaged UMETA(DisplayName = "Character has been damaged"),
@@ -85,6 +75,7 @@ enum class E_Damage_Type : uint8
 
 ITEM ENUMS
 */
+
 UENUM()
 enum class EItemQuality : uint8
 {

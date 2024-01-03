@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-//#include "Character/MainCharacter.h"
 #include "Interface_Interaction.generated.h"
 
 class AMainCharacter;
@@ -23,7 +22,7 @@ enum class  EInteractableType : uint8
 
 
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FInteractableData
 {
 	GENERATED_USTRUCT_BODY()

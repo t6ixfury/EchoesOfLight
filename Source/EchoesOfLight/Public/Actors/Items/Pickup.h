@@ -18,24 +18,22 @@ class ECHOESOFLIGHT_API APickup : public AActor, public IInterface_Interaction
 //---------------------------------------------------------------------------------------------------------------------------
 
 public:	
-
+	UPROPERTY(EditAnywhere, Category = "Pickup | Item Initialization")
+		int32 ItemQuantity;
 
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Pickup | Components")
 	UStaticMeshComponent* PickupMesh;
 
-	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Initialization")
+	UPROPERTY(EditAnywhere, Category = "Pickup | Item Initialization")
 	UDataTable* ItemDataTable;
 
-	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Initialization")
+	UPROPERTY(EditAnywhere, Category = "Pickup | Item Initialization")
 	FName DesiredItemId;
 
-	UPROPERTY(VisibleAnywhere, Category = "Pickup | Item Reference")
+	UPROPERTY(EditAnywhere, Category = "Pickup | Item Reference")
 	UItemBase* ItemReference;
-
-	UPROPERTY(EditInstanceOnly, Category = "Pickup | Item Initialization")
-	int32 ItemQuantity;
 
 	UPROPERTY(VisibleAnywhere, Category = "Pickup | Interaction")
 	FInteractableData InstanceInteractableData;

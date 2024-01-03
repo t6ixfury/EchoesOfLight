@@ -62,19 +62,25 @@ void ABase_Sword::BaseAttack()
 {
     TArray<AActor*> ActorsToIgnore;
     UWorld* World = GetWorld();
+
+    float radius = 25.0f;
+
+    float halfheight = 2.0f;
     if (WeaponTraceStart && WeaponTraceEnd && World)
     {
         ECollisionChannel TraceChannel = ECC_Pawn;
 
         FHitResult HitResult;
-        bool bHit = UKismetSystemLibrary::LineTraceSingle(
+        bool bHit = UKismetSystemLibrary::CapsuleTraceSingle(
             World,
             WeaponTraceStart->GetComponentLocation(),
             WeaponTraceEnd->GetComponentLocation(),
+            radius,
+            halfheight,
             ETraceTypeQuery::TraceTypeQuery1,
             false,
             ActorsToIgnore,
-            EDrawDebugTrace::None,
+            EDrawDebugTrace::Persistent,
             HitResult,
             true,
             FLinearColor::Red, // Trace color

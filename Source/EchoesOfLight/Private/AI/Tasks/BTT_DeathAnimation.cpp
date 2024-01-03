@@ -18,7 +18,7 @@ EBTNodeResult::Type UBTT_DeathAnimation::ExecuteTask(UBehaviorTreeComponent& Own
 		IInterface_EnemyAi* Interface = Cast< IInterface_EnemyAi>(Enemy);
 		if (Interface)
 		{
-			Interface->Execute_Death(Enemy);
+			Interface->Death();
 
 			return EBTNodeResult::Succeeded;
 

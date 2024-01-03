@@ -14,6 +14,7 @@ class ECHOESOFLIGHT_API AEnemyCharacter : public ACharacter, public IInterface_D
 {
 	GENERATED_BODY()
 
+
 //For Variables
 public:
 	// Sets default values for this character's properties
@@ -32,15 +33,24 @@ public:
 		FTimerHandle DeathTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		FTimerHandle HitReactTimer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
 		float TimeTillDamagable;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Timers")
+		float TimeTillHitReactAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Damage properties")
 		float NormalAttackDamage;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "EnemyProperties")
+		float MovementSpeed;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* DeathMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HitReactMontage")
 		class UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
@@ -48,6 +58,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
 		FS_DamageInfo BaseAttackInfo;
+
+	//animation checks
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checks")
+		bool bCanPlayhitReact;
+
+
+
+
+	DECLARE_DELEGATE(FOnEnemyHit);
+	FOnEnemyHit OnHit;
+
 		
 
 protected:
@@ -87,25 +109,26 @@ public:
 	/*
 	ENEMYAI INTERFACE
 	*/
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		float NormalAttack();
-	UFUNCTION()
-		virtual float NormalAttack_Implementation() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		void Death();
+		virtual float NormalAttack() override;
 
-	UFUNCTION()
-		virtual void Death_Implementation() override;
+	
+		virtual void Death() override;
 
+	
+		virtual void SetMovementSpeed(float NewMaxSpeed) override;
+
+
+protected:
+
+	//trace for enemy attack. Calls the damagable interface on the hit actor.
 	UFUNCTION()
 		void CapsuleTraceForEnemy();
 
+
+	//set state of the enemy character to death
 	UFUNCTION()
 		void SetDeath();
-
-
-private:
 
 	//This function set the bisInvincible variable in damage system back to false;
 	UFUNCTION()
@@ -113,6 +136,8 @@ private:
 
 	UFUNCTION()
 		void RemoveActor();
+
+	void CanPlayHitReactMontage();
 
 
 };

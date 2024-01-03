@@ -52,6 +52,8 @@ void UW_Interact::UpdateWidget(const FInteractableData* InteractionData) const
 		break;
 
 	case EInteractableType::Container:
+		QuantityText->SetVisibility(ESlateVisibility::Collapsed);
+		InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
 		break;
 
 	}

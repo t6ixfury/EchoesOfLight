@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Structures/Structs.h"
+#include "Enums/Enums.h"
 #include "ItemBase.generated.h"
 
 class AMainCharacter;
 class UAC_Inventory;
+
 
 /**
  * 
