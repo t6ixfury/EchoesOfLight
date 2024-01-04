@@ -197,7 +197,7 @@ void AEnemyCharacter::CapsuleTraceForEnemy()
 			ETraceTypeQuery::TraceTypeQuery2,
 			false,
 			ActorsToIgnore,
-			EDrawDebugTrace::Persistent,
+			EDrawDebugTrace::None,
 			HitResult,
 			true,
 			FLinearColor::Red, 

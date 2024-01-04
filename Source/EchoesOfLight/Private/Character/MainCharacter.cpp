@@ -435,7 +435,7 @@ void AMainCharacter::PerformInteractionCheck()
 
 	if (LookDirection > 0)
 	{
-		DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
+		//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.0f, 0, 2.0f);
 
 		FCollisionQueryParams QueryParams;
 
