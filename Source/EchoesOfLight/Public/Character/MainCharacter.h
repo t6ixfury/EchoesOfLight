@@ -105,19 +105,13 @@ public:
 //------------------------------Montages--------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttack_1;
+		class UAnimMontage* PrimaryAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttack_2;
+		class UAnimMontage* RollMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttack_3;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttackSpecial_1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttackSpecial_2;
 
 //------------------------------Interaction Variables--------------------------------------------------------------------------
 
@@ -161,6 +155,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* InteractIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* RollIA;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS

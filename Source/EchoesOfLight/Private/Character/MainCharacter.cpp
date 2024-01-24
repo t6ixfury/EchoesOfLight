@@ -261,17 +261,24 @@ void AMainCharacter::MeleeAttack()
 
 		if (!isMontagePlaying && isWeaponEquipped)
 		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
 			switch (meleeAttackIndex)
 			{
 			case 0:
 			{
 				isMontagePlaying = true;
 
-				montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttack_1) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack1");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack1");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
 				meleeAttackIndex=1;
 
 				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				UE_LOG(LogTemp, Warning, TEXT("Attack1"))
 
 				break;
 			}
@@ -279,11 +286,16 @@ void AMainCharacter::MeleeAttack()
 			{
 				isMontagePlaying = true;
 
-				montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttack_2) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack2");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack2");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
 				meleeAttackIndex=2;
 
 				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				UE_LOG(LogTemp, Warning, TEXT("Attack2"))
 
 				break;
 			}
@@ -291,49 +303,85 @@ void AMainCharacter::MeleeAttack()
 			{
 				isMontagePlaying = true;
 
-				montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttack_3) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack3");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack3");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
 				meleeAttackIndex=3;
 
 				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
 
+				UE_LOG(LogTemp, Warning, TEXT("Attack3"))
+
 				break;
 			}
 			case 3:
 			{
-				switch (meleeSpecialAttackIndex)
-				{
-				case 0:
-				{
-					isMontagePlaying = true;
+				isMontagePlaying = true;
 
-					montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttackSpecial_1) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack4");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack4");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
-					meleeSpecialAttackIndex=1;
+				meleeAttackIndex = 4;
 
-					meleeAttackIndex = 0;
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
 
-					GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+				break;
 
-					break;
-				}
-				case 1:
-				{
-					isMontagePlaying = true;
+				UE_LOG(LogTemp, Warning, TEXT("Attack4"))
+				
+			}
+			case 4:
+			{
+				isMontagePlaying = true;
 
-					montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttackSpecial_1) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack5");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack5");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
-					meleeSpecialAttackIndex=0;
+				meleeAttackIndex = 5;
 
-					meleeAttackIndex = 0;
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
 
-					GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+				break;
+				UE_LOG(LogTemp, Warning, TEXT("Attack5"))
+			}
+			case 5:
+			{
+				isMontagePlaying = true;
 
-					break;
-				}
-				default:
-					break;
-				}
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack6");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack6");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
+
+				meleeAttackIndex = 6;
+
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				break;
+				UE_LOG(LogTemp, Warning, TEXT("Attack6"))
+			}
+			case 6:
+			{
+				isMontagePlaying = true;
+
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack7");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack7");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
+
+				meleeAttackIndex = 0;
+
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				break;
+
+				UE_LOG(LogTemp, Warning, TEXT("Attack7"))
 			}
 			default:
 				break;
@@ -415,6 +463,14 @@ void AMainCharacter::SetDamagable()
 void AMainCharacter::setIsMontagePlaying()
 {
 	isMontagePlaying = false;
+	isAttacking = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	}
+
+	
 }
 
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//
