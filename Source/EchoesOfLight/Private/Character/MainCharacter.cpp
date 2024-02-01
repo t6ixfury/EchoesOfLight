@@ -117,6 +117,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	{
 		PerformInteractionCheck();
 	}
+	GetCharacterMovementDirection();
 
 }
 
@@ -146,6 +147,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		//Action to pickup Items.
 		EnhancedInputComponent->BindAction(InteractIA, ETriggerEvent::Completed, this, &AMainCharacter::BeginInteract);
+
+		//Action to perform roll
+		EnhancedInputComponent->BindAction(RollIA, ETriggerEvent::Triggered, this, &AMainCharacter::roll);
 	}
 
 }
@@ -261,17 +265,24 @@ void AMainCharacter::MeleeAttack()
 
 		if (!isMontagePlaying && isWeaponEquipped)
 		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
 			switch (meleeAttackIndex)
 			{
 			case 0:
 			{
 				isMontagePlaying = true;
 
-				montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttack_1) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack1");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack1");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
 				meleeAttackIndex=1;
 
 				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				UE_LOG(LogTemp, Warning, TEXT("Attack1"))
 
 				break;
 			}
@@ -279,11 +290,16 @@ void AMainCharacter::MeleeAttack()
 			{
 				isMontagePlaying = true;
 
-				montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttack_2) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack2");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack2");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
 				meleeAttackIndex=2;
 
 				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				UE_LOG(LogTemp, Warning, TEXT("Attack2"))
 
 				break;
 			}
@@ -291,49 +307,85 @@ void AMainCharacter::MeleeAttack()
 			{
 				isMontagePlaying = true;
 
-				montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttack_3) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack3");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack3");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
 				meleeAttackIndex=3;
 
 				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
 
+				UE_LOG(LogTemp, Warning, TEXT("Attack3"))
+
 				break;
 			}
 			case 3:
 			{
-				switch (meleeSpecialAttackIndex)
-				{
-				case 0:
-				{
-					isMontagePlaying = true;
+				isMontagePlaying = true;
 
-					montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttackSpecial_1) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack4");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack4");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
-					meleeSpecialAttackIndex=1;
+				meleeAttackIndex = 4;
 
-					meleeAttackIndex = 0;
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
 
-					GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+				break;
 
-					break;
-				}
-				case 1:
-				{
-					isMontagePlaying = true;
+				UE_LOG(LogTemp, Warning, TEXT("Attack4"))
+				
+			}
+			case 4:
+			{
+				isMontagePlaying = true;
 
-					montageDuration = CharacterAnimInstance->Montage_Play(baseDualMeleeAttackSpecial_1) - timeTillNextAttack;
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack5");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack5");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
 
-					meleeSpecialAttackIndex=0;
+				meleeAttackIndex = 5;
 
-					meleeAttackIndex = 0;
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
 
-					GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+				break;
+				UE_LOG(LogTemp, Warning, TEXT("Attack5"))
+			}
+			case 5:
+			{
+				isMontagePlaying = true;
 
-					break;
-				}
-				default:
-					break;
-				}
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack6");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack6");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
+
+				meleeAttackIndex = 6;
+
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				break;
+				UE_LOG(LogTemp, Warning, TEXT("Attack6"))
+			}
+			case 6:
+			{
+				isMontagePlaying = true;
+
+				CharacterAnimInstance->Montage_Play(PrimaryAttack);
+				CharacterAnimInstance->Montage_JumpToSection("Attack7");
+				int32 SectionIndex = PrimaryAttack->GetSectionIndex("Attack7");
+				montageDuration = PrimaryAttack->GetSectionLength(SectionIndex) - timeTillNextAttack;
+
+				meleeAttackIndex = 0;
+
+				GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+
+				break;
+
+				UE_LOG(LogTemp, Warning, TEXT("Attack7"))
 			}
 			default:
 				break;
@@ -415,11 +467,20 @@ void AMainCharacter::SetDamagable()
 void AMainCharacter::setIsMontagePlaying()
 {
 	isMontagePlaying = false;
+	isAttacking = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	}
+
+	
 }
+
 
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//
 
-
+// *************** Interaction INTERFACE IMPLEMENTATION (BEGINNING) **************************//
 void AMainCharacter::PerformInteractionCheck()
 {
 	// getting the time in seconds and setting variable
@@ -572,6 +633,156 @@ void AMainCharacter::Interact()
 	{
 		//in item, call Interact and pass a ref of maincharacter.
 		TargetInteractable->Interact(this);
+	}
+}
+
+// *************** Interaction INTERFACE IMPLEMENTATION (END) **************************//
+
+
+void AMainCharacter::GetCharacterMovementDirection()
+{
+	FVector Velocity = GetVelocity();
+	FVector ForwardVector = GetActorForwardVector();
+	FVector RightVector = GetActorRightVector();
+
+	// Define custom thresholds
+	const float ForwardBackwardThreshold = 0.5f; // example value, adjust as needed
+	const float RightLeftThreshold = 0.5f; // example value, adjust as needed
+
+	if (Velocity.SizeSquared() < KINDA_SMALL_NUMBER * KINDA_SMALL_NUMBER)
+	{
+		MovementDirection = EMovementDirection::Stationary;
+		return;
+	}
+
+	FVector NormalizedVelocity = Velocity.GetSafeNormal();
+
+	float ForwardDot = FVector::DotProduct(NormalizedVelocity, ForwardVector);
+	float RightDot = FVector::DotProduct(NormalizedVelocity, RightVector);
+
+	// Diagonal Movement
+	bool bIsMovingForward = ForwardDot > ForwardBackwardThreshold;
+	bool bIsMovingBackward = ForwardDot < -ForwardBackwardThreshold;
+	bool bIsMovingRight = RightDot > RightLeftThreshold;
+	bool bIsMovingLeft = RightDot < -RightLeftThreshold;
+
+	//character is moving forward and to the right at the same time.
+	if (bIsMovingForward && bIsMovingRight)
+	{
+		MovementDirection = EMovementDirection::Forward;
+		return;
+	}
+	//character is moving forward and to the left at the same time.
+	if (bIsMovingForward && bIsMovingLeft)
+	{
+		MovementDirection = EMovementDirection::Forward;
+		return;
+	}
+	//character is moving backward and to the right at the same time.
+	if (bIsMovingBackward && bIsMovingRight)
+	{
+		MovementDirection = EMovementDirection::Backward;
+		return;
+	}
+	//character is moving backward and to the left at the same time.
+	if (bIsMovingBackward && bIsMovingLeft)
+	{
+		MovementDirection = EMovementDirection::Backward;
+		return;
+	}
+
+	// Straight Movement
+	if (bIsMovingForward)
+	{
+		MovementDirection = EMovementDirection::Forward;
+		return;
+	}
+	if (bIsMovingBackward)
+	{
+		MovementDirection = EMovementDirection::Backward;
+		return;
+	}
+	if (bIsMovingRight)
+	{
+		MovementDirection = EMovementDirection::Right;
+		return;
+	}
+	if (bIsMovingLeft)
+	{
+		MovementDirection = EMovementDirection::Left;
+		return;
+	}
+}
+
+
+void AMainCharacter::roll()
+{
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	UAnimInstance* CharacterAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+	float montageDuration = 0;
+
+	int32 SectionIndex = 0;
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	if (CharacterAnimInstance && !isMontagePlaying)
+	{
+		switch (MovementDirection)
+		{
+		case EMovementDirection::Forward:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Forward");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Forward Roll"))
+			break;
+		case EMovementDirection::Backward:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Backward");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Backward");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Backward Roll"))
+			break;
+		case EMovementDirection::Right:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Right");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Right");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Right Roll"))
+			break;
+		case EMovementDirection::Left:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Left");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Left");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Left Roll"))
+			break;
+		case EMovementDirection::Stationary:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Forward");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Stationary Roll"))
+			break;
+		default:
+			break;
+		}
 	}
 }
 

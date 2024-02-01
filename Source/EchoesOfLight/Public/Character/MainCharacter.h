@@ -21,7 +21,16 @@ class UAC_ExperieceSystem;
 class AHUD_MainCharacter;
 class UItemBase;
 
+UENUM()
+enum class EMovementDirection : uint8
+{
+	Forward UMETA(DisplayName = "Forward"),
+	Backward UMETA(DisplayName = "Backward"),
+	Right UMETA(DisplayName = "Right"),
+	Left UMETA(DisplayName = "Left"),
+	Stationary UMETA(DisplayName = "Stationary")
 
+};
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -105,19 +114,16 @@ public:
 //------------------------------Montages--------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttack_1;
+		class UAnimMontage* PrimaryAttack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttack_2;
+		class UAnimMontage* RollMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttack_3;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
+		EMovementDirection MovementDirection;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttackSpecial_1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
-		class UAnimMontage* baseDualMeleeAttackSpecial_2;
+
 
 //------------------------------Interaction Variables--------------------------------------------------------------------------
 
@@ -161,6 +167,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* InteractIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* RollIA;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -222,6 +231,13 @@ private:
 	//This Function set isMontagePlaying to false (change this)
 	UFUNCTION()
 	void setIsMontagePlaying();
+
+	//Gets the current direction the character is moving towards and set the Movement Direction Variable.
+	UFUNCTION()
+	void GetCharacterMovementDirection();
+
+	UFUNCTION()
+	void roll();
 
 
 //------------------------------Interaction Functions--------------------------------------------------------------------------
