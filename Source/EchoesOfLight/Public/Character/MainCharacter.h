@@ -21,7 +21,16 @@ class UAC_ExperieceSystem;
 class AHUD_MainCharacter;
 class UItemBase;
 
+UENUM()
+enum class EMovementDirection : uint8
+{
+	Forward UMETA(DisplayName = "Forward"),
+	Backward UMETA(DisplayName = "Backward"),
+	Right UMETA(DisplayName = "Right"),
+	Left UMETA(DisplayName = "Left"),
+	Stationary UMETA(DisplayName = "Stationary")
 
+};
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -109,6 +118,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* RollMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
+		EMovementDirection MovementDirection;
 
 
 
@@ -219,6 +231,13 @@ private:
 	//This Function set isMontagePlaying to false (change this)
 	UFUNCTION()
 	void setIsMontagePlaying();
+
+	//Gets the current direction the character is moving towards and set the Movement Direction Variable.
+	UFUNCTION()
+	void GetCharacterMovementDirection();
+
+	UFUNCTION()
+	void roll();
 
 
 //------------------------------Interaction Functions--------------------------------------------------------------------------

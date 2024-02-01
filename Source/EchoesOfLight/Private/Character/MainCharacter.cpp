@@ -117,6 +117,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	{
 		PerformInteractionCheck();
 	}
+	GetCharacterMovementDirection();
 
 }
 
@@ -146,6 +147,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		//Action to pickup Items.
 		EnhancedInputComponent->BindAction(InteractIA, ETriggerEvent::Completed, this, &AMainCharacter::BeginInteract);
+
+		//Action to perform roll
+		EnhancedInputComponent->BindAction(RollIA, ETriggerEvent::Triggered, this, &AMainCharacter::roll);
 	}
 
 }
@@ -473,9 +477,10 @@ void AMainCharacter::setIsMontagePlaying()
 	
 }
 
+
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (END) **************************//
 
-
+// *************** Interaction INTERFACE IMPLEMENTATION (BEGINNING) **************************//
 void AMainCharacter::PerformInteractionCheck()
 {
 	// getting the time in seconds and setting variable
@@ -628,6 +633,156 @@ void AMainCharacter::Interact()
 	{
 		//in item, call Interact and pass a ref of maincharacter.
 		TargetInteractable->Interact(this);
+	}
+}
+
+// *************** Interaction INTERFACE IMPLEMENTATION (END) **************************//
+
+
+void AMainCharacter::GetCharacterMovementDirection()
+{
+	FVector Velocity = GetVelocity();
+	FVector ForwardVector = GetActorForwardVector();
+	FVector RightVector = GetActorRightVector();
+
+	// Define custom thresholds
+	const float ForwardBackwardThreshold = 0.5f; // example value, adjust as needed
+	const float RightLeftThreshold = 0.5f; // example value, adjust as needed
+
+	if (Velocity.SizeSquared() < KINDA_SMALL_NUMBER * KINDA_SMALL_NUMBER)
+	{
+		MovementDirection = EMovementDirection::Stationary;
+		return;
+	}
+
+	FVector NormalizedVelocity = Velocity.GetSafeNormal();
+
+	float ForwardDot = FVector::DotProduct(NormalizedVelocity, ForwardVector);
+	float RightDot = FVector::DotProduct(NormalizedVelocity, RightVector);
+
+	// Diagonal Movement
+	bool bIsMovingForward = ForwardDot > ForwardBackwardThreshold;
+	bool bIsMovingBackward = ForwardDot < -ForwardBackwardThreshold;
+	bool bIsMovingRight = RightDot > RightLeftThreshold;
+	bool bIsMovingLeft = RightDot < -RightLeftThreshold;
+
+	//character is moving forward and to the right at the same time.
+	if (bIsMovingForward && bIsMovingRight)
+	{
+		MovementDirection = EMovementDirection::Forward;
+		return;
+	}
+	//character is moving forward and to the left at the same time.
+	if (bIsMovingForward && bIsMovingLeft)
+	{
+		MovementDirection = EMovementDirection::Forward;
+		return;
+	}
+	//character is moving backward and to the right at the same time.
+	if (bIsMovingBackward && bIsMovingRight)
+	{
+		MovementDirection = EMovementDirection::Backward;
+		return;
+	}
+	//character is moving backward and to the left at the same time.
+	if (bIsMovingBackward && bIsMovingLeft)
+	{
+		MovementDirection = EMovementDirection::Backward;
+		return;
+	}
+
+	// Straight Movement
+	if (bIsMovingForward)
+	{
+		MovementDirection = EMovementDirection::Forward;
+		return;
+	}
+	if (bIsMovingBackward)
+	{
+		MovementDirection = EMovementDirection::Backward;
+		return;
+	}
+	if (bIsMovingRight)
+	{
+		MovementDirection = EMovementDirection::Right;
+		return;
+	}
+	if (bIsMovingLeft)
+	{
+		MovementDirection = EMovementDirection::Left;
+		return;
+	}
+}
+
+
+void AMainCharacter::roll()
+{
+
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	UAnimInstance* CharacterAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+	float montageDuration = 0;
+
+	int32 SectionIndex = 0;
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	if (CharacterAnimInstance && !isMontagePlaying)
+	{
+		switch (MovementDirection)
+		{
+		case EMovementDirection::Forward:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Forward");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Forward Roll"))
+			break;
+		case EMovementDirection::Backward:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Backward");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Backward");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Backward Roll"))
+			break;
+		case EMovementDirection::Right:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Right");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Right");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Right Roll"))
+			break;
+		case EMovementDirection::Left:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Left");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Left");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Left Roll"))
+			break;
+		case EMovementDirection::Stationary:
+			isMontagePlaying = true;
+
+			CharacterAnimInstance->Montage_Play(RollMontage);
+			CharacterAnimInstance->Montage_JumpToSection("Roll_Forward");
+			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
+			montageDuration = RollMontage->GetSectionLength(SectionIndex);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
+			UE_LOG(LogTemp, Warning, TEXT("Stationary Roll"))
+			break;
+		default:
+			break;
+		}
 	}
 }
 
