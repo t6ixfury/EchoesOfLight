@@ -2,7 +2,7 @@
 
 
 #include "Widgets/HUD_MainCharacter.h"
-#include "Widgets/W_MainMenu.h"
+#include "Widgets/W_EquipmentMenu.h"
 #include "Widgets/W_Interact.h"
 #include "Interfaces/Interface_Interaction.h"
 
@@ -17,7 +17,7 @@ void AHUD_MainCharacter::BeginPlay()
 	//Creates the main menu widget 
 	if (MainMenuWidgetClass)
 	{
-		MainMenuWidget = CreateWidget<UW_MainMenu>(GetWorld(), MainMenuWidgetClass);
+		MainMenuWidget = CreateWidget<UW_EquipmentMenu>(GetWorld(), MainMenuWidgetClass);
 		MainMenuWidget->AddToViewport(5);
 		MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}

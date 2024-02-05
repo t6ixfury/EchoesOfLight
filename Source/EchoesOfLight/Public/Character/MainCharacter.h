@@ -32,6 +32,21 @@ enum class EMovementDirection : uint8
 
 };
 
+USTRUCT()
+struct FCharacterStats
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	int32 Stamina = 100;
+
+	int32 Strength = 10;
+	
+	int32 DefensePower = 10;
+
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=game)
@@ -110,6 +125,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Timers")
 		float TimeTillDamagable;
+
+//------------------------------Equipment--------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Equipment")
+		ABase_Sword* DualWeaponSlot;
 
 //------------------------------Montages--------------------------------------------------------------------------
 

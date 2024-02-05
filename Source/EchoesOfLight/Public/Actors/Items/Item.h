@@ -7,7 +7,9 @@
 #include "Structures/Structs.h"
 #include "Interfaces/Interface_Interaction.h"
 #include "Item.generated.h"
-
+/// <summary>
+/// WILL BE DELETING THIS CLASS AS BECAUSE IT IS THE WRONG ITEM CLASS AND WAS A FIRST ITERATION.
+/// </summary>
 UCLASS()
 class ECHOESOFLIGHT_API AItem : public AActor, public IInterface_Interaction
 {

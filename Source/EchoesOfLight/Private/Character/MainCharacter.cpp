@@ -11,6 +11,8 @@
 #include "ActorComponents/AC_ExperieceSystem.h"
 #include "Widgets/HUD_MainCharacter.h"
 #include "Actors/Items/Pickup.h"
+#include "Widgets/W_EquipmentSlot.h"
+#include "Widgets/W_EquipmentMenu.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -106,6 +108,15 @@ void AMainCharacter::BeginPlay()
 
 	//Initialize the HUD for the character.
 	HUD = Cast< AHUD_MainCharacter>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+	//set dual weapon
+	if (HUD)
+	{
+		if (HUD->MainMenuWidget->Weapon_Slot->WeaponRef)
+		{
+			DualWeaponSlot = HUD->MainMenuWidget->Weapon_Slot->WeaponRef;
+		}
+	}
 }
 
 void AMainCharacter::Tick(float DeltaTime)

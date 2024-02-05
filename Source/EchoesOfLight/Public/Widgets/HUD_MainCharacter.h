@@ -7,7 +7,7 @@
 #include "HUD_MainCharacter.generated.h"
 
 
-class UW_MainMenu;
+class UW_EquipmentMenu;
 class UW_Interact;
 struct FInteractableData;
 /**
@@ -23,7 +23,7 @@ public:
 	//	PROPERTIES AND VARIABLES
 	//---------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UW_MainMenu> MainMenuWidgetClass;
+		TSubclassOf<UW_EquipmentMenu> MainMenuWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UW_Interact> InteractionWidgetClass;
@@ -46,12 +46,11 @@ public:
 	void UpdateInteractionWidget( const FInteractableData* InteractData) const;
 
 
-protected:
 	//---------------------------------------------------------------------------------------------------------------------------
 	//	PROPERTIES AND VARIABLES
 	//---------------------------------------------------------------------------------------------------------------------------
 	UPROPERTY()
-		UW_MainMenu* MainMenuWidget;
+		UW_EquipmentMenu* MainMenuWidget;
 		UPROPERTY()
 		UW_Interact* InteractionWidget;
 

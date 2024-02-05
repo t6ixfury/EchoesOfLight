@@ -46,6 +46,9 @@ public:
 		FItemStatistics ItemStatistics;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FItemWeaponStatistics ItemWeaponStatistics;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
 		FItemTextData ItemTextData;
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")

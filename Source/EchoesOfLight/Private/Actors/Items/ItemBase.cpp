@@ -25,7 +25,9 @@ UItemBase* UItemBase::CreateItemCopy() const
 	ItemCopy->ItemNumericaData = this->ItemNumericaData;
 	ItemCopy->ItemStatistics = this->ItemStatistics;
 	ItemCopy->ItemAssetData = this->ItemAssetData;
+	ItemCopy->ItemWeaponStatistics = this->ItemWeaponStatistics;
 	ItemCopy->bIsCopy = true;
+
 
 	return ItemCopy;
 
