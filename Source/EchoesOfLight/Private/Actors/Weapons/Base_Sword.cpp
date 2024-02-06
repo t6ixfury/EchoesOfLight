@@ -7,6 +7,8 @@
 #include "ActorComponents/AC_DamageSystem.h"
 #include "Interfaces/Interface_Damagable.h"
 #include "Character/MainCharacter.h"
+#include "Actors/Items/ItemBase.h"
+
 
 
 // Sets default values
@@ -35,7 +37,6 @@ ABase_Sword::ABase_Sword()
     DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 
     //Set BaseAttack weapon info
-    BaseAttackInfo.amount = BaseWeaponDamage;
     BaseAttackInfo.bCanBeBlocked = true;
     BaseAttackInfo.DamageType = E_Damage_Type::Melee;
     BaseAttackInfo.DamageResponse = E_Damage_Response::None;
@@ -48,6 +49,7 @@ ABase_Sword::ABase_Sword()
 void ABase_Sword::BeginPlay()
 {
 	Super::BeginPlay();
+    InitializeWeapon();
 	
 }
 
@@ -62,6 +64,8 @@ void ABase_Sword::BaseAttack()
 {
     TArray<AActor*> ActorsToIgnore;
     UWorld* World = GetWorld();
+
+    //UE_LOG(LogTemp,Warning, TEXT("BaseAttack called"))
 
     float radius = 25.0f;
 
@@ -103,4 +107,38 @@ void ABase_Sword::BaseAttack()
            
     }
 
+}
+
+void ABase_Sword::InitializeWeapon()
+{
+    float BaseDamage = 10;
+    //check to see if the data table is set and the desired item is name is set
+    if (DualWeaponDataTable && !DesiredItemId.IsNone())
+    {
+        //get the item info from the data table.
+        const FItemData* ItemDataRow = DualWeaponDataTable->FindRow<FItemData>(DesiredItemId, DesiredItemId.ToString());
+
+        //create a new item
+        WeaponItemReference = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+        //set the item properties
+        WeaponItemReference->ID = ItemDataRow->ID;
+        WeaponItemReference->ItemType = ItemDataRow->ItemType;
+        WeaponItemReference->ItemQuality = ItemDataRow->ItemQuality;
+        WeaponItemReference->ItemNumericaData = ItemDataRow->ItemNumericaData;
+        WeaponItemReference->ItemTextData = ItemDataRow->ItemTextData;
+        WeaponItemReference->ItemAssetData = ItemDataRow->ItemAssetData;
+        WeaponItemReference->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+        WeaponItemReference->SetQuantity(1);
+
+        //Set Weapon Stats
+        BaseAttackInfo.AttackPower = WeaponItemReference->ItemWeaponStatistics.AttackPower;
+        BaseAttackInfo.AtttackSpeed = WeaponItemReference->ItemWeaponStatistics.AtttackSpeed;
+        BaseAttackInfo.MagicPower = WeaponItemReference->ItemWeaponStatistics.MagicPower;
+        BaseAttackInfo.CriticalHitRate = WeaponItemReference->ItemWeaponStatistics.CriticalHitRate;
+        BaseAttackInfo.Damage = BaseDamage * BaseAttackInfo.AttackPower;
+
+
+
+    }
 }

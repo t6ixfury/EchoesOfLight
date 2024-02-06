@@ -15,7 +15,19 @@ struct ECHOESOFLIGHT_API FS_DamageInfo
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float amount = 0;
+		int32 AttackPower = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int32 MagicPower = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int32 CriticalHitRate = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int32 AtttackSpeed = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float Damage = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		E_Damage_Type DamageType;

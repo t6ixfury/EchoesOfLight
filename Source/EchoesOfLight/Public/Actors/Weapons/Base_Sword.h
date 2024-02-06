@@ -8,6 +8,8 @@
 #include "Interfaces/Interface_Damagable.h"
 #include "Base_Sword.generated.h"
 
+class UItemBase;
+
 UCLASS()
 class ECHOESOFLIGHT_API ABase_Sword : public AActor
 {
@@ -19,9 +21,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
 		 FS_DamageInfo BaseAttackInfo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
-		float BaseWeaponDamage = 10.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class UAC_DamageSystem* DamageSystem;
@@ -35,6 +34,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
 		class USkeletalMeshComponent* SwordMesh;
 
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties | Weapon Initialization")
+		UDataTable* DualWeaponDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties | Weapon Initialization")
+		FName DesiredItemId;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties | Item Reference")
+		UItemBase* WeaponItemReference;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -45,6 +53,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BaseAttack();
+
+	void InitializeWeapon();
 
 
 };

@@ -58,7 +58,7 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 	{
 	case E_Damage_State::DoDamage:
 	{
-		float newHealth = SetHealth(DamageInfo.amount);
+		float newHealth = SetHealth(DamageInfo.Damage);
 
 		if (newHealth <= 0)
 		{

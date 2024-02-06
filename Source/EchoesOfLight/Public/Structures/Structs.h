@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Enums/Enums.h"
 #include "InputCoreTypes.h"
+#include "Actors/Weapons/Base_Sword.h"
 #include "Structs.generated.h"
 
 /**
@@ -143,6 +144,28 @@ struct ECHOESOFLIGHT_API FItemStatistics
 };
 
 USTRUCT()
+struct ECHOESOFLIGHT_API FItemWeaponStatistics
+{
+	GENERATED_USTRUCT_BODY()
+
+		UPROPERTY(EditAnywhere)
+		int32 AttackPower = 0;
+
+	UPROPERTY(EditAnywhere)
+		int32 MagicPower = 0;
+
+	UPROPERTY(EditAnywhere)
+		int32 CriticalHitRate = 0;
+
+	UPROPERTY(EditAnywhere)
+		int32 AtttackSpeed = 0;
+
+	UPROPERTY(VisibleAnywhere)
+		float Damage = AttackPower;
+
+};
+
+USTRUCT()
 struct ECHOESOFLIGHT_API FItemTextData
 {
 	GENERATED_USTRUCT_BODY()
@@ -186,6 +209,9 @@ struct ECHOESOFLIGHT_API FItemAssData
 	UPROPERTY(EditAnywhere)
 		UStaticMesh* Mesh;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<ABase_Sword> DualSword;
+
 	//UPROPERTY(EditAnywhere)
 		//put sound effect here
 
@@ -207,6 +233,9 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 		FItemStatistics ItemStatistics;
+
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+		FItemWeaponStatistics ItemWeaponStatistics;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 		FItemTextData ItemTextData;

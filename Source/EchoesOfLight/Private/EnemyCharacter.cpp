@@ -23,7 +23,7 @@ AEnemyCharacter::AEnemyCharacter()
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 	CurrentDamageState = E_EnemyDamageStates::ApplyDamage;
 
-	BaseAttackInfo.amount = NormalAttackDamage;
+	BaseAttackInfo.Damage = NormalAttackDamage;
 	BaseAttackInfo.bCanBeBlocked = true;
 	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
 	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
