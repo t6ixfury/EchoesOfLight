@@ -109,7 +109,7 @@ public:
 		bool isMontagePlaying = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
-		bool isWeaponEquipped = true;
+		bool isWeaponEquipped = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		int32 meleeAttackIndex = 0;
@@ -127,9 +127,14 @@ public:
 		float TimeTillDamagable;
 
 //------------------------------Equipment--------------------------------------------------------------------------
-	UPROPERTY(VisibleAnywhere, Category = "Equipment")
-		ABase_Sword* DualWeaponSlot;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment | Weapon")
+		ABase_Sword* LeftHandWeapon;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Equipment | Weapon")
+		ABase_Sword* RightHandWeapon;
+
+	UPROPERTY(EditAnywhere, Category = "Equipment | Weapon")
+		TSubclassOf<ABase_Sword> DualSwordWeaponClass;
 //------------------------------Montages--------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
@@ -189,6 +194,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* RollIA;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* EuipWeaponIA;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -314,6 +322,9 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+//------------------------------Equipment Functions--------------------------------------------------------------------------
+public:
+	void SpawnWeapon();
 
 //------------------------------INLINE Functions--------------------------------------------------------------------------
 

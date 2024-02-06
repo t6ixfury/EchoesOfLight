@@ -112,9 +112,9 @@ void AMainCharacter::BeginPlay()
 	//set dual weapon
 	if (HUD)
 	{
-		if (HUD->MainMenuWidget->Weapon_Slot->WeaponRef)
+		if (HUD->MainMenuWidget->Weapon_Slot->Equipment)
 		{
-			DualWeaponSlot = HUD->MainMenuWidget->Weapon_Slot->WeaponRef;
+			HUD->MainMenuWidget->Weapon_Slot->Equipment = nullptr;
 		}
 	}
 }
@@ -161,6 +161,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		//Action to perform roll
 		EnhancedInputComponent->BindAction(RollIA, ETriggerEvent::Triggered, this, &AMainCharacter::roll);
+
+		//Action to equip weapon
+		EnhancedInputComponent->BindAction(EuipWeaponIA, ETriggerEvent::Completed, this, &AMainCharacter::SpawnWeapon);
 	}
 
 }
@@ -258,6 +261,49 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AMainCharacter::SpawnWeapon()
+{
+	if (!isWeaponEquipped)
+	{
+		FName RightHandWeaponSlotName = TEXT("Weapon_RSocket");
+		FName leftHandWeaponSlotName = TEXT("Weapon_LSocket");
+		USkeletalMeshComponent* CharacterMesh = GetMesh();
+
+		UWorld* World = GetWorld();
+		if (World != nullptr)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+			FVector RightSpawnLocation = CharacterMesh->GetSocketLocation(RightHandWeaponSlotName);
+			FRotator RightSpawnRotation = CharacterMesh->GetSocketRotation(RightHandWeaponSlotName);
+			FVector LeftSpawnLocation = CharacterMesh->GetSocketLocation(leftHandWeaponSlotName);
+			FRotator LeftSpawnRotation = CharacterMesh->GetSocketRotation(leftHandWeaponSlotName);
+
+			RightHandWeapon = World->SpawnActor<ABase_Sword>(DualSwordWeaponClass, RightSpawnLocation, RightSpawnRotation, SpawnParams);
+			LeftHandWeapon = World->SpawnActor<ABase_Sword>(DualSwordWeaponClass, LeftSpawnLocation, LeftSpawnRotation, SpawnParams);
+
+			if (RightHandWeapon && LeftHandWeapon)
+			{
+				// Attach the weapon to the socket
+				RightHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandWeaponSlotName);
+				LeftHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, leftHandWeaponSlotName);
+				isWeaponEquipped = true;
+			}
+		}
+	} 
+	else
+	{
+		RightHandWeapon->Destroy();
+		LeftHandWeapon->Destroy();
+		RightHandWeapon = nullptr;
+		LeftHandWeapon = nullptr;
+		isWeaponEquipped = false;
+	}
+	
+
 }
 
 void AMainCharacter::MeleeAttack()
