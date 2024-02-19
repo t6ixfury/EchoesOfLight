@@ -110,6 +110,7 @@ void AMainCharacter::BeginPlay()
 	HUD = Cast< AHUD_MainCharacter>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
 	//set dual weapon
+	/*
 	if (HUD)
 	{
 		if (HUD->MainMenuWidget->Weapon_Slot->Equipment)
@@ -117,6 +118,7 @@ void AMainCharacter::BeginPlay()
 			HUD->MainMenuWidget->Weapon_Slot->Equipment = nullptr;
 		}
 	}
+	*/
 }
 
 void AMainCharacter::Tick(float DeltaTime)
@@ -129,6 +131,7 @@ void AMainCharacter::Tick(float DeltaTime)
 		PerformInteractionCheck();
 	}
 	GetCharacterMovementDirection();
+
 
 }
 
@@ -265,6 +268,7 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 
 void AMainCharacter::SpawnWeapon()
 {
+	UE_LOG(LogTemp, Warning, TEXT("SpawnWeapon called."))
 	if (!isWeaponEquipped)
 	{
 		FName RightHandWeaponSlotName = TEXT("Weapon_RSocket");
