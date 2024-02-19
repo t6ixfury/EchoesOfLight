@@ -24,7 +24,7 @@ public:
 	UAC_MainWidgetHandler();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
-		TSubclassOf<UW_MainGUI> HealthBar;
+		TSubclassOf<UW_MainGUI> GUI_Class;
 
 	UPROPERTY(BlueprintReadWrite)
 		UW_MainGUI* GUI;
@@ -41,25 +41,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 		APlayerController* MainCharacterController;
-
-	UPROPERTY(BlueprintReadOnly)
-		FTimerHandle HoldTimer;
-
-	UPROPERTY(BlueprintReadOnly)
-		float HOLD_NeededTime;
-
-	UPROPERTY(BlueprintReadOnly)
-		AActor* HOLD_Actor;
-
-	//accesses my library
-	UBFL_Utility* Utility;
-
-	UPROPERTY(BlueprintReadWrite, Category = DataTable)
-	FDataTableRowHandle GameSetting;
-
-
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInitializePlayerWidgets_CustomEvent);
-	FInitializePlayerWidgets_CustomEvent InitializePlayerWidgetsEvent;
 
 	UFUNCTION()
 		void CreateAllPlayerWidgets();

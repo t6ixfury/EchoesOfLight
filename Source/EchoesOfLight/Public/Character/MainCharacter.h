@@ -230,19 +230,19 @@ public:
 
 	//Returns the current health of a player
 	UFUNCTION( Category = "Damagable Interface Functions")
-	virtual float GetCurrentHealth_Implementation() override;
+	virtual float GetCurrentHealth() override;
 
 	//Returns the Max Health of the player.
 	UFUNCTION( Category = "Damagable Interface Functions")
-	virtual float GetMaxHealth_Implementation() override;
+	virtual float GetMaxHealth() override;
 
 	//Heals player by the amount passed in.
 	UFUNCTION( Category = "Damagable Interface Functions")
-	virtual void Heal_Implementation(float amount) override;
+	virtual void Heal(float amount) override;
 
 	//Handles the incoming damage of an enemy
 	UFUNCTION( Category = "Damagable Interface Functions")
-	virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
+	virtual bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo) override;
 
 protected:
 	//Performs the basic attack of the character.
@@ -325,6 +325,12 @@ protected:
 //------------------------------Equipment Functions--------------------------------------------------------------------------
 public:
 	void SpawnWeapon();
+
+//------------------------------Character Variable functions--------------------------------------------------------------------------
+
+public:
+	//Updates all variables from the character to the proper widget
+	void UpdateAllWidgets();
 
 //------------------------------INLINE Functions--------------------------------------------------------------------------
 

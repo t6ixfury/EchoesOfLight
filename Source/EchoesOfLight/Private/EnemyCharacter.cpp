@@ -9,6 +9,8 @@
 #include "Interfaces/Interface_Damagable.h"
 #include "ActorComponents/AC_DamageSystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Widgets/EnemyHealthBar.h"
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -19,6 +21,10 @@ AEnemyCharacter::AEnemyCharacter()
 	NormalAttackDamage = 10.f;
 	TimeTillHitReactAction = 1.5f;
 	bCanPlayhitReact = true;
+
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("Health Bar"));
+	HealthBar->SetupAttachment(RootComponent);
+	HealthBar->SetWidgetClass(HealthBarClass);
 
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 	CurrentDamageState = E_EnemyDamageStates::ApplyDamage;
@@ -43,7 +49,8 @@ void AEnemyCharacter::BeginPlay()
 
 		}
 	}
-	
+	//sets the health bar percentage.
+	SetEnemyWidgets();
 }
 
 // Called every frame
@@ -65,7 +72,7 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 // *************** DAMAGABLE INTERFACE IMPLEMENTATION (BEGINNING) **************************//
 
 //Returns the current health on the main character.
-float AEnemyCharacter::GetCurrentHealth_Implementation()
+float AEnemyCharacter::GetCurrentHealth()
 {
 	if (DamageSystem)
 	{
@@ -75,7 +82,7 @@ float AEnemyCharacter::GetCurrentHealth_Implementation()
 }
 
 //Returns the max health of the main character
-float AEnemyCharacter::GetMaxHealth_Implementation()
+float AEnemyCharacter::GetMaxHealth()
 {
 	if (DamageSystem)
 	{
@@ -85,7 +92,7 @@ float AEnemyCharacter::GetMaxHealth_Implementation()
 	return -1;
 }
 
-void AEnemyCharacter::Heal_Implementation(float amount)
+void AEnemyCharacter::Heal(float amount)
 {
 	if (DamageSystem)
 	{
@@ -93,7 +100,7 @@ void AEnemyCharacter::Heal_Implementation(float amount)
 	}
 }
 
-bool AEnemyCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
+bool AEnemyCharacter::TakeIncomingDamage(FS_DamageInfo DamageInfo)
 {
 	bool hasTakenDamage = false;
 
@@ -113,6 +120,7 @@ bool AEnemyCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo
 		DamageSystem->bisInvincible = true;
 		GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemyCharacter::SetDamagable, TimeTillDamagable, false);
 	}
+	SetEnemyWidgets();
 	return hasTakenDamage;
 }
 
@@ -211,7 +219,7 @@ void AEnemyCharacter::CapsuleTraceForEnemy()
 
 				if (HitActor)
 				{
-					HitActor->Execute_TakeIncomingDamage(HitResult.GetActor(), BaseAttackInfo);
+					HitActor->TakeIncomingDamage(BaseAttackInfo);
 				}
 
 			}
@@ -236,4 +244,16 @@ void AEnemyCharacter::SetMovementSpeed(float NewMaxSpeed)
 
 }
 
+void AEnemyCharacter::SetEnemyWidgets()
+{
+	if (HealthBar)
+	{
+		UEnemyHealthBar* WidgetInstance = Cast<UEnemyHealthBar>(HealthBar->GetUserWidgetObject());
+		if (WidgetInstance)
+		{
+			float health = DamageSystem->Health / DamageSystem->MaxHealth;
 
+			WidgetInstance->SetHealthBarPercentage(health);
+		}
+	}
+}

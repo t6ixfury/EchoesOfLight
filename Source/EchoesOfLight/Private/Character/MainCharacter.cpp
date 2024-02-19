@@ -13,6 +13,7 @@
 #include "Actors/Items/Pickup.h"
 #include "Widgets/W_EquipmentSlot.h"
 #include "Widgets/W_EquipmentMenu.h"
+#include "W_MainGUI.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -104,6 +105,13 @@ void AMainCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(inputMappingContext, 0);
 		}
+	}
+
+	//sets health bar percantage to the 
+	if (MainWidgetHandlerComponent->GUI)
+	{
+		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
+		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
 	}
 
 	//Initialize the HUD for the character.
@@ -310,6 +318,7 @@ void AMainCharacter::SpawnWeapon()
 
 }
 
+
 void AMainCharacter::MeleeAttack()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Melee attack called."))
@@ -470,7 +479,7 @@ void AMainCharacter::ToggleInventory()
 
 
 
-float AMainCharacter::GetCurrentHealth_Implementation()
+float AMainCharacter::GetCurrentHealth()
 {
 	if (DamageSystem)
 	{
@@ -479,7 +488,7 @@ float AMainCharacter::GetCurrentHealth_Implementation()
 	return -1;
 }
 
-float AMainCharacter::GetMaxHealth_Implementation()
+float AMainCharacter::GetMaxHealth()
 {
 	if (DamageSystem)
 	{
@@ -489,7 +498,7 @@ float AMainCharacter::GetMaxHealth_Implementation()
 	return -1;
 }
 
-void AMainCharacter::Heal_Implementation(float amount)
+void AMainCharacter::Heal(float amount)
 {
 	if (DamageSystem)
 	{
@@ -497,7 +506,7 @@ void AMainCharacter::Heal_Implementation(float amount)
 	}
 }
 
-bool AMainCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
+bool AMainCharacter::TakeIncomingDamage(FS_DamageInfo DamageInfo)
 {
 
 	// boolean to store the result wether damage was taken or not.
@@ -512,6 +521,13 @@ bool AMainCharacter::TakeIncomingDamage_Implementation(FS_DamageInfo DamageInfo)
 		//set the player to be invincible till the candamagetimer is up then set it back to false.
 		DamageSystem->bisInvincible = true;
 		GetWorldTimerManager().SetTimer(CanDamageTimer, this, &AMainCharacter::SetDamagable, TimeTillDamagable, false);
+
+		//sets health bar percantage to the 
+		if (MainWidgetHandlerComponent->GUI)
+		{
+			float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
+			MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
+		}
 
 	}
 	return hasTakenDamage;
@@ -847,7 +863,16 @@ void AMainCharacter::roll()
 	}
 }
 
+//----------------------------Widgets-------------------------------------------------
 
-
+void AMainCharacter::UpdateAllWidgets()
+{
+	//sets health bar percantage to the 
+	if (MainWidgetHandlerComponent->GUI)
+	{
+		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
+		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
+	}
+}
 
 

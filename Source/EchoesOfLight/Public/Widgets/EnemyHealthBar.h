@@ -3,22 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interfaces/Interface_Damagable.h"
 #include "Blueprint/UserWidget.h"
-#include "W_MainGUI.generated.h"
+#include "EnemyHealthBar.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ECHOESOFLIGHT_API UW_MainGUI : public UUserWidget
+class ECHOESOFLIGHT_API UEnemyHealthBar : public UUserWidget
 {
 	GENERATED_BODY()
+	
 
-
-
-
-		
 //---------------------------------------------------------------------------------------------------------------------------
 //	PROPERTIES AND VARIABLES
 //---------------------------------------------------------------------------------------------------------------------------
@@ -36,5 +32,4 @@ public:
 public:
 	void SetHealthBarPercentage(float newHealth);
 
-	
 };

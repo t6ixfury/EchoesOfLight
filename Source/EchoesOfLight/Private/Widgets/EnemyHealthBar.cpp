@@ -1,13 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 //game
-#include "W_MainGUI.h"
+#include "Widgets/EnemyHealthBar.h"
 
 //engine
 #include "Components/ProgressBar.h"
 
-
-void UW_MainGUI::SetHealthBarPercentage(float newHealth)
+void UEnemyHealthBar::SetHealthBarPercentage(float newHealth)
 {
 	if (HealthBar)
 	{

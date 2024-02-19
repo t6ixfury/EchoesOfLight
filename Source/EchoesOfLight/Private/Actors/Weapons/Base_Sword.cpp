@@ -99,7 +99,7 @@ void ABase_Sword::BaseAttack()
 
             if (HitActor)
             {
-                HitActor->Execute_TakeIncomingDamage(HitResult.GetActor(),BaseAttackInfo);
+                HitActor->TakeIncomingDamage(BaseAttackInfo);
                 UE_LOG(LogTemp, Warning, TEXT("hit actor found"))
             }
 
