@@ -9,6 +9,10 @@
 #include "Interfaces/Interface_EnemyAi.h"
 #include "EnemyCharacter.generated.h"
 
+class UEnemyHealthBar;
+class UAC_DamageSystem;
+class UWidgetComponent;
+
 UCLASS()
 class ECHOESOFLIGHT_API AEnemyCharacter : public ACharacter, public IInterface_Damagable, public IInterface_EnemyAi
 {
@@ -19,10 +23,17 @@ class ECHOESOFLIGHT_API AEnemyCharacter : public ACharacter, public IInterface_D
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
+	//---------------------Components--------------------------------------------
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		UAC_DamageSystem* DamageSystem;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-		class UAC_DamageSystem* DamageSystem;
+		UWidgetComponent* HealthBar;
 
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Components | Widget Classes")
+		TSubclassOf<UEnemyHealthBar> HealthBarClass;
+
+//--------------------------Variables--------------------------------------------------
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Damage State")
 		E_EnemyDamageStates CurrentDamageState;
 
@@ -64,13 +75,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checks")
 		bool bCanPlayhitReact;
 
-
-
+//-------------------------DELEGATES------------------------------------------------------------
 
 	DECLARE_DELEGATE(FOnEnemyHit);
 	FOnEnemyHit OnHit;
 
-		
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -88,21 +98,17 @@ public:
 	/*
 	DAMAGABLE INTERFACE
 	*/
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		float GetCurrentHealth();
-		virtual float GetCurrentHealth_Implementation() override;
+	UFUNCTION()
+		virtual float GetCurrentHealth() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		float GetMaxHealth();
-		virtual float GetMaxHealth_Implementation() override;
+	UFUNCTION()
+		virtual float GetMaxHealth() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		void Heal(float amount);
-		virtual void Heal_Implementation(float amount) override;
+	UFUNCTION()
+		virtual void Heal(float amount) override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Damagable Interface Functions")
-		bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo);
-		virtual bool TakeIncomingDamage_Implementation(struct FS_DamageInfo DamageInfo) override;
+	UFUNCTION()
+		virtual bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo) override;
 
 
 
@@ -138,6 +144,8 @@ protected:
 		void RemoveActor();
 
 	void CanPlayHitReactMontage();
+
+	void SetEnemyWidgets();
 
 
 };

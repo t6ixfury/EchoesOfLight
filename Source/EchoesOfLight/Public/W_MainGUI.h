@@ -15,15 +15,26 @@ class ECHOESOFLIGHT_API UW_MainGUI : public UUserWidget
 {
 	GENERATED_BODY()
 
+
+
+
+		
+//---------------------------------------------------------------------------------------------------------------------------
+//	PROPERTIES AND VARIABLES
+//---------------------------------------------------------------------------------------------------------------------------
+
 public:
 
-	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget))
 		class UProgressBar* HealthBar;
 
-	UPROPERTY(BlueprintReadOnly)
-		TScriptInterface<IInterface_Damagable> DamagableInterface;
 
+//---------------------------------------------------------------------------------------------------------------------------
+//	FUNCTIONS
+//---------------------------------------------------------------------------------------------------------------------------
 
-	
+public:
+	void SetHealthBarPercentage(float newHealth);
+
 	
 };

@@ -38,10 +38,7 @@ void UAC_MainWidgetHandler::BeginPlay()
 {
 	Super::BeginPlay();
 	UE_LOG(LogTemp, Warning, TEXT("mainwidgethandler beginplay called"));
-	InitializePlayerWidgetsEvent.AddDynamic(this, &UAC_MainWidgetHandler::CreateAllPlayerWidgets);
-	InitializePlayerWidgetsEvent.Broadcast();
-
-	
+	CreateAllPlayerWidgets();
 }
 
 
@@ -67,14 +64,12 @@ void UAC_MainWidgetHandler::InitializePlayer()
 
 void UAC_MainWidgetHandler::CreateMainWidget()
 {
-	if (MainCharacterController && HealthBar)
+	if (MainCharacterController && GUI_Class)
 	{
-		GUI = CreateWidget<UW_MainGUI>(MainCharacterController, HealthBar);
+		GUI = CreateWidget<UW_MainGUI>(MainCharacterController, GUI_Class);
 		if (GUI)
 		{
-			GUI->DamagableInterface = MainCharacter;
 			GUI->AddToViewport();
-			UE_LOG(LogTemp, Warning, TEXT("Gui added to view port"))
 		}
 
 	}

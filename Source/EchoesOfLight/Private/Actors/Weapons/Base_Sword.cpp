@@ -65,7 +65,7 @@ void ABase_Sword::BaseAttack()
     TArray<AActor*> ActorsToIgnore;
     UWorld* World = GetWorld();
 
-    //UE_LOG(LogTemp,Warning, TEXT("BaseAttack called"))
+   // UE_LOG(LogTemp,Warning, TEXT("BaseAttack called"))
 
     float radius = 25.0f;
 
@@ -99,7 +99,7 @@ void ABase_Sword::BaseAttack()
 
             if (HitActor)
             {
-                HitActor->Execute_TakeIncomingDamage(HitResult.GetActor(),BaseAttackInfo);
+                HitActor->TakeIncomingDamage(BaseAttackInfo);
                 UE_LOG(LogTemp, Warning, TEXT("hit actor found"))
             }
 
