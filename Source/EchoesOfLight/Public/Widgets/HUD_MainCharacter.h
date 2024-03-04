@@ -22,14 +22,7 @@ public:
 	//---------------------------------------------------------------------------------------------------------------------------
 	//	PROPERTIES AND VARIABLES
 	//---------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UW_EquipmentMenu> MainMenuWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UW_Interact> InteractionWidgetClass;
-
-	UPROPERTY()
-	bool bIsMenuVisible;
 
 	//---------------------------------------------------------------------------------------------------------------------------
 	//	FUNCTIONS
@@ -37,22 +30,10 @@ public:
 
 	AHUD_MainCharacter();
 	
-	void DisplayMenu();
-	void HideMenu();
-	void ToggleMenu();
-
-	void ShowInteractionWidget() const;
-	void HideInteractionWidget() const;
-	void UpdateInteractionWidget( const FInteractableData* InteractData) const;
-
 
 	//---------------------------------------------------------------------------------------------------------------------------
 	//	PROPERTIES AND VARIABLES
 	//---------------------------------------------------------------------------------------------------------------------------
-	UPROPERTY()
-		UW_EquipmentMenu* MainMenuWidget;
-		UPROPERTY()
-		UW_Interact* InteractionWidget;
 
 
 	//---------------------------------------------------------------------------------------------------------------------------

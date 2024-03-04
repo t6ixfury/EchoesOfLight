@@ -45,6 +45,7 @@ public:
 	
 	int32 DefensePower = 10;
 
+
 };
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
