@@ -48,6 +48,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		FItemWeaponStatistics ItemWeaponStatistics;
 
+	UPROPERTY(EditAnywhere, Category = "Item")
+		FItemCharacerStatistics ItemCharacerStatistics;
+
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		FItemTextData ItemTextData;
 
