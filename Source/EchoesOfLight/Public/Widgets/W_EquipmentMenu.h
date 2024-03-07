@@ -10,6 +10,8 @@
 class UTextBlock;
 class UW_InventoryPanel;
 class UW_EquipmentSlot;
+class UW_StatBox;
+class AMainCharacter;
 /**
  * 
  */
@@ -23,31 +25,34 @@ class ECHOESOFLIGHT_API UW_EquipmentMenu : public UUserWidget
 
 public:
 
-	// <Stat Values>
+	// <Weapon Stat Values>
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* AttackPower_Value;
+		UW_StatBox* AttackPower;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* MagicPower_Value;
+		UW_StatBox* MagicPower;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* CriticalHitRate_Value;
+		UW_StatBox* CriticalHitRate;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* AttackSpeed_Value;
+		UW_StatBox* AttackSpeed;
+
+	// <Character Stat Values>
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* Health_Value;
+		UW_StatBox* Health;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* Stamina_Value;
+		UW_StatBox* Stamina;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* StrengthPower_Value;
+		UW_StatBox* Strength;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* DefensePower_Value;
+		UW_StatBox* Defense;
+
 
 
 	// Widgets
@@ -63,6 +68,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		UW_EquipmentSlot* Netherband_Slot;
 
+	UPROPERTY()
+		AMainCharacter* MainCharacter;
+
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -70,10 +78,16 @@ public:
 
 public:
 
+	virtual void NativeOnInitialized();
+
+	void SetMainCharacterReference();
+
 	void UpdateEquipmentStats();
 
 	void UpdateCharacterStats();
 
 	void UpdateSlots();
+
+	void UpdateStatProgressBars();
 	
 };

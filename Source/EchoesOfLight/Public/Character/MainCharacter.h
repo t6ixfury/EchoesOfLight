@@ -39,11 +39,16 @@ struct FCharacterStats
 
 public:
 
-	int32 Stamina = 100;
+	int32 Stamina = 10;
 
 	int32 Strength = 10;
 	
 	int32 DefensePower = 10;
+
+	int32 Constitution = 10;
+
+	int32 MaxStatValue = 99;
+
 
 };
 
@@ -92,6 +97,8 @@ private:
 
 //------------------------------Combat Variables--------------------------------------------------------------------------
 public:
+
+		FCharacterStats MainCharacterStats;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		float ClosestDistance;

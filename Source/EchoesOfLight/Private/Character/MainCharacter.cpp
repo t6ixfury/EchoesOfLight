@@ -201,7 +201,7 @@ void AMainCharacter::UpdateInteractionWidget() const
 	if (IsValid(TargetInteractable.GetObject()))
 	{
 		//update Interaction widget.
-		HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+		MainWidgetHandlerComponent->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 	}
 }
 
@@ -303,6 +303,8 @@ void AMainCharacter::SpawnWeapon()
 				RightHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandWeaponSlotName);
 				LeftHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, leftHandWeaponSlotName);
 				isWeaponEquipped = true;
+				MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentStats();
+				MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateStatProgressBars();
 			}
 		}
 	} 
@@ -329,7 +331,7 @@ void AMainCharacter::MeleeAttack()
 
 	float timeTillNextAttack = 0.5f;
 
-	if (CharacterAnimInstance && !HUD->bIsMenuVisible)
+	if (CharacterAnimInstance && !MainWidgetHandlerComponent->bIsMenuVisible)
 	{
 		isAttacking = true;
 
@@ -468,7 +470,7 @@ void AMainCharacter::MeleeAttack()
 
 void AMainCharacter::ToggleInventory()
 {
-	HUD->ToggleMenu();
+	MainWidgetHandlerComponent->ToggleEquipmentMenu();
 }
 
 
@@ -630,7 +632,7 @@ void AMainCharacter::FoundInteractable(AActor* NewInteractable)
 	TargetInteractable = NewInteractable;
 
 	//this will show the interaction widget on screen and update it simultaneously
-	HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
+	MainWidgetHandlerComponent->UpdateInteractionWidget(&TargetInteractable->InteractableData);
 
 	TargetInteractable->BeginFocus();
 
@@ -651,7 +653,7 @@ void AMainCharacter::NoInteractableFound()
 			TargetInteractable->EndFocus();
 		}
 
-		HUD->HideInteractionWidget();
+		MainWidgetHandlerComponent->HideInteractionWidget();
 
 		//reset currentinteractable and target interactable to null
 		InteractionData.CurrentInteractable = nullptr;

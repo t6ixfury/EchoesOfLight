@@ -12,12 +12,18 @@ class UW_Interact;
 class UW_MainGUI;
 class AMainCharacter;
 class UBFL_Utility;
+class UW_EquipmentMenu;
+struct FInteractableData;
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ECHOESOFLIGHT_API UAC_MainWidgetHandler : public UActorComponent
 {
 	GENERATED_BODY()
+
+//---------------------------------------------------------------------------------------------------------------------------
+//	PROPERTIES AND VARIABLES
+//---------------------------------------------------------------------------------------------------------------------------
 
 public:	
 	// Sets default values for this component's properties
@@ -29,10 +35,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 		UW_MainGUI* GUI;
 
-	UPROPERTY(BlueprintReadOnly)
-		UW_Interact* Interact;
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 		TSubclassOf<AMainCharacter> CharacterClass ;
 
@@ -42,8 +44,41 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		APlayerController* MainCharacterController;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UW_EquipmentMenu> EquipmentMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UW_Interact> InteractionWidgetClass;
+
+	UPROPERTY()
+		UW_EquipmentMenu* EquipmentMenuWidget;
+
+	UPROPERTY()
+		UW_Interact* InteractionWidget;
+
+	UPROPERTY()
+		bool bIsMenuVisible;
+
+//---------------------------------------------------------------------------------------------------------------------------
+//	FUNCTIONS
+//---------------------------------------------------------------------------------------------------------------------------
+
 	UFUNCTION()
 		void CreateAllPlayerWidgets();
+
+	UFUNCTION()
+		void ToggleEquipmentMenu();
+
+	UFUNCTION()
+		void HideMenu();
+
+	UFUNCTION()
+		void DisplayMenu();
+
+	void ShowInteractionWidget() const;
+	void HideInteractionWidget() const;
+	void UpdateInteractionWidget(const FInteractableData* InteractData) const;
+
 
 	
 		
@@ -63,7 +98,7 @@ public:
 		void InitializePlayer();
 
 	UFUNCTION(BlueprintCallable)
-		void CreateMainWidget();
+		void CreateAllWidget();
 
 	UFUNCTION(BlueprintCallable)
 		void TogglePause();

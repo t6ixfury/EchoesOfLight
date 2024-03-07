@@ -12,6 +12,8 @@
 #include "Libraries/BFL_Utility.h"
 #include "W_MainGUI.h"
 #include "ActorComponents/AC_Inventory.h"
+#include "Widgets/W_EquipmentMenu.h"
+#include "Interfaces/Interface_Interaction.h"
 
 
 
@@ -30,15 +32,93 @@ UAC_MainWidgetHandler::UAC_MainWidgetHandler()
 void UAC_MainWidgetHandler::CreateAllPlayerWidgets()
 {
 	InitializePlayer();
-	CreateMainWidget();
+	CreateAllWidget();
+}
+
+void UAC_MainWidgetHandler::DisplayMenu()
+{
+	if (EquipmentMenuWidget)
+	{
+		EquipmentMenuWidget->SetVisibility(ESlateVisibility::Visible);
+		bIsMenuVisible = true;
+	}
+}
+
+void UAC_MainWidgetHandler::ToggleEquipmentMenu()
+{
+	if (bIsMenuVisible)
+	{
+		HideMenu();
+
+		//unpause the game.
+		UGameplayStatics::SetGamePaused(GetWorld(), false);
+
+		//set input mode to game only.
+		const FInputModeGameOnly InputMode;
+		MainCharacterController->SetInputMode(InputMode);
+
+		// remove cursor from the screen.
+		MainCharacterController->SetShowMouseCursor(false);
+	}
+	else
+	{
+		DisplayMenu();
+
+		//set input mode to UI only.
+		const FInputModeUIOnly InputMode;
+		MainCharacterController->SetInputMode(InputMode);
+
+		//pause the game.
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+		// remove cursor from the screen.
+		MainCharacterController->SetShowMouseCursor(true);
+	}
+}
+
+void UAC_MainWidgetHandler::HideMenu()
+{
+	if (EquipmentMenuWidgetClass)
+	{
+		EquipmentMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		bIsMenuVisible = false;
+	}
 }
 
 // Called when the game starts
 void UAC_MainWidgetHandler::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("mainwidgethandler beginplay called"));
 	CreateAllPlayerWidgets();
+}
+
+void UAC_MainWidgetHandler::ShowInteractionWidget() const
+{
+	if (InteractionWidget)
+	{
+		InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UAC_MainWidgetHandler::HideInteractionWidget() const
+{
+	if (InteractionWidget)
+	{
+		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void UAC_MainWidgetHandler::UpdateInteractionWidget(const FInteractableData* InteractData) const
+{
+	if (InteractionWidget)
+	{
+		if (InteractionWidget->GetVisibility() == ESlateVisibility::Collapsed)
+		{
+			InteractionWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+
+		InteractionWidget->UpdateWidget(InteractData);
+	}
 }
 
 
@@ -62,8 +142,9 @@ void UAC_MainWidgetHandler::InitializePlayer()
 	}
 }
 
-void UAC_MainWidgetHandler::CreateMainWidget()
+void UAC_MainWidgetHandler::CreateAllWidget()
 {
+	//Creates the player character GUI
 	if (MainCharacterController && GUI_Class)
 	{
 		GUI = CreateWidget<UW_MainGUI>(MainCharacterController, GUI_Class);
@@ -72,6 +153,21 @@ void UAC_MainWidgetHandler::CreateMainWidget()
 			GUI->AddToViewport();
 		}
 
+	}
+
+	if (EquipmentMenuWidgetClass)
+	{
+		EquipmentMenuWidget = CreateWidget<UW_EquipmentMenu>(MainCharacterController, EquipmentMenuWidgetClass);
+		EquipmentMenuWidget->AddToViewport();
+		EquipmentMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	//Creates the Interaction Widget
+	if (InteractionWidgetClass)
+	{
+		InteractionWidget = CreateWidget<UW_Interact>(GetWorld(), InteractionWidgetClass);
+		InteractionWidget->AddToViewport(-1);
+		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
