@@ -27,6 +27,9 @@ public:
 		int32 AtttackSpeed = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int32 MaxStatValue = 99;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float Damage = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

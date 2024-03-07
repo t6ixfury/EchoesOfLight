@@ -303,6 +303,8 @@ void AMainCharacter::SpawnWeapon()
 				RightHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandWeaponSlotName);
 				LeftHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, leftHandWeaponSlotName);
 				isWeaponEquipped = true;
+				MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentStats();
+				MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateStatProgressBars();
 			}
 		}
 	} 

@@ -11,6 +11,7 @@ class UTextBlock;
 class UW_InventoryPanel;
 class UW_EquipmentSlot;
 class UW_StatBox;
+class AMainCharacter;
 /**
  * 
  */
@@ -67,6 +68,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		UW_EquipmentSlot* Netherband_Slot;
 
+	UPROPERTY()
+		AMainCharacter* MainCharacter;
+
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -74,10 +78,16 @@ public:
 
 public:
 
+	virtual void NativeOnInitialized();
+
+	void SetMainCharacterReference();
+
 	void UpdateEquipmentStats();
 
 	void UpdateCharacterStats();
 
 	void UpdateSlots();
+
+	void UpdateStatProgressBars();
 	
 };
