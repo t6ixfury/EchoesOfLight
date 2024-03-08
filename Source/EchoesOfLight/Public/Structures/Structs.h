@@ -130,13 +130,22 @@ struct ECHOESOFLIGHT_API FItemStatistics
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere)
-		float ArmorRating;
+		float StaminaRestorationAmount;
 
 	UPROPERTY(EditAnywhere)
 		float DamageValue;
 
 	UPROPERTY(EditAnywhere)
-		float RestorationAmount;
+		float ArmorRating;
+
+	UPROPERTY(EditAnywhere)
+		float HealthRestorationAmount;
+
+	UPROPERTY(EditAnywhere)
+		float StrengthVariationAmount;
+
+	UPROPERTY(EditAnywhere)
+		float DefenseVariationAmount;
 
 	UPROPERTY(EditAnywhere)
 		float SellValue;
@@ -162,6 +171,26 @@ struct ECHOESOFLIGHT_API FItemWeaponStatistics
 
 	UPROPERTY(VisibleAnywhere)
 		float Damage = AttackPower;
+
+};
+
+USTRUCT()
+struct ECHOESOFLIGHT_API FItemCharacerStatistics
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere)
+	int32 Health = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 Stamina = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 Defense = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 Strength = 0;
+
 
 };
 
@@ -245,6 +274,9 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 		FItemAssData ItemAssetData;
+
+	UPROPERTY(EditAnywhere, Category = "ItemData")
+		FItemCharacerStatistics ItemCharacerStatistics;
 	
 };
 

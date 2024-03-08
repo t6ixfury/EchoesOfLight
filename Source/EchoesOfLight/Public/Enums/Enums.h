@@ -96,7 +96,8 @@ enum class EItemType : uint8
 	Spell UMETA(DisplayName = "Spell"),
 	Consumable UMETA(DisplayName = "Consumable"),
 	Quest UMETA(DisplayName = "Quest"),
-	Mudane UMETA(DisplayName = "Mudane")
+	Mudane UMETA(DisplayName = "Mudane"),
+	Powerup UMETA(DisplayName = "Powerup")
 };
 
 /*
