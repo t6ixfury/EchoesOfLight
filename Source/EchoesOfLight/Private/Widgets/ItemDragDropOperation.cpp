@@ -4,4 +4,5 @@
 #include "Widgets/ItemDragDropOperation.h"
 #include "Actors/Items/ItemBase.h"
 #include "ActorComponents/AC_Inventory.h"
+#include "Widgets/W_EquipmentSlot.h"
 

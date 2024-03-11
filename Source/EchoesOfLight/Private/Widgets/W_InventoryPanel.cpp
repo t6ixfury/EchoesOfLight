@@ -6,10 +6,12 @@
 #include <ActorComponents/AC_Inventory.h>
 #include "Widgets/W_InventorySlot.h"
 #include "Widgets/ItemDragDropOperation.h"
+#include "Widgets/W_EquipmentSlot.h"
 
 //engine
 #include <Components/WrapBox.h>
 #include <Components/TextBlock.h>
+#include "Components/Image.h"  
 
 
 
@@ -66,13 +68,29 @@ bool UW_InventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 {
 	const UItemDragDropOperation* ItemDragDrop = Cast<UItemDragDropOperation>(InOperation);
 
-	if (ItemDragDrop->SourceItem && InventoryReference)
+	if (ItemDragDrop->SourceItem && InventoryReference && !InventoryReference->FindMatchingItem(ItemDragDrop->SourceItem))
 	{
-		// returning true will stop the drop operation at this widget.
-		return true;
+		
+		FItemAddResult Result = InventoryReference->HandleAddItem(ItemDragDrop->SourceItem);
+
+		if (Result.OperationResult == EItemAddResult::IAR_AllItemAdded)
+		{
+			if (ItemDragDrop->EquipmentSlotReference)
+			{
+				ItemDragDrop->EquipmentSlotReference->ItemReference = nullptr;
+				return true;
+			}
+		}
 	}
 	//returning false will cause the drop operation to fall through to underlying widgets.
 	return false;
+}
+
+void UW_InventoryPanel::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+
 }
 
 

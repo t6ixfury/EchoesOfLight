@@ -65,7 +65,7 @@ void UAC_MainWidgetHandler::ToggleEquipmentMenu()
 		DisplayMenu();
 
 		//set input mode to UI only.
-		const FInputModeUIOnly InputMode;
+		const FInputModeGameAndUI InputMode;
 		MainCharacterController->SetInputMode(InputMode);
 
 		//pause the game.

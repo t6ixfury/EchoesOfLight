@@ -102,7 +102,7 @@ void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
-	if (DragItemVisualClass)
+	if (DragItemVisualClass && ItemReference)
 	{
 		// Create widget
 		const TObjectPtr<UDragItemVisual> DragVisual = CreateWidget< UDragItemVisual>(this, DragItemVisualClass);

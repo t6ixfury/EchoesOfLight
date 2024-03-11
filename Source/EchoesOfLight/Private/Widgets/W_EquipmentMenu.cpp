@@ -8,11 +8,13 @@
 #include "Character/MainCharacter.h"
 #include "Actors/Weapons/Base_Sword.h"
 #include "ActorComponents/AC_DamageSystem.h"
+#include "Widgets/ItemDragDropOperation.h"
 
 //engine
 #include "Components/ProgressBar.h"  
 #include "Components/TextBlock.h"  
 #include "Kismet/KismetMathLibrary.h"
+
 
 void UW_EquipmentMenu::NativeOnInitialized()
 {
@@ -101,3 +103,4 @@ void UW_EquipmentMenu::UpdateStatProgressBars()
 		Strength->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.Strength) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.MaxStatValue));
 	}
 }
+
