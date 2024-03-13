@@ -13,7 +13,6 @@
 //engine
 #include "Components/ProgressBar.h"  
 #include "Components/TextBlock.h"  
-#include "Kismet/KismetMathLibrary.h"
 
 
 void UW_EquipmentMenu::NativeOnInitialized()
@@ -23,6 +22,10 @@ void UW_EquipmentMenu::NativeOnInitialized()
 	SetMainCharacterReference();
 	UpdateCharacterStats();
 	UpdateStatProgressBars();
+
+	Weapon_Slot->EquipmentType = EItemType::Weapon;
+	Amulet_Slot->EquipmentType = EItemType::Amulet;
+	Netherband_Slot->EquipmentType = EItemType::Netherband;
 
 }
 
@@ -45,20 +48,32 @@ void UW_EquipmentMenu::UpdateEquipmentStats()
 	if (MainCharacter->LeftHandWeapon)
 	{
 		// Set the Attack power stat to be properly represented int the widget.
-		AttackPower->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.AttackPower));
-		AttackPower->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
+		AttackPower->SetStatValues(MainCharacter->LeftHandWeapon->BaseAttackInfo.AttackPower, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
 
 		//set magic power stat
-		MagicPower->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.MagicPower));
-		MagicPower->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
-		
+		MagicPower->SetStatValues(MainCharacter->LeftHandWeapon->BaseAttackInfo.MagicPower, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+
 		//set Critical Hit rate stat
-		CriticalHitRate->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.CriticalHitRate));
-		CriticalHitRate->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
+		CriticalHitRate->SetStatValues(MainCharacter->LeftHandWeapon->BaseAttackInfo.CriticalHitRate, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
 
 		//Set AttackSpeed Stat
-		AttackSpeed->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.AtttackSpeed));
-		AttackSpeed->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
+		AttackSpeed->SetStatValues(MainCharacter->LeftHandWeapon->BaseAttackInfo.AtttackSpeed, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+		UE_LOG(LogTemp, Warning, TEXT("Equipment stats not Lefthand null"));
+	}
+	else
+	{
+		// Set the Attack power stat to be properly represented int the widget.
+		AttackPower->SetStatValues(1, 99);
+
+		//set magic power stat
+		MagicPower->SetStatValues(1, 99);
+
+		//set Critical Hit rate stat
+		CriticalHitRate->SetStatValues(1, 99);
+
+		//Set AttackSpeed Stat
+		AttackSpeed->SetStatValues(1, 99);
+		UE_LOG(LogTemp, Warning, TEXT("Equipment stats Lefthand null"));
 	}
 }
 
@@ -67,21 +82,24 @@ void UW_EquipmentMenu::UpdateCharacterStats()
 	if (MainCharacter)
 	{
 		//set health stat bar
-		Health->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.Constitution));
-		Health->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.MaxStatValue));
+		Health->SetStatValues(MainCharacter->MainCharacterStats.Constitution, MainCharacter->MainCharacterStats.MaxStatValue);
 
 		//set defense stat bar
-		Defense->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.DefensePower));
-		Defense->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.MaxStatValue));
+		Defense->SetStatValues(MainCharacter->MainCharacterStats.DefensePower, MainCharacter->MainCharacterStats.MaxStatValue);
 
 		//set stamina stat bar
-		Stamina->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.Stamina));
-		Stamina->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.MaxStatValue));
+		Stamina->SetStatValues(MainCharacter->MainCharacterStats.Stamina, MainCharacter->MainCharacterStats.MaxStatValue);
 
 		// Set strength stat bar
-		Strength->CurrentStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.Strength));
-		Strength->MaximumStatValue->SetText(FText::AsNumber(MainCharacter->MainCharacterStats.MaxStatValue));
+		Strength->SetStatValues(MainCharacter->MainCharacterStats.Strength, MainCharacter->MainCharacterStats.MaxStatValue);
 	}
+}
+
+void UW_EquipmentMenu::UpdateEquipmentWidget()
+{
+	UpdateCharacterStats();
+	UpdateStatProgressBars();
+	UpdateEquipmentStats();
 }
 
 void UW_EquipmentMenu::UpdateStatProgressBars()
@@ -89,18 +107,26 @@ void UW_EquipmentMenu::UpdateStatProgressBars()
 	if (MainCharacter->LeftHandWeapon)
 	{
 		//Set equipment Stat progress bar.
-		AttackPower->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.AttackPower) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
-		MagicPower->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.MagicPower) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
-		CriticalHitRate->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.CriticalHitRate) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
-		AttackSpeed->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.AtttackSpeed) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue));
+		AttackPower->SetProgressBarPercentage(MainCharacter->LeftHandWeapon->BaseAttackInfo.AttackPower, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+		MagicPower->SetProgressBarPercentage(MainCharacter->LeftHandWeapon->BaseAttackInfo.MagicPower, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+		CriticalHitRate->SetProgressBarPercentage(MainCharacter->LeftHandWeapon->BaseAttackInfo.CriticalHitRate, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+		AttackSpeed->SetProgressBarPercentage(MainCharacter->LeftHandWeapon->BaseAttackInfo.AtttackSpeed, MainCharacter->LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+	}
+	else
+	{
+		AttackPower->SetProgressBarPercentage(1, 99);
+		MagicPower->SetProgressBarPercentage(1, 99);
+		CriticalHitRate->SetProgressBarPercentage(1, 99);
+		AttackSpeed->SetProgressBarPercentage(1, 99);
+
 	}
 	if (MainCharacter)
 	{
 		//set Character Stat progress bar.
-		Health->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.Constitution) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.MaxStatValue));
-		Defense->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.DefensePower) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.MaxStatValue));
-		Stamina->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.Stamina) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.MaxStatValue));
-		Strength->StatProgressBar->SetPercent(UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.Strength) / UKismetMathLibrary::Conv_IntToFloat(MainCharacter->MainCharacterStats.MaxStatValue));
+		Health->SetProgressBarPercentage(MainCharacter->MainCharacterStats.Constitution, MainCharacter->MainCharacterStats.MaxStatValue);
+		Defense->SetProgressBarPercentage(MainCharacter->MainCharacterStats.DefensePower, MainCharacter->MainCharacterStats.MaxStatValue);
+		Stamina->SetProgressBarPercentage(MainCharacter->MainCharacterStats.Stamina, MainCharacter->MainCharacterStats.MaxStatValue);
+		Strength->SetProgressBarPercentage(MainCharacter->MainCharacterStats.Strength, MainCharacter->MainCharacterStats.MaxStatValue);
 	}
 }
 

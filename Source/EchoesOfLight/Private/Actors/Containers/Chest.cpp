@@ -156,7 +156,7 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 		}
 		break;
 	
-	case EItemType::Armor:
+	case EItemType::Amulet:
 		break;
 	case EItemType::Weapon:
 		break;

@@ -68,15 +68,19 @@ bool UW_InventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 {
 	const UItemDragDropOperation* ItemDragDrop = Cast<UItemDragDropOperation>(InOperation);
 
+	//checks for null ptrs and If the Item being dropped on the inventory is not the same item picked up.
 	if (ItemDragDrop->SourceItem && InventoryReference && !InventoryReference->FindMatchingItem(ItemDragDrop->SourceItem))
 	{
 		
 		FItemAddResult Result = InventoryReference->HandleAddItem(ItemDragDrop->SourceItem);
-
+		
+		//check to see if the item was indeed added to the inventory
 		if (Result.OperationResult == EItemAddResult::IAR_AllItemAdded)
 		{
 			if (ItemDragDrop->EquipmentSlotReference)
 			{
+				WasEquipmentAddedToInventory(ItemDragDrop->EquipmentSlotReference->EquipmentType);
+				//remove the reference to the item currently in the equipment slot.
 				ItemDragDrop->EquipmentSlotReference->ItemReference = nullptr;
 				return true;
 			}
@@ -91,6 +95,23 @@ void UW_InventoryPanel::NativeOnDragDetected(const FGeometry& InGeometry, const 
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 
+}
+
+void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType)
+{
+	switch (EquipmentType)
+	{
+	case EItemType::Amulet:
+		break;
+	case EItemType::Weapon:
+		//Removes the weapon that was previously in slot.
+		PlayerCharacter->OnWeaponSlotRemoval();
+		break;
+	case EItemType::Netherband:
+		break;
+	default:
+		break;
+	}
 }
 
 

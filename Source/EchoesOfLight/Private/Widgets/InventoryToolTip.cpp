@@ -20,13 +20,13 @@ void UInventoryToolTip::NativeConstruct()
 			//switch sets the setting for which fields should be visible in the tool tip
 			switch (ItemBeingHovered->ItemType)
 			{
-			case EItemType::Armor:
+			case EItemType::Amulet:
 				break;
 
 			case EItemType::Weapon:
 				break;
 
-			case EItemType::Shield:
+			case EItemType::Netherband:
 				break;
 
 			case EItemType::Spell:

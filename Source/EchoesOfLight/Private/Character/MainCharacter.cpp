@@ -14,6 +14,7 @@
 #include "Widgets/W_EquipmentSlot.h"
 #include "Widgets/W_EquipmentMenu.h"
 #include "W_MainGUI.h"
+#include "Actors/Items/ItemBase.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -117,16 +118,7 @@ void AMainCharacter::BeginPlay()
 	//Initialize the HUD for the character.
 	HUD = Cast< AHUD_MainCharacter>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
-	//set dual weapon
-	/*
-	if (HUD)
-	{
-		if (HUD->MainMenuWidget->Weapon_Slot->Equipment)
-		{
-			HUD->MainMenuWidget->Weapon_Slot->Equipment = nullptr;
-		}
-	}
-	*/
+	BindEquipmentSlotDelegates();
 }
 
 void AMainCharacter::Tick(float DeltaTime)
@@ -276,7 +268,12 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 
 void AMainCharacter::SpawnWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("SpawnWeapon called."))
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference == nullptr || 
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Null pointer from weapon slot."))
+		return;
+	}
 	if (!isWeaponEquipped)
 	{
 		FName RightHandWeaponSlotName = TEXT("Weapon_RSocket");
@@ -294,8 +291,12 @@ void AMainCharacter::SpawnWeapon()
 			FVector LeftSpawnLocation = CharacterMesh->GetSocketLocation(leftHandWeaponSlotName);
 			FRotator LeftSpawnRotation = CharacterMesh->GetSocketRotation(leftHandWeaponSlotName);
 
-			RightHandWeapon = World->SpawnActor<ABase_Sword>(DualSwordWeaponClass, RightSpawnLocation, RightSpawnRotation, SpawnParams);
-			LeftHandWeapon = World->SpawnActor<ABase_Sword>(DualSwordWeaponClass, LeftSpawnLocation, LeftSpawnRotation, SpawnParams);
+			RightHandWeapon = World->SpawnActor<ABase_Sword>(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword,
+				RightSpawnLocation, RightSpawnRotation, SpawnParams);
+
+			LeftHandWeapon = World->SpawnActor<ABase_Sword>(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword,
+				LeftSpawnLocation, LeftSpawnRotation, SpawnParams);
+			UE_LOG(LogTemp, Warning, TEXT("Weapons are supposed to be spawned."))
 
 			if (RightHandWeapon && LeftHandWeapon)
 			{
@@ -310,16 +311,49 @@ void AMainCharacter::SpawnWeapon()
 	} 
 	else
 	{
-		RightHandWeapon->Destroy();
-		LeftHandWeapon->Destroy();
-		RightHandWeapon = nullptr;
-		LeftHandWeapon = nullptr;
-		isWeaponEquipped = false;
+		DespawnWeapon();
 	}
 	
 
 }
 
+void AMainCharacter::DespawnWeapon()
+{
+	RightHandWeapon->Destroy();
+	LeftHandWeapon->Destroy();
+	RightHandWeapon = nullptr;
+	LeftHandWeapon = nullptr;
+	isWeaponEquipped = false;
+}
+
+
+void AMainCharacter::OnWeaponEquipmentChange()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Weapon Broadcast fired."));
+	if(isWeaponEquipped)
+	{
+		DespawnWeapon();
+	}
+
+	SpawnWeapon();
+
+
+}
+
+void AMainCharacter::BindEquipmentSlotDelegates()
+{
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot)
+	{
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->WeaponChange.AddUObject(this, &AMainCharacter::OnWeaponEquipmentChange);
+	}
+}
+
+void AMainCharacter::OnWeaponSlotRemoval()
+{
+	DespawnWeapon();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+	UE_LOG(LogTemp, Warning, TEXT("Equipment Stats re-adjusted."));
+}
 
 void AMainCharacter::MeleeAttack()
 {

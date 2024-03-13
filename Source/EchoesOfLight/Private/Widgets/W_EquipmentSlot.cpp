@@ -23,24 +23,22 @@ bool UW_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 {
 	const UItemDragDropOperation* ItemBeingDroppedOnWidget = Cast<UItemDragDropOperation>(InOperation);
 
-	if (ItemBeingDroppedOnWidget->SourceItem)
+	if (ItemBeingDroppedOnWidget->SourceItem->ItemType == EquipmentType)
 	{
 		ItemReference = ItemBeingDroppedOnWidget->SourceItem;
 
 		if (ItemReference)
 		{
+			EventItemEquipped(ItemBeingDroppedOnWidget->SourceItem->ItemType);
+			//Remove the now equipped equipment item from inventory.
 			ItemBeingDroppedOnWidget->SourceInventory->RemoveSingleInstanceOfItem(ItemBeingDroppedOnWidget->SourceItem);
 			if (EquipmentIcon)
 			{
+				//set the icon image for the equipment slot and set to visisble.
 				EquipmentIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 				EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
-				UE_LOG(LogTemp, Warning, TEXT("Equipment Icon is present"))
+				return true;
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("No equipment ICon"))
-			}
-			return true;
 		}
 
 	}
@@ -91,16 +89,13 @@ void UW_EquipmentSlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 		DragItemOperation->DefaultDragVisual = DragVisual;
 
 		DragItemOperation->EquipmentSlotReference = this;
-
+		
+		//sets the visibilty of the Icon to hidden so the slot appears blank.
 		EquipmentIcon->SetVisibility(ESlateVisibility::Hidden);
 
 		//set where the dragged item icon is attached to the mouse when dragging.
 		DragItemOperation->Pivot = EDragPivot::MouseDown;
 		OutOperation = DragItemOperation;
-
-		//ItemReference = nullptr;
-
-		//EquipmentIcon = nullptr;
 
 	}
 }
@@ -113,8 +108,27 @@ void UW_EquipmentSlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEve
 
 	if (ItemBeingDroppedOnWidget->SourceItem)
 	{
+		//might delete later. redudant.
 		ItemReference = ItemBeingDroppedOnWidget->SourceItem;
-
+		//set the visibilty of the icon to visible since the equipment was not removed.
 		EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandled)
+{
+	switch (EquipmentTypeToBeHandled)
+	{
+	case EItemType::Amulet:
+		//AmuletChange.Broadcast();
+		break;
+	case EItemType::Weapon:
+		WeaponChange.Broadcast();
+		break;
+	case EItemType::Netherband:
+		//NetherBandChange.Broadcast();
+		break;
+	default:
+		break;
 	}
 }

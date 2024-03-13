@@ -10,6 +10,9 @@ class UImage;
 class ABase_Sword;
 class UItemBase;
 class UDragItemVisual;
+enum class EItemType:uint8;
+
+
 
 UENUM()
 enum class EEquipmentType : uint8
@@ -19,9 +22,11 @@ enum class EEquipmentType : uint8
 	NetherBand UMETA(Displayname = "Dual Swords")
 };
 
-/**
- * 
- */
+
+DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate);
+DECLARE_MULTICAST_DELEGATE(FAmuletEquippedDelegate);
+DECLARE_MULTICAST_DELEGATE(FNetherbandEquippedDelegate);
+
 UCLASS()
 class ECHOESOFLIGHT_API UW_EquipmentSlot : public UUserWidget
 {
@@ -33,13 +38,19 @@ public:
 		UImage* EquipmentIcon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment Type")
-		EEquipmentType EquipmentType;
+		EItemType EquipmentType;
 
 	UPROPERTY(EditAnywhere)
-		UItemBase* ItemReference;
+		UItemBase* ItemReference = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 		TSubclassOf<UDragItemVisual> DragItemVisualClass;
+
+	FWeaponEquippedDelegate WeaponChange;
+
+	FAmuletEquippedDelegate AmuletChange;
+
+	FNetherbandEquippedDelegate NetherBandChange;
 
 
 	virtual void NativeConstruct() override;
@@ -51,6 +62,9 @@ public:
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
+	void EventItemEquipped(EItemType EquipmentTypeToBeHandled);
 
 
 	
