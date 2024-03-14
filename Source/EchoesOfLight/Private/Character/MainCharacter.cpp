@@ -345,6 +345,15 @@ void AMainCharacter::BindEquipmentSlotDelegates()
 	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot)
 	{
 		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->WeaponChange.AddUObject(this, &AMainCharacter::OnWeaponEquipmentChange);
+	};
+
+	if(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot)
+	{
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->NetherBandChange.AddUObject(this, &AMainCharacter::NetherbandEquipped);
+	}
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot)
+	{
+		//MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->AmuletChange.AddUObject(this, );
 	}
 }
 
@@ -353,6 +362,24 @@ void AMainCharacter::OnWeaponSlotRemoval()
 	DespawnWeapon();
 	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
 	UE_LOG(LogTemp, Warning, TEXT("Equipment Stats re-adjusted."));
+}
+
+void AMainCharacter::NetherbandEquipped(UItemBase* NetherbandItem)
+{
+	if (NetherbandItem)
+	{
+		IncreaseStats(NetherbandItem->ItemCharacerStatistics);
+		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+	}
+}
+
+void AMainCharacter::NetherbandUnEquipped(UItemBase* NetherbandItem)
+{
+	if (NetherbandItem)
+	{
+		DecreaseStats(NetherbandItem->ItemCharacerStatistics);
+		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+	}
 }
 
 void AMainCharacter::MeleeAttack()
@@ -909,6 +936,35 @@ void AMainCharacter::UpdateAllWidgets()
 		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
 	}
+}
+
+
+//----------------------------Stats-------------------------------------------------
+
+
+
+void AMainCharacter::IncreaseStats(FItemCharacerStatistics Stats)
+{
+	MainCharacterStats.Strength = FMath::Clamp(MainCharacterStats.Strength + Stats.Strength, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Stamina = FMath::Clamp(MainCharacterStats.Stamina + Stats.Stamina, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.DefensePower = FMath::Clamp(MainCharacterStats.DefensePower + Stats.Defense, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Constitution = FMath::Clamp(MainCharacterStats.Constitution + Stats.Health, 1, MainCharacterStats.MaxStatValue);
+
+}
+
+void AMainCharacter::DecreaseStats(FItemCharacerStatistics Stats)
+{
+	MainCharacterStats.Strength = FMath::Clamp(MainCharacterStats.Strength - Stats.Strength, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Stamina = FMath::Clamp(MainCharacterStats.Stamina - Stats.Stamina, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.DefensePower = FMath::Clamp(MainCharacterStats.DefensePower - Stats.Defense, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Constitution = FMath::Clamp(MainCharacterStats.Constitution - Stats.Health, 1, MainCharacterStats.MaxStatValue);
+
 }
 
 

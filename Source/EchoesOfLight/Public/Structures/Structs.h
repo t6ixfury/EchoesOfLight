@@ -267,6 +267,9 @@ struct FItemData : public FTableRowBase
 		FItemWeaponStatistics ItemWeaponStatistics;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
+		FItemCharacerStatistics ItemCharacerStatistics;
+
+	UPROPERTY(EditAnywhere, Category = "ItemData")
 		FItemTextData ItemTextData;
 
 	UPROPERTY(EditAnywhere, Category = "ItemData")
@@ -275,8 +278,6 @@ struct FItemData : public FTableRowBase
 	UPROPERTY(EditAnywhere, Category = "ItemData")
 		FItemAssData ItemAssetData;
 
-	UPROPERTY(EditAnywhere, Category = "ItemData")
-		FItemCharacerStatistics ItemCharacerStatistics;
 	
 };
 

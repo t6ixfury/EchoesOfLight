@@ -25,7 +25,7 @@ enum class EEquipmentType : uint8
 
 DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate);
 DECLARE_MULTICAST_DELEGATE(FAmuletEquippedDelegate);
-DECLARE_MULTICAST_DELEGATE(FNetherbandEquippedDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FNetherbandEquippedDelegate, UItemBase*);
 
 UCLASS()
 class ECHOESOFLIGHT_API UW_EquipmentSlot : public UUserWidget
@@ -64,7 +64,7 @@ public:
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
-	void EventItemEquipped(EItemType EquipmentTypeToBeHandled);
+	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled);
 
 
 	

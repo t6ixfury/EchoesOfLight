@@ -67,7 +67,6 @@ class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Da
 public:
 	UPROPERTY()
 		AHUD_MainCharacter* HUD;
-	FWeaponEquippedDelegate testdelegate;
 
 //------------------------------Components--------------------------------------------------------------------------
 
@@ -143,6 +142,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Equipment | Weapon")
 		TSubclassOf<ABase_Sword> DualSwordWeaponClass;
+
 
 //------------------------------Montages--------------------------------------------------------------------------
 
@@ -265,6 +265,10 @@ public:
 	//Despawns Weapon and Update Equipment menu widget
 	void OnWeaponSlotRemoval();
 
+	void NetherbandEquipped(UItemBase* NetherbandItem);
+
+	void NetherbandUnEquipped(UItemBase* NetherbandItem);
+
 
 protected:
 	//Performs the basic attack of the character.
@@ -350,13 +354,15 @@ public:
 
 	void DespawnWeapon();
 
-
 //------------------------------Character Variable functions--------------------------------------------------------------------------
 
 public:
 	//Updates all variables from the character to the proper widget
 	void UpdateAllWidgets();
 
+	void IncreaseStats(FItemCharacerStatistics Stats);
+
+	void DecreaseStats(FItemCharacerStatistics Stats);
 //------------------------------INLINE Functions--------------------------------------------------------------------------
 
 public:

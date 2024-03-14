@@ -7,6 +7,7 @@
 #include "Widgets/W_InventorySlot.h"
 #include "Widgets/ItemDragDropOperation.h"
 #include "Widgets/W_EquipmentSlot.h"
+#include "Actors/Items/ItemBase.h"
 
 //engine
 #include <Components/WrapBox.h>
@@ -77,9 +78,9 @@ bool UW_InventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 		//check to see if the item was indeed added to the inventory
 		if (Result.OperationResult == EItemAddResult::IAR_AllItemAdded)
 		{
-			if (ItemDragDrop->EquipmentSlotReference)
+			if (ItemDragDrop->EquipmentSlotReference->ItemReference)
 			{
-				WasEquipmentAddedToInventory(ItemDragDrop->EquipmentSlotReference->EquipmentType);
+				WasEquipmentAddedToInventory(ItemDragDrop->EquipmentSlotReference->EquipmentType, ItemDragDrop->EquipmentSlotReference->ItemReference);
 				//remove the reference to the item currently in the equipment slot.
 				ItemDragDrop->EquipmentSlotReference->ItemReference = nullptr;
 				return true;
@@ -97,7 +98,7 @@ void UW_InventoryPanel::NativeOnDragDetected(const FGeometry& InGeometry, const 
 
 }
 
-void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType)
+void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType, UItemBase* EquipmentItem)
 {
 	switch (EquipmentType)
 	{
@@ -108,6 +109,7 @@ void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType)
 		PlayerCharacter->OnWeaponSlotRemoval();
 		break;
 	case EItemType::Netherband:
+		PlayerCharacter->NetherbandUnEquipped(EquipmentItem);
 		break;
 	default:
 		break;
