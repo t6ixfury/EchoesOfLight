@@ -64,7 +64,7 @@ public:
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
-	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled);
+	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef);
 
 
 	

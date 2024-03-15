@@ -269,6 +269,13 @@ public:
 
 	void NetherbandUnEquipped(UItemBase* NetherbandItem);
 
+	void AmuletEquipped();
+
+	void AmuletUnEquipped();
+
+	//Update the stats of the dual weapons. True value increases stats and false value decreases stats.
+	void UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats);
+
 
 protected:
 	//Performs the basic attack of the character.

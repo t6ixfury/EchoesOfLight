@@ -103,6 +103,7 @@ void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType, UI
 	switch (EquipmentType)
 	{
 	case EItemType::Amulet:
+		PlayerCharacter->AmuletUnEquipped();
 		break;
 	case EItemType::Weapon:
 		//Removes the weapon that was previously in slot.

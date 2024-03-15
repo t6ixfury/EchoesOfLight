@@ -31,29 +31,8 @@ bool UW_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Equipment slot: Strength: %d, Stamina: %d"), ItemReference->ItemCharacerStatistics.Strength, ItemReference->ItemCharacerStatistics.Stamina)
 
-			EItemType EquipmentResult = EventItemEquipped(ItemReference->ItemType);
-			switch (EquipmentResult)
-			{
-			case EItemType::Amulet:
-				break;
-			case EItemType::Weapon:
-				break;
-			case EItemType::Netherband:
-				NetherBandChange.Broadcast(ItemReference);
-				break;
-			case EItemType::Spell:
-				break;
-			case EItemType::Consumable:
-				break;
-			case EItemType::Quest:
-				break;
-			case EItemType::Mudane:
-				break;
-			case EItemType::Powerup:
-				break;
-			default:
-				break;
-			}
+			EItemType EquipmentResult = EventItemEquipped(ItemReference->ItemType, ItemReference);
+
 			//Remove the now equipped equipment item from inventory.
 			ItemBeingDroppedOnWidget->SourceInventory->RemoveSingleInstanceOfItem(ItemBeingDroppedOnWidget->SourceItem);
 			if (EquipmentIcon)
@@ -139,12 +118,12 @@ void UW_EquipmentSlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEve
 	}
 }
 
-EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandled)
+EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef)
 {
 	switch (EquipmentTypeToBeHandled)
 	{
 	case EItemType::Amulet:
-		//AmuletChange.Broadcast();
+		AmuletChange.Broadcast();
 
 		return EItemType::Amulet;
 		break;
@@ -154,7 +133,8 @@ EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandle
 		return EItemType::Weapon;
 		break;
 	case EItemType::Netherband:
-		
+
+		NetherBandChange.Broadcast(ItemReference);
 		return EItemType::Netherband;
 		break;
 	default:
