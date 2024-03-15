@@ -27,6 +27,14 @@ void APickup::BeginPlay()
 	Super::BeginPlay();
 
 	InitializePickup(ItemQuantity);
+	if (ItemReference)
+	{
+		//FItemCharacerStatistics stats = ItemReference->ItemCharacerStatistics;
+		UE_LOG(LogTemp, Warning, TEXT("pickUp Strength: %d, Stamina: %d, Defense: %d, Health: %d"),ItemReference->ItemCharacerStatistics.Strength,
+			ItemReference->ItemCharacerStatistics.Stamina,
+			ItemReference->ItemCharacerStatistics.Defense,
+			ItemReference->ItemCharacerStatistics.Health);
+	}
 
 }
 
@@ -68,6 +76,8 @@ void APickup::InitializePickup(const int32 InQuantity)
 		ItemReference->ItemNumericaData = ItemDataRow->ItemNumericaData;
 		ItemReference->ItemTextData = ItemDataRow->ItemTextData;
 		ItemReference->ItemAssetData = ItemDataRow->ItemAssetData;
+		ItemReference->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+		ItemReference->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
 
 		//set the desired quantity based off the passed in data.
 		InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);

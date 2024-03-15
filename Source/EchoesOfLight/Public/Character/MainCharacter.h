@@ -53,6 +53,7 @@ public:
 };
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate)
 
 UCLASS(config=game)
 class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Damagable
@@ -66,7 +67,6 @@ class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Da
 public:
 	UPROPERTY()
 		AHUD_MainCharacter* HUD;
-
 
 //------------------------------Components--------------------------------------------------------------------------
 
@@ -142,6 +142,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Equipment | Weapon")
 		TSubclassOf<ABase_Sword> DualSwordWeaponClass;
+
+
 //------------------------------Montages--------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
@@ -251,6 +253,30 @@ public:
 	UFUNCTION( Category = "Damagable Interface Functions")
 	virtual bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo) override;
 
+
+//------------------------------Equipment system functions--------------------------------------------------------------------------
+	UFUNCTION()
+	// Function to be called on the weapon change delegate in the equipment slot widget.
+	void OnWeaponEquipmentChange();
+
+	//Binds all necessary delegate to the perspective function for the Equipment slot widget.
+	void BindEquipmentSlotDelegates();
+
+	//Despawns Weapon and Update Equipment menu widget
+	void OnWeaponSlotRemoval();
+
+	void NetherbandEquipped(UItemBase* NetherbandItem);
+
+	void NetherbandUnEquipped(UItemBase* NetherbandItem);
+
+	void AmuletEquipped();
+
+	void AmuletUnEquipped();
+
+	//Update the stats of the dual weapons. True value increases stats and false value decreases stats.
+	void UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats);
+
+
 protected:
 	//Performs the basic attack of the character.
 	UFUNCTION()
@@ -333,12 +359,17 @@ protected:
 public:
 	void SpawnWeapon();
 
+	void DespawnWeapon();
+
 //------------------------------Character Variable functions--------------------------------------------------------------------------
 
 public:
 	//Updates all variables from the character to the proper widget
 	void UpdateAllWidgets();
 
+	void IncreaseStats(FItemCharacerStatistics Stats);
+
+	void DecreaseStats(FItemCharacerStatistics Stats);
 //------------------------------INLINE Functions--------------------------------------------------------------------------
 
 public:

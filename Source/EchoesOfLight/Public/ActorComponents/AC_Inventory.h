@@ -55,22 +55,22 @@ struct FItemAddResult
 	//Call This Function to set the FItemAddedResult variable if only a partial amount of the item was added to the inventory.
 	static FItemAddResult AddedPartial(const int32 PartialAmountAdded, const FText& ErrorText)
 	{
-		FItemAddResult AddedNoneResult;
-		AddedNoneResult.ActualAmountAdded = PartialAmountAdded;
-		AddedNoneResult.OperationResult = EItemAddResult::IAR_PartialAmountItemAdded;
-		AddedNoneResult.ResultMessage = ErrorText;
+		FItemAddResult AddedPartialResult;
+		AddedPartialResult.ActualAmountAdded = PartialAmountAdded;
+		AddedPartialResult.OperationResult = EItemAddResult::IAR_PartialAmountItemAdded;
+		AddedPartialResult.ResultMessage = ErrorText;
 
-		return AddedNoneResult;
+		return AddedPartialResult;
 	};
 	//Call This Function to set the FItemAddedResult variable if all items was added to the inventory.
 	static FItemAddResult AddedAll(const int32 AmountAdded, const FText& Message)
 	{
-		FItemAddResult AddedNoneResult;
-		AddedNoneResult.ActualAmountAdded = AmountAdded;
-		AddedNoneResult.OperationResult = EItemAddResult::IAR_AllItemAdded;
-		AddedNoneResult.ResultMessage = Message;
+		FItemAddResult AddedAllResult;
+		AddedAllResult.ActualAmountAdded = AmountAdded;
+		AddedAllResult.OperationResult = EItemAddResult::IAR_AllItemAdded;
+		AddedAllResult.ResultMessage = Message;
 
-		return AddedNoneResult;
+		return AddedAllResult;
 	};
 
 

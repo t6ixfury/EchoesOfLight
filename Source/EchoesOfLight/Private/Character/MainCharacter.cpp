@@ -14,6 +14,7 @@
 #include "Widgets/W_EquipmentSlot.h"
 #include "Widgets/W_EquipmentMenu.h"
 #include "W_MainGUI.h"
+#include "Actors/Items/ItemBase.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -117,16 +118,7 @@ void AMainCharacter::BeginPlay()
 	//Initialize the HUD for the character.
 	HUD = Cast< AHUD_MainCharacter>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
-	//set dual weapon
-	/*
-	if (HUD)
-	{
-		if (HUD->MainMenuWidget->Weapon_Slot->Equipment)
-		{
-			HUD->MainMenuWidget->Weapon_Slot->Equipment = nullptr;
-		}
-	}
-	*/
+	BindEquipmentSlotDelegates();
 }
 
 void AMainCharacter::Tick(float DeltaTime)
@@ -276,7 +268,12 @@ void AMainCharacter::Look(const FInputActionValue& Value)
 
 void AMainCharacter::SpawnWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("SpawnWeapon called."))
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference == nullptr || 
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Null pointer from weapon slot."))
+		return;
+	}
 	if (!isWeaponEquipped)
 	{
 		FName RightHandWeaponSlotName = TEXT("Weapon_RSocket");
@@ -294,8 +291,13 @@ void AMainCharacter::SpawnWeapon()
 			FVector LeftSpawnLocation = CharacterMesh->GetSocketLocation(leftHandWeaponSlotName);
 			FRotator LeftSpawnRotation = CharacterMesh->GetSocketRotation(leftHandWeaponSlotName);
 
-			RightHandWeapon = World->SpawnActor<ABase_Sword>(DualSwordWeaponClass, RightSpawnLocation, RightSpawnRotation, SpawnParams);
-			LeftHandWeapon = World->SpawnActor<ABase_Sword>(DualSwordWeaponClass, LeftSpawnLocation, LeftSpawnRotation, SpawnParams);
+			RightHandWeapon = World->SpawnActor<ABase_Sword>(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword,
+				RightSpawnLocation, RightSpawnRotation, SpawnParams);
+
+			LeftHandWeapon = World->SpawnActor<ABase_Sword>(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword,
+				LeftSpawnLocation, LeftSpawnRotation, SpawnParams);
+			
+			UE_LOG(LogTemp, Warning, TEXT("Weapons are supposed to be spawned."))
 
 			if (RightHandWeapon && LeftHandWeapon)
 			{
@@ -310,16 +312,188 @@ void AMainCharacter::SpawnWeapon()
 	} 
 	else
 	{
-		RightHandWeapon->Destroy();
-		LeftHandWeapon->Destroy();
-		RightHandWeapon = nullptr;
-		LeftHandWeapon = nullptr;
-		isWeaponEquipped = false;
+		DespawnWeapon();
 	}
 	
 
 }
 
+void AMainCharacter::DespawnWeapon()
+{
+	RightHandWeapon->Destroy();
+	LeftHandWeapon->Destroy();
+	RightHandWeapon = nullptr;
+	LeftHandWeapon = nullptr;
+	isWeaponEquipped = false;
+}
+
+
+void AMainCharacter::OnWeaponEquipmentChange()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Weapon Broadcast fired."));
+	if(isWeaponEquipped)
+	{
+		DespawnWeapon();
+	}
+
+	SpawnWeapon();
+
+
+}
+
+void AMainCharacter::BindEquipmentSlotDelegates()
+{
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot)
+	{
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->WeaponChange.AddUObject(this, &AMainCharacter::OnWeaponEquipmentChange);
+	}
+
+	if(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot)
+	{
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->NetherBandChange.AddUObject(this, &AMainCharacter::NetherbandEquipped);
+	}
+
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot)
+	{
+		MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->AmuletChange.AddUObject(this, &AMainCharacter::AmuletEquipped);
+	}
+}
+
+void AMainCharacter::OnWeaponSlotRemoval()
+{
+	DespawnWeapon();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+	
+}
+
+void AMainCharacter::NetherbandEquipped(UItemBase* NetherbandItem)
+{
+	if (NetherbandItem)
+	{
+		IncreaseStats(NetherbandItem->ItemCharacerStatistics);
+		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+	}
+}
+
+void AMainCharacter::NetherbandUnEquipped(UItemBase* NetherbandItem)
+{
+	if (NetherbandItem)
+	{
+		DecreaseStats(NetherbandItem->ItemCharacerStatistics);
+		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+	}
+}
+
+void AMainCharacter::AmuletEquipped()
+{
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference)
+	{
+		FItemWeaponStatistics stats = MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference->ItemWeaponStatistics;
+
+		FS_DamageInfo addedWeaponStats;
+
+		addedWeaponStats.AttackPower = stats.AttackPower;
+		addedWeaponStats.AtttackSpeed = stats.AtttackSpeed;
+		addedWeaponStats.CriticalHitRate = stats.CriticalHitRate;
+		addedWeaponStats.MagicPower = stats.MagicPower;
+
+		UpdateDualWeaponStats(addedWeaponStats, true);
+
+		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+
+
+	}
+}
+
+void AMainCharacter::AmuletUnEquipped()
+{
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference)
+	{
+		FItemWeaponStatistics stats = MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference->ItemWeaponStatistics;
+
+		FS_DamageInfo addedWeaponStats;
+
+		addedWeaponStats.AttackPower = stats.AttackPower;
+		addedWeaponStats.AtttackSpeed = stats.AtttackSpeed;
+		addedWeaponStats.CriticalHitRate = stats.CriticalHitRate;
+		addedWeaponStats.MagicPower = stats.MagicPower;
+
+		UpdateDualWeaponStats(addedWeaponStats, false);
+
+		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
+
+	}
+}
+
+void AMainCharacter::UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats)
+{
+	if (LeftHandWeapon && RightHandWeapon)
+	{
+		if (AddToStats)
+		{
+			//Lefthand weapon
+			LeftHandWeapon->BaseAttackInfo.AttackPower =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.AttackPower + stats.AttackPower, 1, LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+
+			LeftHandWeapon->BaseAttackInfo.AtttackSpeed =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.AtttackSpeed + stats.AtttackSpeed, 1, LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+
+			LeftHandWeapon->BaseAttackInfo.CriticalHitRate =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.CriticalHitRate + stats.CriticalHitRate, 1, LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+
+			LeftHandWeapon->BaseAttackInfo.MagicPower =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.MagicPower + stats.MagicPower, 1, LeftHandWeapon->BaseAttackInfo.MaxStatValue);
+
+
+			//righthand weapon
+			RightHandWeapon->BaseAttackInfo.AttackPower =
+				FMath::Clamp(RightHandWeapon->BaseAttackInfo.AttackPower + stats.AttackPower, 1, RightHandWeapon->BaseAttackInfo.MaxStatValue);
+
+			RightHandWeapon->BaseAttackInfo.AtttackSpeed =
+				FMath::Clamp(RightHandWeapon->BaseAttackInfo.AtttackSpeed + stats.AtttackSpeed, 1, RightHandWeapon->BaseAttackInfo.MaxStatValue);
+
+			RightHandWeapon->BaseAttackInfo.CriticalHitRate =
+				FMath::Clamp(RightHandWeapon->BaseAttackInfo.CriticalHitRate + stats.CriticalHitRate, 1, RightHandWeapon->BaseAttackInfo.MaxStatValue);
+
+			RightHandWeapon->BaseAttackInfo.MagicPower =
+				FMath::Clamp(RightHandWeapon->BaseAttackInfo.MagicPower + stats.MagicPower, 1, RightHandWeapon->BaseAttackInfo.MaxStatValue);
+
+
+		
+		}
+		if (!AddToStats)
+		{
+			//Lefthand weapon
+			LeftHandWeapon->BaseAttackInfo.AttackPower =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.AttackPower - stats.AttackPower, 1, MainCharacterStats.MaxStatValue);
+
+			LeftHandWeapon->BaseAttackInfo.AtttackSpeed =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.AtttackSpeed - stats.AtttackSpeed, 1, MainCharacterStats.MaxStatValue);
+
+			LeftHandWeapon->BaseAttackInfo.CriticalHitRate =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.CriticalHitRate - stats.CriticalHitRate, 1, MainCharacterStats.MaxStatValue);
+
+			LeftHandWeapon->BaseAttackInfo.MagicPower =
+				FMath::Clamp(LeftHandWeapon->BaseAttackInfo.MagicPower - stats.MagicPower, 1, MainCharacterStats.MaxStatValue);
+
+
+			//righthand weapon
+			RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.AttackPower =
+				FMath::Clamp(RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.AttackPower - stats.AttackPower, 1, MainCharacterStats.MaxStatValue);
+
+			RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.AtttackSpeed =
+				FMath::Clamp(RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.AtttackSpeed - stats.AtttackSpeed, 1, MainCharacterStats.MaxStatValue);
+
+			RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.CriticalHitRate =
+				FMath::Clamp(RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.CriticalHitRate - stats.CriticalHitRate, 1, MainCharacterStats.MaxStatValue);
+
+			RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.MagicPower =
+				FMath::Clamp(RightHandWeapon->WeaponItemReference->ItemWeaponStatistics.MagicPower - stats.MagicPower, 1, MainCharacterStats.MaxStatValue);
+		}
+
+
+	}
+}
 
 void AMainCharacter::MeleeAttack()
 {
@@ -875,6 +1049,35 @@ void AMainCharacter::UpdateAllWidgets()
 		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
 	}
+}
+
+
+//----------------------------Stats-------------------------------------------------
+
+
+
+void AMainCharacter::IncreaseStats(FItemCharacerStatistics Stats)
+{
+	MainCharacterStats.Strength = FMath::Clamp(MainCharacterStats.Strength + Stats.Strength, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Stamina = FMath::Clamp(MainCharacterStats.Stamina + Stats.Stamina, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.DefensePower = FMath::Clamp(MainCharacterStats.DefensePower + Stats.Defense, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Constitution = FMath::Clamp(MainCharacterStats.Constitution + Stats.Health, 1, MainCharacterStats.MaxStatValue);
+
+}
+
+void AMainCharacter::DecreaseStats(FItemCharacerStatistics Stats)
+{
+	MainCharacterStats.Strength = FMath::Clamp(MainCharacterStats.Strength - Stats.Strength, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Stamina = FMath::Clamp(MainCharacterStats.Stamina - Stats.Stamina, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.DefensePower = FMath::Clamp(MainCharacterStats.DefensePower - Stats.Defense, 1, MainCharacterStats.MaxStatValue);
+
+	MainCharacterStats.Constitution = FMath::Clamp(MainCharacterStats.Constitution - Stats.Health, 1, MainCharacterStats.MaxStatValue);
+
 }
 
 

@@ -6,10 +6,13 @@
 #include <ActorComponents/AC_Inventory.h>
 #include "Widgets/W_InventorySlot.h"
 #include "Widgets/ItemDragDropOperation.h"
+#include "Widgets/W_EquipmentSlot.h"
+#include "Actors/Items/ItemBase.h"
 
 //engine
 #include <Components/WrapBox.h>
 #include <Components/TextBlock.h>
+#include "Components/Image.h"  
 
 
 
@@ -66,13 +69,52 @@ bool UW_InventoryPanel::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 {
 	const UItemDragDropOperation* ItemDragDrop = Cast<UItemDragDropOperation>(InOperation);
 
-	if (ItemDragDrop->SourceItem && InventoryReference)
+	//checks for null ptrs and If the Item being dropped on the inventory is not the same item picked up.
+	if (ItemDragDrop->SourceItem && InventoryReference && !InventoryReference->FindMatchingItem(ItemDragDrop->SourceItem))
 	{
-		// returning true will stop the drop operation at this widget.
-		return true;
+		
+		FItemAddResult Result = InventoryReference->HandleAddItem(ItemDragDrop->SourceItem);
+		
+		//check to see if the item was indeed added to the inventory
+		if (Result.OperationResult == EItemAddResult::IAR_AllItemAdded)
+		{
+			if (ItemDragDrop->EquipmentSlotReference->ItemReference)
+			{
+				WasEquipmentAddedToInventory(ItemDragDrop->EquipmentSlotReference->EquipmentType, ItemDragDrop->EquipmentSlotReference->ItemReference);
+				//remove the reference to the item currently in the equipment slot.
+				ItemDragDrop->EquipmentSlotReference->ItemReference = nullptr;
+				return true;
+			}
+		}
 	}
 	//returning false will cause the drop operation to fall through to underlying widgets.
 	return false;
+}
+
+void UW_InventoryPanel::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+
+}
+
+void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType, UItemBase* EquipmentItem)
+{
+	switch (EquipmentType)
+	{
+	case EItemType::Amulet:
+		PlayerCharacter->AmuletUnEquipped();
+		break;
+	case EItemType::Weapon:
+		//Removes the weapon that was previously in slot.
+		PlayerCharacter->OnWeaponSlotRemoval();
+		break;
+	case EItemType::Netherband:
+		PlayerCharacter->NetherbandUnEquipped(EquipmentItem);
+		break;
+	default:
+		break;
+	}
 }
 
 

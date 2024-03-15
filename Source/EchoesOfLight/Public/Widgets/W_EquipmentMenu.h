@@ -78,16 +78,22 @@ public:
 
 public:
 
-	virtual void NativeOnInitialized();
+	virtual void NativeOnInitialized() override;
 
 	void SetMainCharacterReference();
 
+	//Updates the Text for the Equipment stats on the stat bar
 	void UpdateEquipmentStats();
 
+	//Updates the Text for the Character Stats on the stat bar
 	void UpdateCharacterStats();
 
-	void UpdateSlots();
+	//Updates widget UI
+	void UpdateEquipmentWidget();
 
+	//Updates the stat progress bar for the equipment stats and the character stats
 	void UpdateStatProgressBars();
+	
+	
 	
 };

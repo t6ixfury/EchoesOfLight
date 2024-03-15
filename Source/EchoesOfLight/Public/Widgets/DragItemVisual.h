@@ -9,6 +9,7 @@
 class UBorder;
 class UImage;
 class UTextBlock;
+class UW_EquipmentSlot;
 
 /**
  * 

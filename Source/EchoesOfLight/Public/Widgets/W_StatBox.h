@@ -43,9 +43,13 @@ public:
 //	FUNCTIONS
 //---------------------------------------------------------------------------------------------------------------------------
 public:
-
+	// Updates the stat Text in the statbox
 	void SetStatValues(int32 StartingStatValue, int32 CapStatValue);
 
+	//Updates the percentage of the progress bar in the stat box
+	void SetProgressBarPercentage(int32 Value, int32 MaxValue);
+
+	//Set Icon image for the Stat box
 	void SetStatImage();
 
 	virtual void NativeConstruct() override;

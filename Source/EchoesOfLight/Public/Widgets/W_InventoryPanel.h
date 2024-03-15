@@ -12,6 +12,8 @@ class UTextBlock;
 class AMainCharacter;
 class UAC_Inventory;
 class UW_InventorySlot;
+enum class EItemType :uint8;
+class UItemBase;
 
 /**
  * 
@@ -61,5 +63,9 @@ protected:
 
 	virtual void NativeOnInitialized() override;
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
+	//Handles Equipment being added from slot to Inventory.
+	void WasEquipmentAddedToInventory(EItemType EquipmentType, UItemBase* EquipmentItem);
 
 };

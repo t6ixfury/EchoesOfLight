@@ -90,9 +90,9 @@ enum class EItemQuality : uint8
 UENUM()
 enum class EItemType : uint8
 {
-	Armor UMETA(DisplayName = "Armor"),
+	Amulet UMETA(DisplayName = "Amulet"),
 	Weapon UMETA(DisplayName = "Weapon"),
-	Shield UMETA(DisplayName = "Shield"),
+	Netherband UMETA(DisplayName = "Netherband"),
 	Spell UMETA(DisplayName = "Spell"),
 	Consumable UMETA(DisplayName = "Consumable"),
 	Quest UMETA(DisplayName = "Quest"),

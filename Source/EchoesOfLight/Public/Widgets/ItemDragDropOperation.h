@@ -8,7 +8,7 @@
 
 class UItemBase;
 class UAC_Inventory;
-
+class UW_EquipmentSlot;
 /**
  * 
  */
@@ -28,6 +28,8 @@ public:
 	UPROPERTY()
 		UAC_Inventory* SourceInventory;
 
+	UPROPERTY()
+		UW_EquipmentSlot* EquipmentSlotReference;
 
 
 //---------------------------------------------------------------------------------------------------------------------------
