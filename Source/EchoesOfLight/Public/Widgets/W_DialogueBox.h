@@ -25,4 +25,10 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Dialogue Box", meta = (BindWidget))
 	UMultiLineEditableTextBox* DialogueText;
+
+	void SetDialogueText(FString message);
+
+	void SetName(FName name);
+
 };
+

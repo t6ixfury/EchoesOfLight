@@ -20,6 +20,13 @@ class UAC_CurrencySystem;
 class UAC_ExperieceSystem;
 class AHUD_MainCharacter;
 class UItemBase;
+class UDialogueSystem;
+class UAC_Inventory;
+class UAC_ExperieceSystem;
+class UAC_CurrencySystem;
+class UAC_DamageSystem;
+class UAC_MainWidgetHandler;
+
 
 UENUM()
 enum class EMovementDirection : uint8
@@ -65,25 +72,26 @@ class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Da
 //---------------------------------------------------------------------------------------------------------------------------
 
 public:
-	UPROPERTY()
-		AHUD_MainCharacter* HUD;
 
 //------------------------------Components--------------------------------------------------------------------------
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-		class UAC_MainWidgetHandler* MainWidgetHandlerComponent;
+		 UAC_MainWidgetHandler* MainWidgetHandlerComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		class UAC_DamageSystem* DamageSystem;
+		 UAC_DamageSystem* DamageSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		class UAC_CurrencySystem* CurrencySystem;
+		 UAC_CurrencySystem* CurrencySystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-		class UAC_ExperieceSystem* ExperienceSystem;
+		 UAC_ExperieceSystem* ExperienceSystem;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-		class UAC_Inventory* PlayerInventory;
+		 UAC_Inventory* PlayerInventory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+		UDialogueSystem* DialogueSystem;
 
 private:
 

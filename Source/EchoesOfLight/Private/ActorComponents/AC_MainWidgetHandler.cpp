@@ -14,6 +14,8 @@
 #include "ActorComponents/AC_Inventory.h"
 #include "Widgets/W_EquipmentMenu.h"
 #include "Interfaces/Interface_Interaction.h"
+#include "Widgets/HUD_MainCharacter.h"
+#include "Widgets/W_DialogueGui.h"
 
 
 
@@ -41,6 +43,29 @@ void UAC_MainWidgetHandler::DisplayMenu()
 	{
 		EquipmentMenuWidget->SetVisibility(ESlateVisibility::Visible);
 		bIsMenuVisible = true;
+	}
+}
+
+void UAC_MainWidgetHandler::CreateDialogueWidget()
+{
+	if (MainCharacterController && DialogueGUI_Class)
+	{
+		DialogueGui = CreateWidget<UW_DialogueGui>(MainCharacterController, DialogueGUI_Class);
+		if (GUI)
+		{
+			DialogueGui->AddToViewport();
+		}
+
+	}
+
+}
+
+void UAC_MainWidgetHandler::RemoveDialogueWidget()
+{
+	if (DialogueGui)
+	{
+		DialogueGui->RemoveFromViewport();
+		DialogueGui = nullptr;
 	}
 }
 
@@ -175,5 +200,21 @@ void UAC_MainWidgetHandler::CreateAllWidget()
 void UAC_MainWidgetHandler::TogglePause()
 {
 
+}
+
+void UAC_MainWidgetHandler::HideHUD()
+{	
+	if (GUI)
+	{
+		GUI->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UAC_MainWidgetHandler::ShowHUD()
+{
+	if (GUI)
+	{
+		GUI->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 

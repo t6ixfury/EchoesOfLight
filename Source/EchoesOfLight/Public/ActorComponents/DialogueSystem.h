@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Interfaces/Interface_Interaction.h"
 #include "DialogueSystem.generated.h"
 
-
+class AMainCharacter;
 
 USTRUCT()
 struct FDialogueData : public FTableRowBase
@@ -18,7 +17,7 @@ struct FDialogueData : public FTableRowBase
 	FName Name;
 
 	UPROPERTY(EditAnywhere, Category = "DialogueData")
-	FText Dialoguetext;
+	FString Dialoguetext;
 
 	UPROPERTY(EditAnywhere, Category = "DialogueData")
 	USoundBase* VoiceDoialogue;
@@ -32,16 +31,27 @@ struct FDialogueData : public FTableRowBase
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class ECHOESOFLIGHT_API UDialogueSystem : public UActorComponent, public IInterface_Interaction
+class ECHOESOFLIGHT_API UDialogueSystem : public UActorComponent
 {
 	GENERATED_BODY()
 
+//---------------------------------------------------------------------------------------------------------------------------
+//	PROPERTIES AND VARIABLES
+//---------------------------------------------------------------------------------------------------------------------------
+
+
 public:	
-	// Sets default values for this component's properties
-	UDialogueSystem();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Villager Information")
+		FName VillagerName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Villager Information")
+		FString VillagerDialogueID;
 
 	UPROPERTY()
 	FDialogueData DialogueData;
+
+	UPROPERTY()
+		TArray<FString> DialogueSentences;
 
 	UPROPERTY(EditAnywhere, Category = "Dialogue | Data Tables")
 	UDataTable* NpcDataTable;
@@ -50,25 +60,29 @@ public:
 	UDataTable* GenericNpcDataTable;
 
 	AMainCharacter* MainCharacter;
-protected:
+
+	bool bIsTalking = false;
+
+
+
+//---------------------------------------------------------------------------------------------------------------------------
+//	FUNCTIONS
+//---------------------------------------------------------------------------------------------------------------------------
+
+public:
+
+	// Sets default values for this component's properties
+	UDialogueSystem();
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void BeginFocus() override;
-
-	virtual void EndFocus() override;
-
-	virtual void BeginInteract() override;
-
-	virtual void EndInteract() override;
-
-	virtual void Interact(AMainCharacter* PlayerCharacter) override;
-
 	void RetrieveDialogueData();
+
+	void SetDialogueSentencesArray(FString InputString);
 
 		
 };

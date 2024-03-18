@@ -15,6 +15,7 @@
 #include "Widgets/W_EquipmentMenu.h"
 #include "W_MainGUI.h"
 #include "Actors/Items/ItemBase.h"
+#include "ActorComponents/DialogueSystem.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -82,6 +83,7 @@ AMainCharacter::AMainCharacter()
 	CurrencySystem = CreateDefaultSubobject<UAC_CurrencySystem>(TEXT("Currenct System"));
 	ExperienceSystem = CreateDefaultSubobject<UAC_ExperieceSystem>(TEXT("Experience System"));
 	PlayerInventory = CreateDefaultSubobject<UAC_Inventory>(TEXT("Inventory System"));
+	DialogueSystem = CreateDefaultSubobject<UDialogueSystem>(TEXT("DialogueSystem"));
 
 	//Set the Weight and capacity of the Inventory.
 	PlayerInventory->SetWeightCapacity(50.0f);
@@ -89,7 +91,7 @@ AMainCharacter::AMainCharacter()
 
 	//Interaction
 	InteractionCheckFrequency = 0.1;
-	InteractionCheckDistance = 400.0f;
+	InteractionCheckDistance = 500.0f;
 
 
 
@@ -115,9 +117,6 @@ void AMainCharacter::BeginPlay()
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
 	}
 
-	//Initialize the HUD for the character.
-	HUD = Cast< AHUD_MainCharacter>(GetWorld()->GetFirstPlayerController()->GetHUD());
-
 	BindEquipmentSlotDelegates();
 }
 
@@ -126,7 +125,7 @@ void AMainCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// creates a delay on the line trace for looking at the Item to be performed at the rate set in InteractionCheckFrequency.
-	if (GetWorld()->TimeSince(InteractionData.LastInteractionCheckingTime) > InteractionCheckFrequency)
+	if ((GetWorld()->TimeSince(InteractionData.LastInteractionCheckingTime) > InteractionCheckFrequency) && !DialogueSystem->bIsTalking)
 	{
 		PerformInteractionCheck();
 	}
@@ -760,6 +759,7 @@ void AMainCharacter::PerformInteractionCheck()
 		// if the trace hits an item
 		if (GetWorld()->LineTraceSingleByChannel(TraceHit, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
 		{
+			//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Blue, true);
 			//TODO: Trace hit enemy actor and crashed the game.
 			//checks to see the object we are looking at is implementing the interaction interface
 			if (TraceHit.GetActor()->GetClass()->ImplementsInterface(UInterface_Interaction::StaticClass()))
@@ -979,7 +979,7 @@ void AMainCharacter::roll()
 
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
-	if (CharacterAnimInstance && !isMontagePlaying)
+	if (CharacterAnimInstance && !isMontagePlaying && !DialogueSystem->bIsTalking)
 	{
 		switch (MovementDirection)
 		{

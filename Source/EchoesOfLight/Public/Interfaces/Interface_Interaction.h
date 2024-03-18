@@ -15,7 +15,8 @@ enum class  EInteractableType : uint8
 	NonPlayerCharcter UMETA(DisplayName = "NonPlayerCharcter"),
 	Device UMETA(DisplayName = "Device"),
 	Toggle UMETA(DisplayName = "Toggle"),
-	Container UMETA(DisplayName = "Container")
+	Container UMETA(DisplayName = "Container"),
+	Villager UMETA(DisplayName = "Villager")
 
 };
 
