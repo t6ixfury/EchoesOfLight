@@ -47,6 +47,39 @@ void AVillager::BeginInteract()
 
 void AVillager::EndInteract()
 {
+	if (CharacterRef)
+	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			//set camera view to dialoge camera.
+			PlayerController->SetViewTargetWithBlend(CharacterRef, .8f);
+
+			UCharacterMovementComponent* MovementComponent = CharacterRef->GetCharacterMovement();
+			if (MovementComponent)
+			{
+				//stops all movement on character.
+				MovementComponent->SetMovementMode(EMovementMode::MOVE_Walking);
+
+				CharacterRef->MainWidgetHandlerComponent->RemoveDialogueWidget();
+
+				//hides all widgets
+				CharacterRef->MainWidgetHandlerComponent->ShowHUD();
+
+				//hides the main character in game
+				CharacterRef->SetActorHiddenInGame(false);
+
+				Dialogue->bIsTalking = false;
+				CharacterRef->DialogueSystem->bIsTalking = false;
+				CharacterRotation = FRotator();
+				DialogueCamera = nullptr;
+				SetActorRotation(FRotator::ZeroRotator);
+
+				
+			}
+
+		}
+	}
 }
 
 void AVillager::Interact(AMainCharacter* PlayerCharacter)
@@ -54,12 +87,9 @@ void AVillager::Interact(AMainCharacter* PlayerCharacter)
 
 	if (PlayerCharacter && !Dialogue->bIsTalking)
 	{
+		CharacterRef = PlayerCharacter;
 		Dialogue->bIsTalking = true;
 		PlayerCharacter->DialogueSystem->bIsTalking = true;
-		//TODO:
-	//set villager rotation toward character
-		CharacterRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerCharacter->GetActorLocation());
-		
 
 		//Set character camera to villager location. and lock position
 		SetDialogueCameraView(PlayerCharacter);
@@ -70,16 +100,13 @@ void AVillager::Interact(AMainCharacter* PlayerCharacter)
 
 		if (PlayerCharacter->MainWidgetHandlerComponent->DialogueGui)
 		{
+			PlayerCharacter->MainWidgetHandlerComponent->DialogueGui->SetFocus();
+			Dialogue->SetDialogueSentencesArray(Dialogue->DialogueData.Dialoguetext);
 			PlayerCharacter->MainWidgetHandlerComponent->DialogueGui->DialogueBox->SetName(Dialogue->DialogueData.Name);
-			PlayerCharacter->MainWidgetHandlerComponent->DialogueGui->DialogueBox->SetDialogueText(Dialogue->DialogueData.Dialoguetext);
+			PlayerCharacter->MainWidgetHandlerComponent->DialogueGui->DialogueBox->SetDialogueText(Dialogue->DialogueSentences[0]);
+			PlayerCharacter->MainWidgetHandlerComponent->DialogueGui->DialogueBox->sentences = Dialogue->DialogueSentences;
 		}
 
-		Dialogue->SetDialogueSentencesArray(Dialogue->DialogueData.Dialoguetext);
-
-
-		// Press f to go to the next. 
-
-		// after all text are done. Reset character camera. unlock movement.
 	}
 
 }
@@ -97,37 +124,62 @@ void AVillager::SetVillagerRotation(float DeltaTime)
 	FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), CharacterRotation, DeltaTime, RotationSpeed);
 	SetActorRotation(NewRotation);
 
+
 }
 
 void AVillager::SetDialogueCameraView(AMainCharacter* Character)
 {
-	FVector ForwardVector = GetActorForwardVector();
-	FVector CameraLocation = GetActorLocation() - (ForwardVector * 200); // Move 200 units in front
-	FRotator CameraRotation = FRotationMatrix::MakeFromX(GetActorLocation() - CameraLocation).Rotator();
-
-	DialogueCamera = GetWorld()->SpawnActor<ADialogueCamera>(ADialogueCamera::StaticClass(), CameraLocation, CameraRotation);
-
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController && DialogueCamera)
+	if (Dialogue->bIsTalking)
 	{
-		//set camera view to dialoge camera.
-		PlayerController->SetViewTargetWithBlend(DialogueCamera, .8f);
+		FVector VillagerToCharacter = Character->GetActorLocation() - GetActorLocation();
+		VillagerToCharacter.Normalize();
 
-		UCharacterMovementComponent* MovementComponent = Character->GetCharacterMovement();
-		if (MovementComponent)
-		{
-			//stops all movement on character.
-			MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
 
-			//hides all widgets
-			Character->MainWidgetHandlerComponent->HideHUD();
-			Character->MainWidgetHandlerComponent->HideInteractionWidget();
 
-			//hides the main character in game
-			Character->SetActorHiddenInGame(true);
+		// Get the villager's forward vector
+		FVector VillagerForward = Character->GetActorForwardVector();
+
+		// Calculate the dot product
+		float DotProduct = FVector::DotProduct(VillagerForward, VillagerToCharacter);
+
+		FVector CameraLocation;
+		if (DotProduct > 0) {
+			CameraLocation = GetActorLocation() + VillagerForward * 200;
+		}
+		else {
+			CameraLocation = GetActorLocation() - VillagerForward * 200;
 		}
 
+		// Ensure the camera always faces towards the villager
+		FRotator CameraRotation = FRotationMatrix::MakeFromX(GetActorLocation() - CameraLocation).Rotator() *1;
+
+		CharacterRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), CameraLocation);
+
+		DialogueCamera = GetWorld()->SpawnActor<ADialogueCamera>(ADialogueCamera::StaticClass(), CameraLocation, CameraRotation);
+
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController && DialogueCamera)
+		{
+			//set camera view to dialoge camera.
+			PlayerController->SetViewTargetWithBlend(DialogueCamera, .8f);
+
+			UCharacterMovementComponent* MovementComponent = Character->GetCharacterMovement();
+			if (MovementComponent)
+			{
+				//stops all movement on character.
+				MovementComponent->SetMovementMode(EMovementMode::MOVE_None);
+
+				//hides all widgets
+				Character->MainWidgetHandlerComponent->HideHUD();
+				Character->MainWidgetHandlerComponent->HideInteractionWidget();
+
+				//hides the main character in game
+				Character->SetActorHiddenInGame(true);
+			}
+
+		}
 	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -143,10 +195,21 @@ void AVillager::BeginPlay()
 void AVillager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (Dialogue->bIsTalking)
+	if (Dialogue->bIsTalking && CharacterRef->MainWidgetHandlerComponent->DialogueGui->DialogueBox->bHasDialogueText)
 	{
 		SetVillagerRotation(DeltaTime);
 	}
+	if (CharacterRef)
+	{
+		if (CharacterRef->MainWidgetHandlerComponent->DialogueGui)
+		{
+			if (!CharacterRef->MainWidgetHandlerComponent->DialogueGui->DialogueBox->bHasDialogueText)
+			{
+				EndInteract();
+			}
+		}
+	}
+
 }
 
 // Called to bind functionality to input

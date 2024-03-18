@@ -20,5 +20,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 		UW_DialogueBox* DialogueBox;
+
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	
 };

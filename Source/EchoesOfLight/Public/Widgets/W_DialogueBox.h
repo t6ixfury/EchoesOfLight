@@ -26,9 +26,20 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Dialogue Box", meta = (BindWidget))
 	UMultiLineEditableTextBox* DialogueText;
 
+	bool bHasDialogueText = true;
+
+	TArray<FString> sentences; 
+
+	int32 SentencesIndex = 0;
+
 	void SetDialogueText(FString message);
 
 	void SetName(FName name);
+
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+
+	void GoToTheNextDialogueSentence();
+
 
 };
 

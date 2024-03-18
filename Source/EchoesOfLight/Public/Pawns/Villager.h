@@ -9,6 +9,7 @@
 
 class UDialogueSystem;
 class ADialogueCamera;
+class AMainCharcter;
 
 
 UCLASS()
@@ -25,6 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
 		UDialogueSystem* Dialogue;
 
+	AMainCharacter* CharacterRef;
+
 	FRotator CharacterRotation;
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
@@ -32,6 +35,7 @@ public:
 
 
 	ADialogueCamera* DialogueCamera;
+	bool bisDoneRotating = false;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS

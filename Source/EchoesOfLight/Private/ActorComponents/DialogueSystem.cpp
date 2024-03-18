@@ -58,31 +58,35 @@ void UDialogueSystem::RetrieveDialogueData()
 
 void UDialogueSystem::SetDialogueSentencesArray(FString InputString)
 {
-	FRegexPattern SentencePattern(TEXT("([.!?])\\s+"));
-	FRegexMatcher Matcher(SentencePattern, InputString);
-
-	int32 PrevMatchEnd = 0;
-
-	while (Matcher.FindNext())
+	if (DialogueSentences.IsEmpty())
 	{
-		int32 MatchEnd = Matcher.GetMatchEnding();
-		FString Sentence = InputString.Mid(PrevMatchEnd, MatchEnd - PrevMatchEnd - 1).TrimStartAndEnd();
-		if (!Sentence.IsEmpty())
+		FRegexPattern SentencePattern(TEXT("([.!?])\\s+"));
+		FRegexMatcher Matcher(SentencePattern, InputString);
+
+		int32 PrevMatchEnd = 0;
+
+		while (Matcher.FindNext())
 		{
-			DialogueSentences.Add(Sentence);
+			int32 MatchEnd = Matcher.GetMatchEnding();
+			FString Sentence = InputString.Mid(PrevMatchEnd, MatchEnd - PrevMatchEnd - 1).TrimStartAndEnd();
+			if (!Sentence.IsEmpty())
+			{
+				DialogueSentences.Add(Sentence);
+			}
+			PrevMatchEnd = MatchEnd;
 		}
-		PrevMatchEnd = MatchEnd;
+
+		// Add the last sentence if there's any text left after the last match
+		if (PrevMatchEnd < InputString.Len())
+		{
+			FString Sentence = InputString.Mid(PrevMatchEnd).TrimStartAndEnd();
+			if (!Sentence.IsEmpty())
+			{
+				DialogueSentences.Add(Sentence);
+			}
+		}
 	}
 
-	// Add the last sentence if there's any text left after the last match
-	if (PrevMatchEnd < InputString.Len())
-	{
-		FString Sentence = InputString.Mid(PrevMatchEnd).TrimStartAndEnd();
-		if (!Sentence.IsEmpty())
-		{
-			DialogueSentences.Add(Sentence);
-		}
-	}
 	/*
 	for (const FString& Sentence : DialogueSentences)
 	{
