@@ -14,6 +14,8 @@ class AMainCharacter;
 class UBFL_Utility;
 class UW_EquipmentMenu;
 struct FInteractableData;
+class AHUD_MainCharacter;
+class UW_DialogueGui;
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -32,23 +34,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_MainGUI> GUI_Class;
 
-	UPROPERTY(BlueprintReadWrite)
-		UW_MainGUI* GUI;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
+		TSubclassOf<UW_DialogueGui> DialogueGUI_Class;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
-		TSubclassOf<AMainCharacter> CharacterClass ;
-
-	UPROPERTY(BlueprintReadOnly)
-		AMainCharacter* MainCharacter;
-
-	UPROPERTY(BlueprintReadOnly)
-		APlayerController* MainCharacterController;
+		TSubclassOf<AMainCharacter> CharacterClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UW_EquipmentMenu> EquipmentMenuWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UW_Interact> InteractionWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly)
+		AMainCharacter* MainCharacter;
+
+	UPROPERTY(BlueprintReadOnly)
+		APlayerController* MainCharacterController;
 
 	UPROPERTY()
 		UW_EquipmentMenu* EquipmentMenuWidget;
@@ -57,7 +60,17 @@ public:
 		UW_Interact* InteractionWidget;
 
 	UPROPERTY()
+		UW_DialogueGui* DialogueGui;
+
+	UPROPERTY()
+		UW_MainGUI* GUI;
+
+
+	UPROPERTY()
 		bool bIsMenuVisible;
+
+//	UPROPERTY()
+	//	AHUD_MainCharacter* HUD;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -75,9 +88,26 @@ public:
 	UFUNCTION()
 		void DisplayMenu();
 
+	UFUNCTION()
+		void CreateDialogueWidget();
+
+	UFUNCTION()
+		void RemoveDialogueWidget();
+
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
 	void UpdateInteractionWidget(const FInteractableData* InteractData) const;
+
+	void InitializePlayer();
+
+	void CreateAllWidget();
+
+	void TogglePause();
+
+	void HideHUD();
+
+	void ShowHUD();
+
 
 
 	
@@ -94,14 +124,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable)
-		void InitializePlayer();
-
-	UFUNCTION(BlueprintCallable)
-		void CreateAllWidget();
-
-	UFUNCTION(BlueprintCallable)
-		void TogglePause();
 
 		
 };
