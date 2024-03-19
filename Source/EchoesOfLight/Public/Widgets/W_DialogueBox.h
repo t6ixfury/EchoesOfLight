@@ -24,7 +24,7 @@ public:
 	UTextBlock* CharacterName;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Dialogue Box", meta = (BindWidget))
-	UMultiLineEditableTextBox* DialogueText;
+		UTextBlock* DialogueText;
 
 	bool bHasDialogueText = true;
 

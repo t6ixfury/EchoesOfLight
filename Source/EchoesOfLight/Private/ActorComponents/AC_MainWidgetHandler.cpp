@@ -16,6 +16,7 @@
 #include "Interfaces/Interface_Interaction.h"
 #include "Widgets/HUD_MainCharacter.h"
 #include "Widgets/W_DialogueGui.h"
+#include "Widgets/W_DialogueBox.h"
 
 
 
@@ -51,9 +52,12 @@ void UAC_MainWidgetHandler::CreateDialogueWidget()
 	if (MainCharacterController && DialogueGUI_Class)
 	{
 		DialogueGui = CreateWidget<UW_DialogueGui>(MainCharacterController, DialogueGUI_Class);
-		if (GUI)
+		if (DialogueGui)
 		{
 			DialogueGui->AddToViewport();
+			FInputModeGameOnly InputMode;
+			MainCharacterController->SetInputMode(InputMode);
+			MainCharacterController->SetShowMouseCursor(false);
 		}
 
 	}
@@ -62,10 +66,14 @@ void UAC_MainWidgetHandler::CreateDialogueWidget()
 
 void UAC_MainWidgetHandler::RemoveDialogueWidget()
 {
-	if (DialogueGui)
+	if (DialogueGui && MainCharacterController)
 	{
 		DialogueGui->RemoveFromViewport();
+		//set input mode to game only.
+		const FInputModeGameOnly InputMode;
+		MainCharacterController->SetInputMode(InputMode);
 		DialogueGui = nullptr;
+
 	}
 }
 

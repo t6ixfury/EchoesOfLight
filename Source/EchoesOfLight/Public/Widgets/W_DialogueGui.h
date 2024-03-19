@@ -22,5 +22,8 @@ public:
 		UW_DialogueBox* DialogueBox;
 
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
-	
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+
 };

@@ -14,5 +14,13 @@ FReply UW_DialogueGui::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 		return FReply::Handled();
 	}
 
-	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+	return FReply::Handled();
 }
+
+void UW_DialogueGui::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	DialogueBox->SetFocus();
+}
+
+

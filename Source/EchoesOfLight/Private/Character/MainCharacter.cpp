@@ -131,6 +131,10 @@ void AMainCharacter::Tick(float DeltaTime)
 	}
 	GetCharacterMovementDirection();
 
+	if (DialogueSystem->bIsTalking)
+	{
+	}
+
 
 }
 
@@ -142,6 +146,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent)
 	{
+		InputComponent = EnhancedInputComponent;
 		//Action for performing base attack
 		EnhancedInputComponent->BindAction(MeleeAttackIA, ETriggerEvent::Triggered, this, &AMainCharacter::MeleeAttack);
 
@@ -504,7 +509,7 @@ void AMainCharacter::MeleeAttack()
 
 	float timeTillNextAttack = 0.5f;
 
-	if (CharacterAnimInstance && !MainWidgetHandlerComponent->bIsMenuVisible)
+	if (CharacterAnimInstance && !MainWidgetHandlerComponent->bIsMenuVisible && !DialogueSystem->bIsTalking)
 	{
 		isAttacking = true;
 

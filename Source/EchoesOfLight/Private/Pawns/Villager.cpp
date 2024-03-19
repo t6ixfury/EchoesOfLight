@@ -10,6 +10,7 @@
 #include "ActorComponents/AC_MainWidgetHandler.h"
 #include "Widgets/W_DialogueBox.h"
 #include "Widgets/W_DialogueGui.h"
+#include "EnhancedInputComponent.h" 
 
 
 
@@ -68,6 +69,12 @@ void AVillager::EndInteract()
 
 				//hides the main character in game
 				CharacterRef->SetActorHiddenInGame(false);
+
+				if (CharacterRef->LeftHandWeapon && CharacterRef->RightHandWeapon)
+				{
+					CharacterRef->LeftHandWeapon->SetActorHiddenInGame(false);
+					CharacterRef->RightHandWeapon->SetActorHiddenInGame(false);
+				}
 
 				Dialogue->bIsTalking = false;
 				CharacterRef->DialogueSystem->bIsTalking = false;
@@ -175,6 +182,11 @@ void AVillager::SetDialogueCameraView(AMainCharacter* Character)
 
 				//hides the main character in game
 				Character->SetActorHiddenInGame(true);
+				if (Character->LeftHandWeapon && Character->RightHandWeapon)
+				{
+					Character->LeftHandWeapon->SetActorHiddenInGame(true);
+					Character->RightHandWeapon->SetActorHiddenInGame(true);
+				}
 			}
 
 		}
