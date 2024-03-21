@@ -4,49 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DungeonRoom.generated.h"
+#include "EnemySpawnPoint.generated.h"
 
-class AEnemySpawnPoint;
-struct FEnemySpawnArray;
 class AEnemyCharacter;
 class UBoxComponent;
 
 
-USTRUCT(BlueprintType)
-struct FEnemySpawnArray
-{
-	GENERATED_BODY()
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AEnemyCharacter> EnemyType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int32 NumberOfEnemyTypeToSpawn = 0;
-
-};
 
 UCLASS()
-class ECHOESOFLIGHT_API ADungeonRoom : public AActor
+class ECHOESOFLIGHT_API AEnemySpawnPoint : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ADungeonRoom();
+	AEnemySpawnPoint();
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USceneComponent* Root;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Spawn Parameters")
 		UBoxComponent* SpawnArea;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawn Parameters")
 		int32 NumberOfEnemiesSpawned = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Parameters")
-		TArray<FEnemySpawnArray> EnemyTypesToSpawn;
 
 
 
@@ -59,16 +37,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void SpawnAllEnemies();
+
+	UFUNCTION()
+	AEnemyCharacter* SpawnEnemy(TSubclassOf<AEnemyCharacter> EnemyClass);
+
 
 	UFUNCTION()
 		FVector FindSpawnPoint();
+	
+	UFUNCTION()
+		void SpawnAllEnemies();
 
 	UFUNCTION()
 		bool IsSpawnLocationValid(FVector TestLocation);
-
-
-
-
 
 };

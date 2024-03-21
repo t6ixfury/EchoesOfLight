@@ -68,7 +68,7 @@ void UAC_MainWidgetHandler::RemoveDialogueWidget()
 {
 	if (DialogueGui && MainCharacterController)
 	{
-		DialogueGui->RemoveFromViewport();
+		DialogueGui->RemoveFromParent();
 		//set input mode to game only.
 		const FInputModeGameOnly InputMode;
 		MainCharacterController->SetInputMode(InputMode);

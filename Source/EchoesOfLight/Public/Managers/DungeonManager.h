@@ -8,6 +8,8 @@
 
 
 class ADungeonRoom;
+class AEnemyCharacter;
+
 /**
  * 
  */
@@ -25,6 +27,11 @@ public:
 	UPROPERTY()
 		TArray<ADungeonRoom*> DungeonRooms;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Properties")
+		TArray <TSubclassOf<AEnemyCharacter>> EnemiesToSpawn;
+
+	TArray<AEnemyCharacter*> EnemiesInDungeon;
+
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
 //---------------------------------------------------------------------------------------------------------------------------
@@ -33,6 +40,8 @@ public:
 public:
 
 	void GetLevelDungeonRooms();
+
+	void SpawnAllEnemies();
 
 	virtual void BeginPlay() override;
 

@@ -4,6 +4,7 @@
 //game
 #include "Managers/DungeonManager.h"
 #include "Actors/Dungeon/DungeonRoom.h"
+#include "Actors/Dungeon/EnemySpawnPoint.h"
 
 //engine
 #include "Kismet/GameplayStatics.h"
@@ -32,6 +33,10 @@ void ADungeonManager::GetLevelDungeonRooms()
 	}
 
 
+}
+
+void ADungeonManager::SpawnAllEnemies()
+{
 }
 
 void ADungeonManager::BeginPlay()
