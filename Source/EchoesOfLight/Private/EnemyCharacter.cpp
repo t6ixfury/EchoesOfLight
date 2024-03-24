@@ -145,7 +145,7 @@ float AEnemyCharacter::NormalAttack()
 
 void AEnemyCharacter::Death()
 {
-	UE_LOG(LogTemp, Warning, TEXT("DeathImplementation Called"))
+	OnDeath.Broadcast();
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 

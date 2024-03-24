@@ -8,6 +8,8 @@
 #include "Pickup.generated.h"
 
 class UItemBase;
+class UDataTable;
+class FName;
 
 UCLASS()
 class ECHOESOFLIGHT_API APickup : public AActor, public IInterface_Interaction
@@ -71,7 +73,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void TakePickup(const AMainCharacter* Taker);
 	//Updates the interact widget with the data of the item you are looking at.
 	void UpdateInteractableData();

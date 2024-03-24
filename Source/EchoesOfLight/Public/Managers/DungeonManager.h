@@ -9,6 +9,7 @@
 
 class ADungeonRoom;
 class AEnemyCharacter;
+class AChest;
 
 /**
  * 
@@ -30,7 +31,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Properties")
 		TArray <TSubclassOf<AEnemyCharacter>> EnemiesToSpawn;
 
-	TArray<AEnemyCharacter*> EnemiesInDungeon;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Properties")
+		TArray<AEnemyCharacter*> EnemiesInDungeon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Properties")
+		TArray<AChest*> ChestInDungeon;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Properties")
+		int32 NumberOfEnemiesInDungeon = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Properties")
+		int32 NumberOfChestInDungeon = 0;
+
+
+	
+
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -39,11 +54,19 @@ public:
 
 public:
 
+
 	void GetLevelDungeonRooms();
 
-	void SpawnAllEnemies();
+	void GetAllChest();
 
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+		void HandleEnemyDeath();
+
+	void HandleEnemySpawned(AEnemyCharacter* NewEnemy);
+
+	void HandleChestOpened(AChest* Chest);
 
 
 };

@@ -77,10 +77,10 @@ void ADungeonRoom::SpawnAllEnemies()
 					{
 						EnemiesSpawned.Add(Enemy);
 						NumberOfEnemiesSpawned += 1;
+						OnEnemySpawned.Broadcast(Enemy);
+						
 					}
 				}
-
-
 			}
 		}
 	}
@@ -114,3 +114,4 @@ bool ADungeonRoom::IsSpawnLocationValid(FVector TestLocation)
 {
 	return true;
 }
+

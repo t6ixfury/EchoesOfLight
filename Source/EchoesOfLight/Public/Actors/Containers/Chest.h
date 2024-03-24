@@ -88,6 +88,11 @@ class ECHOESOFLIGHT_API AChest : public AActor, public IInterface_Interaction
 
 public:
 
+
+	DECLARE_MULTICAST_DELEGATE_OneParam(FChestOpenedDelegate, AChest*);
+	FChestOpenedDelegate ChestOpenedDelegate;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
 		EContainerType Type;
 

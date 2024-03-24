@@ -107,6 +107,9 @@ void AChest::Interact(AMainCharacter* PlayerCharacter)
 		{
 			PlayerCharacter->PlayerInventory->HandleAddItem(CreateItem(&ChestItem));
 		}
+
+		ChestOpenedDelegate.Broadcast(this);
+
 		//flag to make the chess only lootable once.
 		bIsChestLootable = false;
 	}
@@ -159,6 +162,32 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 	case EItemType::Amulet:
 		break;
 	case EItemType::Weapon:
+		if (ItemWeaponDataTable && !ItemDataForCreation->DesiredItemId.IsNone())
+		{
+			//get the item info from the data table.
+			const FItemData* ItemDataRow = ItemWeaponDataTable->FindRow<FItemData>(ItemDataForCreation->DesiredItemId, ItemDataForCreation->DesiredItemId.ToString());
+
+			//create a new item
+			UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+			if (ItemDataRow)
+			{
+				//set the item properties
+				ItemToAdd->ID = ItemDataRow->ID;
+				ItemToAdd->ItemType = ItemDataRow->ItemType;
+				ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+				ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+				ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+
+				//set the desired quantity based off the passed in data.
+				ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
+			}
+
+			return ItemToAdd;
+		}
+
 		break;
 	case EItemType::Spell:
 		break;
@@ -235,7 +264,6 @@ void AChest::StopChestAudio()
 
 void AChest::PlayChestAmbientAudio(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Component Begin Overlap"));
 	if (bIsChestLootable)
 	{
 		if (AudioComponent)
@@ -251,7 +279,6 @@ void AChest::PlayChestAmbientAudio(UPrimitiveComponent* OverlappedComponent, AAc
 
 void AChest::StopChestAmbientAudio(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Component End Overlap"));
 	if (bIsChestLootable)
 	{
 		if (AudioComponent)

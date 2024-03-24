@@ -32,6 +32,14 @@ class ECHOESOFLIGHT_API ADungeonRoom : public AActor
 	GENERATED_BODY()
 	
 public:	
+
+	DECLARE_MULTICAST_DELEGATE_OneParam(FEnemySpawned, AEnemyCharacter*);
+	FEnemySpawned OnEnemySpawned;
+
+
+
+
+
 	// Sets default values for this actor's properties
 	ADungeonRoom();
 
@@ -66,6 +74,9 @@ public:
 
 	UFUNCTION()
 		bool IsSpawnLocationValid(FVector TestLocation);
+
+
+	
 
 
 

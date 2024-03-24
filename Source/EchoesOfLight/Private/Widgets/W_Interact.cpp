@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 #include "Interfaces/Interface_Interaction.h"
 
+
 void UW_Interact::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
@@ -46,6 +47,11 @@ void UW_Interact::UpdateWidget(const FInteractableData* InteractionData) const
 		break;
 
 	case EInteractableType::Device:
+		InteractionProgressBar->SetVisibility(ESlateVisibility::Collapsed);
+		QuantityText->SetVisibility(ESlateVisibility::Collapsed);
+		ActionText->SetVisibility(ESlateVisibility::Visible);
+		NameText->SetVisibility(ESlateVisibility::Visible);
+
 		break;
 
 	case EInteractableType::Toggle:
