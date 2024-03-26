@@ -94,13 +94,13 @@ void ABase_Sword::BaseAttack()
 
         if (HitResult.GetActor())
         {
-            UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+           // UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
             IInterface_Damagable* HitActor = Cast<IInterface_Damagable>(HitResult.GetActor());
 
             if (HitActor)
             {
                 HitActor->TakeIncomingDamage(BaseAttackInfo);
-                UE_LOG(LogTemp, Warning, TEXT("hit actor found"))
+                //UE_LOG(LogTemp, Warning, TEXT("hit actor found"))
             }
 
         }

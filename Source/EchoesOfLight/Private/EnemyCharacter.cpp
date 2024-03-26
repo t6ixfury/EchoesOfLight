@@ -51,6 +51,7 @@ void AEnemyCharacter::BeginPlay()
 	}
 	//sets the health bar percentage.
 	SetEnemyWidgets();
+
 }
 
 // Called every frame
@@ -145,7 +146,7 @@ float AEnemyCharacter::NormalAttack()
 
 void AEnemyCharacter::Death()
 {
-	UE_LOG(LogTemp, Warning, TEXT("DeathImplementation Called"))
+	OnDeath.Broadcast();
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 
@@ -246,6 +247,7 @@ void AEnemyCharacter::SetMovementSpeed(float NewMaxSpeed)
 
 void AEnemyCharacter::SetEnemyWidgets()
 {
+
 	if (HealthBar)
 	{
 		UEnemyHealthBar* WidgetInstance = Cast<UEnemyHealthBar>(HealthBar->GetUserWidgetObject());
@@ -256,4 +258,5 @@ void AEnemyCharacter::SetEnemyWidgets()
 			WidgetInstance->SetHealthBarPercentage(health);
 		}
 	}
+	
 }

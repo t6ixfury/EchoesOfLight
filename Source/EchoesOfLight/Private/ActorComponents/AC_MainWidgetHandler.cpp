@@ -17,6 +17,9 @@
 #include "Widgets/HUD_MainCharacter.h"
 #include "Widgets/W_DialogueGui.h"
 #include "Widgets/W_DialogueBox.h"
+#include "Widgets/W_Alert.h"
+#include "TimerManager.h"
+
 
 
 
@@ -68,12 +71,38 @@ void UAC_MainWidgetHandler::RemoveDialogueWidget()
 {
 	if (DialogueGui && MainCharacterController)
 	{
-		DialogueGui->RemoveFromViewport();
+		DialogueGui->RemoveFromParent();
 		//set input mode to game only.
 		const FInputModeGameOnly InputMode;
 		MainCharacterController->SetInputMode(InputMode);
 		DialogueGui = nullptr;
 
+	}
+}
+
+void UAC_MainWidgetHandler::ShowAlertWidget(FText message)
+{
+	UWorld* World = GetWorld();
+	if (AlertWidgetClass && MainCharacterController && World)
+	{
+		AlertWidget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
+		if (AlertWidget)
+		{
+			AlertWidget->SetAlertMessageText(message);
+			AlertWidget->AddToPlayerScreen();
+
+			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, AlertDuration);
+		}
+
+	}
+}
+
+void UAC_MainWidgetHandler::RemoveAlertWidget()
+{
+	if (AlertWidget)
+	{
+		AlertWidget->RemoveFromParent();
+		AlertWidget = nullptr;
 	}
 }
 

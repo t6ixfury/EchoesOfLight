@@ -16,6 +16,8 @@ class UW_EquipmentMenu;
 struct FInteractableData;
 class AHUD_MainCharacter;
 class UW_DialogueGui;
+class UW_Alert;
+struct FTimerHandle;
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -37,14 +39,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_DialogueGui> DialogueGUI_Class;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
+		TSubclassOf<UW_Alert> AlertWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 		TSubclassOf<AMainCharacter> CharacterClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_EquipmentMenu> EquipmentMenuWidgetClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_Interact> InteractionWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -64,13 +68,19 @@ public:
 
 	UPROPERTY()
 		UW_MainGUI* GUI;
+	UPROPERTY()
+		UW_Alert* AlertWidget;
 
 
 	UPROPERTY()
 		bool bIsMenuVisible;
 
-//	UPROPERTY()
-	//	AHUD_MainCharacter* HUD;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget's properties")
+		float AlertDuration = 5;
+
+	//Timers
+
+	FTimerHandle AlertTimer;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -93,6 +103,10 @@ public:
 
 	UFUNCTION()
 		void RemoveDialogueWidget();
+
+	void ShowAlertWidget(FText message);
+
+	void RemoveAlertWidget();
 
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;

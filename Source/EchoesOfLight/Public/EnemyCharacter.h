@@ -80,6 +80,11 @@ public:
 	DECLARE_DELEGATE(FOnEnemyHit);
 	FOnEnemyHit OnHit;
 
+	DECLARE_MULTICAST_DELEGATE(FOnDeath);
+	FOnDeath OnDeath;
+
+
+
 
 
 protected:
