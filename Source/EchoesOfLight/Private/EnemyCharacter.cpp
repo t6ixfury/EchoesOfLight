@@ -134,8 +134,9 @@ float AEnemyCharacter::NormalAttack()
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 
-	if (EnemyAnimInstance)
+	if (EnemyAnimInstance && BaseAttack)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Inside normal attack."))
 		MontageDuration = EnemyAnimInstance->Montage_Play(BaseAttack);
 		CapsuleTraceForEnemy();
 	}
