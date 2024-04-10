@@ -146,7 +146,7 @@ float AEnemyCharacter::NormalAttack()
 
 void AEnemyCharacter::Death()
 {
-	OnDeath.Broadcast();
+	OnDeath.Broadcast(this);
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
 
