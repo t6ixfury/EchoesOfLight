@@ -6,6 +6,7 @@
 #include "Actors/Dungeon/DungeonRoom.h"
 #include "EnemyCharacter.h"
 #include "Actors/Containers/Chest.h"
+#include "Actors/Items/AutoCollectPickup.h"
 
 //engine
 #include "Kismet/GameplayStatics.h"
@@ -30,7 +31,6 @@ void ADungeonManager::GetLevelDungeonRooms()
 				int32 index = DungeonRooms.Add(Dungeonroom);
 				UE_LOG(LogTemp, Warning, TEXT("Array Index : %d"), index);
 				Dungeonroom->OnEnemySpawned.AddUObject(this, &ADungeonManager::HandleEnemySpawned);
-				NumberOfEnemiesInDungeon += 1;
 			}
 		}
 	}
@@ -69,12 +69,27 @@ void ADungeonManager::BeginPlay()
 
 	GetLevelDungeonRooms();
 	GetAllChest();
+	UE_LOG(LogTemp, Warning, TEXT("Number of Enemies in dungeon: %d"), NumberOfEnemiesInDungeon);
 }
 
-void ADungeonManager::HandleEnemyDeath()
+void ADungeonManager::HandleEnemyDeath(AEnemyCharacter* NewEnemy)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Handle Enemy Death Called"));
 	NumberOfEnemiesInDungeon = FMath::Clamp(NumberOfEnemiesInDungeon - 1, 0, 100);
+	UE_LOG(LogTemp, Warning, TEXT("Number of Enemies in dungeon: %d"), NumberOfEnemiesInDungeon);
+	if (NumberOfEnemiesInDungeon < 1)
+	{
+		UWorld* World = GetWorld();
+		if (World && DungeonKey && NewEnemy)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+			World->SpawnActor<AAutoCollectPickup>(DungeonKey, NewEnemy->GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+			UE_LOG(LogTemp, Warning, TEXT("DungeonKeySpawned"));
+		}
+
+	}
 }
 
 void ADungeonManager::HandleEnemySpawned(AEnemyCharacter* NewEnemy)
@@ -82,6 +97,7 @@ void ADungeonManager::HandleEnemySpawned(AEnemyCharacter* NewEnemy)
 	if (NewEnemy)
 	{
 		NewEnemy->OnDeath.AddUObject(this, &ADungeonManager::HandleEnemyDeath);
+		NumberOfEnemiesInDungeon += 1;
 		UE_LOG(LogTemp, Warning, TEXT("Handle EnemySpawn Called"));
 	}
 }

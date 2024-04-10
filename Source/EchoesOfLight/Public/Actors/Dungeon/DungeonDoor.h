@@ -9,6 +9,7 @@
 
 
 class UStaticMeshComponent;
+class AAutoCollectPickup;
 
 UCLASS()
 class ECHOESOFLIGHT_API ADungeonDoor : public AActor, public IInterface_Interaction
@@ -29,10 +30,13 @@ public:
 		UStaticMeshComponent* DoorFrame;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door properties")
-		bool bHasKey = false;
+		bool bIsDoorOpen = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door properties")
-		bool bIsDoorOpen = false;
+		TSubclassOf<AAutoCollectPickup> DungeonKey;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door properties")
+		FName DungeonKeyName;
 
 	FRotator TargetLeftDoorRotation;
 	FRotator TargetRightDoorRotation;
@@ -71,5 +75,7 @@ public:
 	void OperateDoor();
 
 	void UpdateInteractable();
+
+	bool HasDungeonKey(AMainCharacter* PlayerCharacter);
 
 };

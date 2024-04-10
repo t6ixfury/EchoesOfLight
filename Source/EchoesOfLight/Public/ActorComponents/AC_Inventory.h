@@ -123,6 +123,9 @@ public:
 	UFUNCTION(Category = "Inventory")
 	FItemAddResult HandleAddItem(UItemBase* InputItem);
 
+	UFUNCTION(Category = "Inventory")
+		UItemBase* FindItembyName(FName ItemName);
+
 	// Check to see if the Item of same type being added is all ready in the inventory.
 	UFUNCTION(Category = "Inventory")
 	UItemBase* FindMatchingItem(UItemBase* ItemIn) const;
