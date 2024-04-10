@@ -35,7 +35,7 @@ UItemBase* UAC_Inventory::FindMatchingItem(UItemBase* ItemIn) const
 {
 	if (ItemIn)
 	{
-		//check to see if the passed in Item in the Inventory and if it is return the passed in Item
+		//check to see if the passed in Item is in the Inventory and if it is return the passed in Item
 		if (InventoryContents.Contains(ItemIn))
 		{
 			return ItemIn;
@@ -298,6 +298,18 @@ FItemAddResult UAC_Inventory::HandleAddItem(UItemBase* InputItem)
 	}
 	check(false);
 	return FItemAddResult::AddedNone(FText::FromString("TryaddItem fallthrough error. GetOwner() check somehow failed."));
+}
+
+UItemBase* UAC_Inventory::FindItembyName(FName ItemName)
+{
+	for (UItemBase* item : InventoryContents)
+	{
+		if (item->ID == ItemName)
+		{
+			return item;
+		}
+	}
+	return nullptr;
 }
 
 void UAC_Inventory::AddNewItem(UItemBase* Item, const int32 ItemAmountToAdd)

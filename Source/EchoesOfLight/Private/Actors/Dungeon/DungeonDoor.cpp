@@ -4,6 +4,8 @@
 #include "Actors/Dungeon/DungeonDoor.h"
 #include "Character/MainCharacter.h"
 #include "ActorComponents/AC_MainWidgetHandler.h"
+#include "ActorComponents/AC_Inventory.h"
+#include "Actors/Items/ItemBase.h"
 
 //engine
 #include "Components/StaticMeshComponent.h"
@@ -79,7 +81,7 @@ void ADungeonDoor::EndInteract()
 
 void ADungeonDoor::Interact(AMainCharacter* PlayerCharacter)
 {
-	if (bHasKey)
+	if (HasDungeonKey(PlayerCharacter) && !bIsDoorOpen)
 	{
 		OperateDoor();
 	}
@@ -121,5 +123,21 @@ void ADungeonDoor::UpdateInteractable()
 	InteractableData.Action = FText::FromString("Open");
 	InteractableData.InteractableType = EInteractableType::Device;
 	InteractableData.Name = FText::FromString("Dungeon Door");
+}
+
+bool ADungeonDoor::HasDungeonKey(AMainCharacter* PlayerCharacter)
+{
+	if (IsValid(PlayerCharacter))
+	{
+		UItemBase* key = PlayerCharacter->PlayerInventory->FindItembyName(DungeonKeyName);
+
+		if (IsValid(key))
+		{
+			PlayerCharacter->PlayerInventory->RemoveSingleInstanceOfItem(key);
+			return true;
+		}
+
+	}
+	return false;
 }
 

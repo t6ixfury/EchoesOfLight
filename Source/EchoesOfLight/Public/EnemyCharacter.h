@@ -80,7 +80,7 @@ public:
 	DECLARE_DELEGATE(FOnEnemyHit);
 	FOnEnemyHit OnHit;
 
-	DECLARE_MULTICAST_DELEGATE(FOnDeath);
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeath, AEnemyCharacter*);
 	FOnDeath OnDeath;
 
 

@@ -4,6 +4,8 @@
 #include "Actors/Items/AutoCollectPickup.h"
 #include "Components/BoxComponent.h"
 #include "Character/MainCharacter.h"
+#include "ActorComponents/AC_MainWidgetHandler.h"
+#include "Actors/Items/ItemBase.h"
 
 AAutoCollectPickup::AAutoCollectPickup()
 {
@@ -20,6 +22,15 @@ void AAutoCollectPickup::CollectPickup(UPrimitiveComponent* OverlappedComponent,
 	if (Character && bIsItem)
 	{
 		TakePickup(Character);
+		if (this->ItemReference)
+		{
+			FText ItemAddedText = FText::Format(
+				NSLOCTEXT("YourNamespace", "ItemAddedToInventory", "{0} has been added to your inventory!"),
+				FText::FromName(this->ItemReference->ID)
+			);
+
+			Character->MainWidgetHandlerComponent->ShowAlertWidget(ItemAddedText);
+		}
 	}
 }
 

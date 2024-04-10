@@ -10,7 +10,7 @@
 class ADungeonRoom;
 class AEnemyCharacter;
 class AChest;
-
+class AAutoCollectPickup;
 /**
  * 
  */
@@ -43,6 +43,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Properties")
 		int32 NumberOfChestInDungeon = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Properties")
+		TSubclassOf<AAutoCollectPickup> DungeonKey;
+
 
 	
 
@@ -62,7 +65,7 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-		void HandleEnemyDeath();
+		void HandleEnemyDeath(AEnemyCharacter* NewEnemy);
 
 	void HandleEnemySpawned(AEnemyCharacter* NewEnemy);
 
