@@ -66,6 +66,8 @@ public:
 	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
 	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef);
 
+	void SetIconImage(UTexture2D* icon);
+
 
 	
 };

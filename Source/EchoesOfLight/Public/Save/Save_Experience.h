@@ -18,13 +18,13 @@ public:
 	USave_Experience();
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
-		float sExperience;
+		float sExperience = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
-		float sExperienceToNextLevel;
+		float sExperienceToNextLevel = 100;;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
-		int32 sCurrentLevel;
+		int32 sCurrentLevel = 1;
 
 	
 };

@@ -37,6 +37,7 @@ bool UW_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 			ItemBeingDroppedOnWidget->SourceInventory->RemoveSingleInstanceOfItem(ItemBeingDroppedOnWidget->SourceItem);
 			if (EquipmentIcon)
 			{
+				UE_LOG(LogTemp, Warning, TEXT("equip icon not null"))
 				//set the icon image for the equipment slot and set to visisble.
 				EquipmentIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 				EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
@@ -140,5 +141,14 @@ EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandle
 	default:
 		return EItemType::Mudane;
 		break;
+	}
+}
+
+void UW_EquipmentSlot::SetIconImage(UTexture2D* icon)
+{
+	EquipmentIcon->SetBrushFromTexture(icon);
+	if(icon == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("icon null"))
 	}
 }

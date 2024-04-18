@@ -16,6 +16,8 @@
 #include "W_MainGUI.h"
 #include "Actors/Items/ItemBase.h"
 #include "ActorComponents/DialogueSystem.h"
+#include "Save/Save_PlayerInfo.h"
+#include "Save/EchoesGameInstance.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -27,6 +29,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -93,7 +96,8 @@ AMainCharacter::AMainCharacter()
 	InteractionCheckFrequency = 0.1;
 	InteractionCheckDistance = 500.0f;
 
-
+	//Save
+	PlayerInfoSaveSlot = FString("PlayerInfoSlot1");
 
 }
 
@@ -118,6 +122,14 @@ void AMainCharacter::BeginPlay()
 	}
 
 	BindEquipmentSlotDelegates();
+
+	ExperienceSystem->ExperienceAddedDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
+	ExperienceSystem->LevelUpDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
+
+	if (UEchoesGameInstance* instance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
+	{
+		LoadAll();
+	}
 }
 
 void AMainCharacter::Tick(float DeltaTime)
@@ -1048,12 +1060,21 @@ void AMainCharacter::roll()
 
 void AMainCharacter::UpdateAllWidgets()
 {
+	UE_LOG(LogTemp,Warning, TEXT("UpdateWidget"))
 	//sets health bar percantage to the 
 	if (MainWidgetHandlerComponent->GUI)
 	{
 		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
+		MainWidgetHandlerComponent->GUI->SetStaminaBarPercetage(CurrentStamina / Stamina);
+		MainWidgetHandlerComponent->GUI->SetExperienceBarPercentage(ExperienceSystem->CurrentExp / ExperienceSystem->ExpToNextLevel);
+		MainWidgetHandlerComponent->GUI->SetLevelText(FText::AsNumber(ExperienceSystem->CurrentLevel));
 	}
+
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentStats();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateCharacterStats();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateStatProgressBars();
+
 }
 
 
@@ -1086,3 +1107,140 @@ void AMainCharacter::DecreaseStats(FItemCharacerStatistics Stats)
 }
 
 
+void AMainCharacter::SavePlayerInfo()
+{
+	if (UWorld* World = GetOwner()->GetWorld())
+	{
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+		USave_PlayerInfo* Nsave = NewObject<USave_PlayerInfo>(this, USave_PlayerInfo::StaticClass());
+
+		if (IsValid(GameInstance) && IsValid(Nsave))
+		{
+			Nsave->sHealth = DamageSystem->Health;
+			Nsave->sPlayerTransform = GetActorTransform();
+			Nsave->sPlayerLocation = GetActorLocation();
+			Nsave->sPlayerRotation = GetActorRotation();
+			Nsave->sStatsLevels = MainCharacterStats;
+			
+			if (IsValid(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference))
+			{
+				Nsave->sCurrentWeapon = MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->SaveItem(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference);
+			}
+			if (IsValid(MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference))
+			{
+				Nsave->sCurrentAmulet = MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference->SaveItem(MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference);
+			}
+
+			if (IsValid(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference))
+			{
+				Nsave->sCurrentNetherbad = MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->SaveItem(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference);
+			}
+
+			if (LeftHandWeapon)
+			{
+				Nsave->sCurrentWeapnStats.AttackPower = LeftHandWeapon->BaseAttackInfo.AttackPower;
+				Nsave->sCurrentWeapnStats.AtttackSpeed = LeftHandWeapon->BaseAttackInfo.AtttackSpeed;
+				Nsave->sCurrentWeapnStats.CriticalHitRate = LeftHandWeapon->BaseAttackInfo.CriticalHitRate;
+				Nsave->sCurrentWeapnStats.MagicPower = LeftHandWeapon->BaseAttackInfo.MagicPower;
+				Nsave->sCurrentWeapnStats.Damage = LeftHandWeapon->BaseAttackInfo.Damage;
+			}
+
+			GameInstance->SaveGameData(nullptr, Nsave, nullptr);
+			UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
+			
+		}
+
+	}
+
+}
+
+void AMainCharacter::LoadPlayerInfo()
+{
+	if (UWorld* World = GetOwner()->GetWorld())
+	{
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+
+		if (UGameplayStatics::DoesSaveGameExist(GameInstance->PlayerInfoSlot, 0))
+		{
+			SetActorTransform(GameInstance->PlayerInfoData->sPlayerTransform);
+
+			SetActorRotation(GameInstance->PlayerInfoData->sPlayerRotation);
+
+			MainCharacterStats = GameInstance->PlayerInfoData->sStatsLevels;
+
+			DamageSystem->Health = GameInstance->PlayerInfoData->sHealth;
+
+			if(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference = nullptr;
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->EquipmentIcon = nullptr;
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentWeapon);
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->SetIconImage(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.Icon);
+
+			}
+
+			MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentAmulet);
+
+			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->SetIconImage(MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference->ItemAssetData.Icon);
+			}
+
+			MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentNetherbad);
+
+			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->SetIconImage(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->ItemAssetData.Icon);
+			}
+
+			UItemBase* NewWeapon = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentWeapon);
+			if (NewWeapon)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference = NewWeapon;
+				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->SetIconImage(NewWeapon->ItemAssetData.Icon);
+			}
+
+			DualSwordWeaponClass = GameInstance->PlayerInfoData->sCurrentWeapon.ItemAssetData.DualSword;
+
+			if (IsValid(DualSwordWeaponClass))
+			{
+				SpawnWeapon();
+			}
+
+			if (LeftHandWeapon && RightHandWeapon)
+			{
+				LeftHandWeapon->BaseAttackInfo.AttackPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.AttackPower;
+				LeftHandWeapon->BaseAttackInfo.AtttackSpeed = GameInstance->PlayerInfoData->sCurrentWeapnStats.AtttackSpeed;
+				LeftHandWeapon->BaseAttackInfo.CriticalHitRate = GameInstance->PlayerInfoData->sCurrentWeapnStats.CriticalHitRate;
+				LeftHandWeapon->BaseAttackInfo.MagicPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.MagicPower;
+				LeftHandWeapon->BaseAttackInfo.Damage = GameInstance->PlayerInfoData->sCurrentWeapnStats.Damage;
+
+				RightHandWeapon->BaseAttackInfo.AttackPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.AttackPower;
+				RightHandWeapon->BaseAttackInfo.AtttackSpeed = GameInstance->PlayerInfoData->sCurrentWeapnStats.AtttackSpeed;
+				RightHandWeapon->BaseAttackInfo.CriticalHitRate = GameInstance->PlayerInfoData->sCurrentWeapnStats.CriticalHitRate;
+				RightHandWeapon->BaseAttackInfo.MagicPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.MagicPower;
+				RightHandWeapon->BaseAttackInfo.Damage = GameInstance->PlayerInfoData->sCurrentWeapnStats.Damage;
+			}
+			UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Loaded"));
+			UpdateAllWidgets();
+		}
+	}
+
+}
+
+void AMainCharacter::LoadAll()
+{
+	LoadPlayerInfo();
+	ExperienceSystem->LoadExperience();
+	PlayerInventory->LoadInventory();
+	UE_LOG(LogTemp, Warning, TEXT("load all called"));
+}
+
+void AMainCharacter::SaveAll()
+{
+	SavePlayerInfo();
+	ExperienceSystem->SaveExperience();
+	PlayerInventory->SaveInventory();
+
+	UE_LOG(LogTemp, Warning, TEXT("Save all called"));
+}

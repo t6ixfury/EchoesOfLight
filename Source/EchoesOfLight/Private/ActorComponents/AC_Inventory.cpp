@@ -3,6 +3,9 @@
 
 #include "ActorComponents/AC_Inventory.h"
 #include "Actors/Items/ItemBase.h"
+#include "Save/Save_Inventory.h"
+#include "Kismet/GameplayStatics.h"
+#include "Save/EchoesGameInstance.h"
 
 // Sets default values for this component's properties
 UAC_Inventory::UAC_Inventory()
@@ -10,6 +13,8 @@ UAC_Inventory::UAC_Inventory()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	InventorySlot = FString("InventorySlot1");
 
 
 }
@@ -138,6 +143,75 @@ void UAC_Inventory::SplitExistingStack(UItemBase* Item, const int32 AmountToSpli
 		AddNewItem(Item, AmountToSplit);
 
 	}
+}
+
+void UAC_Inventory::SaveInventory()
+{
+
+	if (UWorld* World = GetOwner()->GetWorld())
+	{
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+		USave_Inventory* InvSave = NewObject<USave_Inventory>(this, USave_Inventory::StaticClass());
+
+		if (IsValid(GameInstance) && IsValid(InvSave))
+		{
+
+			for (UItemBase* item : InventoryContents)
+			{
+				FItemSaveInfo info = item->SaveItem(item);
+				InvSave->sInventoryContents.Add(info);
+			}
+
+			InvSave->sInventorySlotsCapacity = GetSlotsCapacity();
+			InvSave->sInventoryTotalWeight = GetInventoryTotalWeight();
+			InvSave->sInventoryWeightCapacity = GetWeightCapacity();
+			GameInstance->SaveGameData(nullptr, nullptr, InvSave);
+
+			UE_LOG(LogTemp, Warning, TEXT("Inventory Saved"));
+		}
+
+	}
+}
+
+void UAC_Inventory::LoadInventory()
+{
+	if (UWorld* World = GetOwner()->GetWorld())
+	{
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+
+		if (UGameplayStatics::DoesSaveGameExist(GameInstance->InventoryDataSlot, 0))
+		{
+			InventoryContents.Empty();
+			for (FItemSaveInfo info : GameInstance->InventoryData->sInventoryContents)
+			{
+				UItemBase* item = CreateItem(info);
+				item->OwningInventory = this;
+				AddNewItem(item, item->Quantity);
+			}
+			InventorySlotsCapacity = GameInstance->InventoryData->sInventorySlotsCapacity;
+			InventoryTotalWeight = GameInstance->InventoryData->sInventoryTotalWeight;
+			InventoryWeightCapacity = GameInstance->InventoryData->sInventoryWeightCapacity;
+			UE_LOG(LogTemp, Warning, TEXT("Inventory Loaded"));
+		}
+	}
+
+}
+
+UItemBase* UAC_Inventory::CreateItem(FItemSaveInfo info)
+{
+	UItemBase* Item = NewObject<UItemBase>(StaticClass());
+	Item->ID = info.ID;
+	Item->Quantity = info.Quantity;
+	Item->ItemQuality = info.ItemQuality;
+	Item->ItemType = info.ItemType;
+	Item->ItemTextData = info.ItemTextData;
+	Item->ItemNumericaData = info.ItemNumericaData;
+	Item->ItemStatistics = info.ItemStatistics;
+	Item->ItemAssetData = info.ItemAssetData;
+	Item->ItemWeaponStatistics = info.ItemWeaponStatistics;
+	Item->ItemCharacerStatistics = info.ItemCharacerStatistics;
+
+	return Item;
 }
 
 

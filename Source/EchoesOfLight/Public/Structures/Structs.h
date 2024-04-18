@@ -299,3 +299,25 @@ struct ECHOESOFLIGHT_API FInteractionData
 	float LastInteractionCheckingTime;
 
 };
+
+USTRUCT()
+struct FCharacterStats
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	int32 Stamina = 10;
+
+	int32 Strength = 10;
+
+	int32 DefensePower = 10;
+
+	int32 Constitution = 10;
+
+	int32 MaxStatValue = 99;
+
+
+};
+
+

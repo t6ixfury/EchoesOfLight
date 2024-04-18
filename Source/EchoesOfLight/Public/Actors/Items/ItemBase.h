@@ -11,6 +11,43 @@
 class AMainCharacter;
 class UAC_Inventory;
 
+USTRUCT()
+struct FItemSaveInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		int32 Quantity;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FName ID;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		EItemType ItemType;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		EItemQuality ItemQuality;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FItemStatistics ItemStatistics;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FItemWeaponStatistics ItemWeaponStatistics;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+		FItemCharacerStatistics ItemCharacerStatistics;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FItemTextData ItemTextData;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FItemNumericData ItemNumericaData;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+		FItemAssData ItemAssetData;
+};
+
 
 /**
  * 
@@ -97,6 +134,12 @@ public:
 
 	UFUNCTION(Category = "Item")
 	virtual void Use(AMainCharacter* Character);
+
+	UFUNCTION(Category = "Item")
+		FItemSaveInfo SaveItem(UItemBase* item);
+	
+	
+
 
 protected:
 	//allows for comparison while using tarray functions

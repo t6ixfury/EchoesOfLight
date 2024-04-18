@@ -5,7 +5,7 @@
 
 //engine
 #include "Components/ProgressBar.h"
-
+#include "Components/TextBlock.h"
 
 void UW_MainGUI::SetHealthBarPercentage(float newHealth)
 {
@@ -14,3 +14,28 @@ void UW_MainGUI::SetHealthBarPercentage(float newHealth)
 		HealthBar->SetPercent(newHealth);
 	}
 }
+
+void UW_MainGUI::SetStaminaBarPercetage(float newStamina)
+{
+	if (StaminaBar)
+	{
+		StaminaBar->SetPercent(newStamina);
+	}
+}
+
+void UW_MainGUI::SetExperienceBarPercentage(float newExperience)
+{
+	if (ExperienceBar)
+	{
+		ExperienceBar->SetPercent(newExperience);
+	}
+}
+
+void UW_MainGUI::SetLevelText(FText NewLevel)
+{
+	if (LevelText)
+	{
+		LevelText->SetText(NewLevel);
+	}
+}
+

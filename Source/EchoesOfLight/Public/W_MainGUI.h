@@ -10,6 +10,9 @@
 /**
  * 
  */
+
+class UProgressBar;
+class UTextBlock;
 UCLASS()
 class ECHOESOFLIGHT_API UW_MainGUI : public UUserWidget
 {
@@ -26,7 +29,17 @@ class ECHOESOFLIGHT_API UW_MainGUI : public UUserWidget
 public:
 
 	UPROPERTY(meta = (BindWidget))
-		class UProgressBar* HealthBar;
+		UProgressBar* HealthBar;
+
+	UPROPERTY(meta = (BindWidget))
+		UProgressBar* StaminaBar;
+
+	UPROPERTY(meta = (BindWidget))
+		UProgressBar* ExperienceBar;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* LevelText;
+
 
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -35,6 +48,9 @@ public:
 
 public:
 	void SetHealthBarPercentage(float newHealth);
+	void SetStaminaBarPercetage(float newStamina);
+	void SetExperienceBarPercentage(float newExperience);
+	void SetLevelText(FText NewLevel);
 
 	
 };

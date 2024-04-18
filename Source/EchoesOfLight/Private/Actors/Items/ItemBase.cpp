@@ -56,3 +56,22 @@ void UItemBase::Use(AMainCharacter* Character)
 {
 	//implement later
 }
+
+
+FItemSaveInfo UItemBase::SaveItem(UItemBase* item)
+{
+	FItemSaveInfo info;
+
+	info.ID = item->ID;
+	info.ItemAssetData = item->ItemAssetData;
+	info.ItemCharacerStatistics = item->ItemCharacerStatistics;
+	info.ItemNumericaData = item->ItemNumericaData;
+	info.ItemQuality = item->ItemQuality;
+	info.ItemStatistics = item->ItemStatistics;
+	info.ItemTextData = item->ItemTextData;
+	info.ItemType = item->ItemType;
+	info.ItemWeaponStatistics = item->ItemWeaponStatistics;
+	info.Quantity = item->Quantity;
+
+	return info;
+}

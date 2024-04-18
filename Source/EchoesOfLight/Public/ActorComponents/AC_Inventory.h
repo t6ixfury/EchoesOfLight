@@ -11,6 +11,7 @@ DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 
 class UItemBase;
+class USave_Inventory;
 
 
 //This will be used to as result for how many items are picked up.
@@ -92,6 +93,12 @@ public:
 
 	FOnInventoryUpdated OnInventoryUpdated;
 
+	UPROPERTY()
+		USave_Inventory* InventorySaveReference;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory | Save")
+		FString InventorySlot;
+
 protected:
 
 	//Represents the total weight the player is currently carring.
@@ -149,6 +156,18 @@ public:
 	//This will split an item stack by a specified amount.
 	UFUNCTION(Category = "Inventory")
 	void SplitExistingStack(UItemBase* Item, const int32 AmountToSplit);
+
+
+	//----------------------------------------Save----------------------------
+
+	UFUNCTION(BlueprintCallable, Category = "Experience System Functions")
+		void SaveInventory();
+
+	UFUNCTION(BlueprintCallable, Category = "Experience System Functions")
+		void LoadInventory();
+
+	UFUNCTION()
+		UItemBase* CreateItem(FItemSaveInfo info);
 
 
 	/*GETTER FUNCTIONS*/

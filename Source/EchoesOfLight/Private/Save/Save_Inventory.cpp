@@ -2,11 +2,11 @@
 
 
 #include "Save/Save_Inventory.h"
-#include "Engine/DataTable.h"
+#include "Actors/Items/ItemBase.h"
 
 USave_Inventory::USave_Inventory()
 {
-	sInventory.Empty();
+	sInventoryContents.Empty();
 	
 }
 

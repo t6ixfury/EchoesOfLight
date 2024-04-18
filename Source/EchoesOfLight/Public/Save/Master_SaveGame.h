@@ -9,9 +9,16 @@
 /**
  * 
  */
+
+class USave_Experience;
+class USave_Inventory;
+
+
 UCLASS()
 class ECHOESOFLIGHT_API UMaster_SaveGame : public USaveGame
 {
 	GENERATED_BODY()
+
+
 	
 };
