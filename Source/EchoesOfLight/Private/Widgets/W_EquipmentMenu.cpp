@@ -9,10 +9,14 @@
 #include "Actors/Weapons/Base_Sword.h"
 #include "ActorComponents/AC_DamageSystem.h"
 #include "Widgets/ItemDragDropOperation.h"
+#include "Save/EchoesGameInstance.h"
+#include "Save/Save_Equipment.h"
+
 
 //engine
 #include "Components/ProgressBar.h"  
 #include "Components/TextBlock.h"  
+#include "Kismet/GameplayStatics.h"
 
 
 void UW_EquipmentMenu::NativeOnInitialized()
@@ -127,6 +131,62 @@ void UW_EquipmentMenu::UpdateStatProgressBars()
 		Defense->SetProgressBarPercentage(MainCharacter->MainCharacterStats.DefensePower, MainCharacter->MainCharacterStats.MaxStatValue);
 		Stamina->SetProgressBarPercentage(MainCharacter->MainCharacterStats.Stamina, MainCharacter->MainCharacterStats.MaxStatValue);
 		Strength->SetProgressBarPercentage(MainCharacter->MainCharacterStats.Strength, MainCharacter->MainCharacterStats.MaxStatValue);
+	}
+}
+
+void UW_EquipmentMenu::SaveEquipment()
+{
+	if (UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
+	{
+		if (USave_Equipment* save = NewObject<USave_Equipment>(this, USave_Equipment::StaticClass()))
+		{
+			if (!Amulet_Slot->SlotItemId.IsNone())
+			{
+				save->sAmuletID = Amulet_Slot->SlotItemId;
+			}
+			if (!Weapon_Slot->SlotItemId.IsNone())
+			{
+				save->sWeaponID = Weapon_Slot->SlotItemId;
+			}
+			if (!Netherband_Slot->SlotItemId.IsNone())
+			{
+				save->sWeaponID = Netherband_Slot->SlotItemId;
+			}
+
+			UGameplayStatics::SaveGameToSlot(save, GameInstance->EquipmentDataSlot, 0);
+		}
+
+	}
+}
+
+void UW_EquipmentMenu::LoadEquipmentSlots()
+{
+	if (UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
+	{
+		if (UGameplayStatics::DoesSaveGameExist(GameInstance->EquipmentDataSlot, 0))
+		{
+			if (USave_Equipment* LoadData = Cast<USave_Equipment>(UGameplayStatics::LoadGameFromSlot(GameInstance->EquipmentDataSlot, 0)))
+			{
+				if (IsValid(Amulet_Slot) && !LoadData->sAmuletID.IsNone() && IsValid(Amulet_Slot->AmuletDataTable))
+				{
+					Amulet_Slot->SlotItemId = LoadData->sAmuletID;
+					Amulet_Slot->CreateItem(Amulet_Slot->AmuletDataTable, Amulet_Slot->SlotItemId);
+					Amulet_Slot->SetIconImage();
+				}
+				if (IsValid(Weapon_Slot) && !LoadData->sWeaponID.IsNone() && IsValid(Weapon_Slot->WeaponDataTable))
+				{
+					Weapon_Slot->SlotItemId = LoadData->sWeaponID;
+					Weapon_Slot->CreateItem(Weapon_Slot->WeaponDataTable, Weapon_Slot->SlotItemId);
+					Weapon_Slot->SetIconImage();
+				}
+				if (IsValid(Netherband_Slot) && !LoadData->sNetherbandID.IsNone() && IsValid(Netherband_Slot->NetherBandDataTable))
+				{
+					Netherband_Slot->SlotItemId = LoadData->sNetherbandID;
+					Netherband_Slot->CreateItem(Netherband_Slot->NetherBandDataTable, Netherband_Slot->SlotItemId);
+					Netherband_Slot->SetIconImage();
+				}
+			}
+		}
 	}
 }
 

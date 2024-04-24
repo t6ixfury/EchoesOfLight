@@ -16,16 +16,7 @@ void UEchoesGameInstance::LoadGameData()
 		if (USave_PlayerInfo* SaveInfo = Cast<USave_PlayerInfo>(UGameplayStatics::LoadGameFromSlot(PlayerInfoSlot, 0)))
 		{
 			PlayerInfoData = SaveInfo;
-			isInfo = true;
-			
-		}
-	}
-	else
-	{
-		PlayerInfoData = NewObject<USave_PlayerInfo>(this, USave_PlayerInfo::StaticClass());
-		if (IsValid(PlayerInfoData))
-		{
-			UGameplayStatics::SaveGameToSlot(PlayerInfoData, PlayerInfoSlot, 0);
+			UE_LOG(LogTemp, Warning, TEXT("player info save exist"));
 		}
 	}
 
@@ -34,74 +25,29 @@ void UEchoesGameInstance::LoadGameData()
 		if (USave_Inventory* SaveInventory = Cast<USave_Inventory>(UGameplayStatics::LoadGameFromSlot(InventoryDataSlot, 0)))
 		{
 			InventoryData = SaveInventory;
-			isInvData = true;
-			UE_LOG(LogTemp, Warning, TEXT("inv save"));
+			UE_LOG(LogTemp, Warning, TEXT("inv save exist"));
 		}
 	}
-	else
-	{
-		InventoryData = NewObject<USave_Inventory>(this, USave_Inventory::StaticClass());
-		if (IsValid(InventoryData))
-		{
-			UGameplayStatics::SaveGameToSlot(InventoryData, InventoryDataSlot, 0);
-		}
-	}
+	
 
 	if (UGameplayStatics::DoesSaveGameExist(ExperienceSlot, 0))
 	{
 		if (USave_Experience* SaveExperience = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(ExperienceSlot, 0)))
 		{
-			ExperienceData = SaveExperience;
-			isExpSave = true;
-			UE_LOG(LogTemp, Warning, TEXT("exp save"));
+			ExperienceData = SaveExperience; 
+			UE_LOG(LogTemp, Warning, TEXT("exp save exist"));
 		}
 	}
-	else
+	if (UGameplayStatics::DoesSaveGameExist(EquipmentDataSlot, 0))
 	{
-		ExperienceData = NewObject<USave_Experience>(this, USave_Experience::StaticClass());
-		if (IsValid(ExperienceData))
+		if (USave_Experience* SaveExperience = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(ExperienceSlot, 0)))
 		{
-			UGameplayStatics::SaveGameToSlot(ExperienceData, ExperienceSlot, 0);
+			ExperienceData = SaveExperience;
+			UE_LOG(LogTemp, Warning, TEXT("equipment save exist"));
 		}
 	}
 }
 
-void UEchoesGameInstance::SaveGameData(USave_Experience* Exp, USave_PlayerInfo* InfoToSave, USave_Inventory* InventorySave)
-{
-	if (IsValid(Exp) && IsValid(ExperienceData))
-	{
-		ExperienceData = Exp;
-		UGameplayStatics::SaveGameToSlot(ExperienceData, ExperienceSlot, 0);
-	}
-	if (IsValid(InfoToSave) && IsValid(PlayerInfoData))
-	{
-		PlayerInfoData->sPlayerLocation = InfoToSave->sPlayerLocation;
-		PlayerInfoData->sPlayerTransform = InfoToSave->sPlayerTransform;
-		PlayerInfoData->sPlayerRotation = InfoToSave->sPlayerRotation;
-		PlayerInfoData->sHealth = InfoToSave->sHealth;
-		PlayerInfoData->sCurrentAmulet = InfoToSave->sCurrentAmulet;
-		PlayerInfoData->sCurrentNetherbad = InfoToSave->sCurrentNetherbad;
-		PlayerInfoData->sCurrentWeapnStats = InfoToSave->sCurrentWeapnStats;
-		PlayerInfoData->sCurrentWeapon = InfoToSave->sCurrentWeapon;
-
-		UGameplayStatics::SaveGameToSlot(PlayerInfoData, PlayerInfoSlot, 0);
-	}
-	if (IsValid(InventorySave) && IsValid(InventoryData))
-	{
-		InventoryData = InventorySave;
-		UGameplayStatics::SaveGameToSlot(InventoryData, InventoryDataSlot, 0);
-	}
-}
-
-FGameSaves UEchoesGameInstance::GetGameData()
-{
-	FGameSaves Saves;
-	Saves.ExperienceSaveData = ExperienceData;
-	Saves.InventorySaveData = InventoryData;
-	Saves.PlayerInfoSaveData = PlayerInfoData;
-
-	return Saves;
-}
 
 void UEchoesGameInstance::Init()
 {

@@ -165,8 +165,7 @@ void UAC_Inventory::SaveInventory()
 			InvSave->sInventorySlotsCapacity = GetSlotsCapacity();
 			InvSave->sInventoryTotalWeight = GetInventoryTotalWeight();
 			InvSave->sInventoryWeightCapacity = GetWeightCapacity();
-			GameInstance->SaveGameData(nullptr, nullptr, InvSave);
-
+			UGameplayStatics::SaveGameToSlot(InvSave, GameInstance->InventoryDataSlot, 0);
 			UE_LOG(LogTemp, Warning, TEXT("Inventory Saved"));
 		}
 

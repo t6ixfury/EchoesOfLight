@@ -40,8 +40,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment Type")
 		EItemType EquipmentType;
 
+	UPROPERTY(EditAnywhere, Category = "Item")
+		UDataTable* WeaponDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+		UDataTable* AmuletDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+		UDataTable* NetherBandDataTable;
+
 	UPROPERTY(EditAnywhere)
 		UItemBase* ItemReference = nullptr;
+
+	FName SlotItemId;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 		TSubclassOf<UDragItemVisual> DragItemVisualClass;
@@ -66,7 +77,9 @@ public:
 	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
 	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef);
 
-	void SetIconImage(UTexture2D* icon);
+	void SetIconImage();
+
+	void CreateItem(UDataTable* table, FName DesiredItemId);
 
 
 	

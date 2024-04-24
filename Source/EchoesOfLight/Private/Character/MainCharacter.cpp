@@ -1112,41 +1112,28 @@ void AMainCharacter::SavePlayerInfo()
 	if (UWorld* World = GetOwner()->GetWorld())
 	{
 		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
-		USave_PlayerInfo* Nsave = NewObject<USave_PlayerInfo>(this, USave_PlayerInfo::StaticClass());
 
-		if (IsValid(GameInstance) && IsValid(Nsave))
+		if (IsValid(GameInstance))
 		{
-			Nsave->sHealth = DamageSystem->Health;
-			Nsave->sPlayerTransform = GetActorTransform();
-			Nsave->sPlayerLocation = GetActorLocation();
-			Nsave->sPlayerRotation = GetActorRotation();
-			Nsave->sStatsLevels = MainCharacterStats;
-			
-			if (IsValid(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference))
+			if (USave_PlayerInfo* Save = Cast<USave_PlayerInfo>(UGameplayStatics::CreateSaveGameObject(USave_PlayerInfo::StaticClass())))
 			{
-				Nsave->sCurrentWeapon = MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->SaveItem(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference);
-			}
-			if (IsValid(MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference))
-			{
-				Nsave->sCurrentAmulet = MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference->SaveItem(MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference);
-			}
+				Save->sHealth = DamageSystem->Health;
+				Save->sPlayerTransform = GetActorTransform();
+				Save->sPlayerRotation = GetActorRotation();
+				Save->sStatsLevels = MainCharacterStats;
 
-			if (IsValid(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference))
-			{
-				Nsave->sCurrentNetherbad = MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->SaveItem(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference);
-			}
+				if (LeftHandWeapon)
+				{
+					Save->sCurrentWeapnStats.AttackPower = LeftHandWeapon->BaseAttackInfo.AttackPower;
+					Save->sCurrentWeapnStats.AtttackSpeed = LeftHandWeapon->BaseAttackInfo.AtttackSpeed;
+					Save->sCurrentWeapnStats.CriticalHitRate = LeftHandWeapon->BaseAttackInfo.CriticalHitRate;
+					Save->sCurrentWeapnStats.MagicPower = LeftHandWeapon->BaseAttackInfo.MagicPower;
+					Save->sCurrentWeapnStats.Damage = LeftHandWeapon->BaseAttackInfo.Damage;
+				}
 
-			if (LeftHandWeapon)
-			{
-				Nsave->sCurrentWeapnStats.AttackPower = LeftHandWeapon->BaseAttackInfo.AttackPower;
-				Nsave->sCurrentWeapnStats.AtttackSpeed = LeftHandWeapon->BaseAttackInfo.AtttackSpeed;
-				Nsave->sCurrentWeapnStats.CriticalHitRate = LeftHandWeapon->BaseAttackInfo.CriticalHitRate;
-				Nsave->sCurrentWeapnStats.MagicPower = LeftHandWeapon->BaseAttackInfo.MagicPower;
-				Nsave->sCurrentWeapnStats.Damage = LeftHandWeapon->BaseAttackInfo.Damage;
+				UGameplayStatics::SaveGameToSlot(Save, GameInstance->PlayerInfoSlot, 0);
+				UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
 			}
-
-			GameInstance->SaveGameData(nullptr, Nsave, nullptr);
-			UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
 			
 		}
 
@@ -1169,43 +1156,6 @@ void AMainCharacter::LoadPlayerInfo()
 			MainCharacterStats = GameInstance->PlayerInfoData->sStatsLevels;
 
 			DamageSystem->Health = GameInstance->PlayerInfoData->sHealth;
-
-			if(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference)
-			{
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference = nullptr;
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->EquipmentIcon = nullptr;
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentWeapon);
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->SetIconImage(MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.Icon);
-
-			}
-
-			MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentAmulet);
-
-			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference)
-			{
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->SetIconImage(MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference->ItemAssetData.Icon);
-			}
-
-			MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentNetherbad);
-
-			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
-			{
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->SetIconImage(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->ItemAssetData.Icon);
-			}
-
-			UItemBase* NewWeapon = PlayerInventory->CreateItem(GameInstance->PlayerInfoData->sCurrentWeapon);
-			if (NewWeapon)
-			{
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference = NewWeapon;
-				MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->SetIconImage(NewWeapon->ItemAssetData.Icon);
-			}
-
-			DualSwordWeaponClass = GameInstance->PlayerInfoData->sCurrentWeapon.ItemAssetData.DualSword;
-
-			if (IsValid(DualSwordWeaponClass))
-			{
-				SpawnWeapon();
-			}
 
 			if (LeftHandWeapon && RightHandWeapon)
 			{
@@ -1233,6 +1183,7 @@ void AMainCharacter::LoadAll()
 	LoadPlayerInfo();
 	ExperienceSystem->LoadExperience();
 	PlayerInventory->LoadInventory();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->LoadEquipmentSlots();
 	UE_LOG(LogTemp, Warning, TEXT("load all called"));
 }
 
@@ -1241,6 +1192,7 @@ void AMainCharacter::SaveAll()
 	SavePlayerInfo();
 	ExperienceSystem->SaveExperience();
 	PlayerInventory->SaveInventory();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->SaveEquipment();
 
 	UE_LOG(LogTemp, Warning, TEXT("Save all called"));
 }

@@ -31,6 +31,8 @@ bool UW_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Equipment slot: Strength: %d, Stamina: %d"), ItemReference->ItemCharacerStatistics.Strength, ItemReference->ItemCharacerStatistics.Stamina)
 
+			SlotItemId = ItemReference->ID;
+
 			EItemType EquipmentResult = EventItemEquipped(ItemReference->ItemType, ItemReference);
 
 			//Remove the now equipped equipment item from inventory.
@@ -114,6 +116,7 @@ void UW_EquipmentSlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEve
 	{
 		//might delete later. redudant.
 		ItemReference = ItemBeingDroppedOnWidget->SourceItem;
+		SlotItemId = ItemBeingDroppedOnWidget->SourceItem->ID;
 		//set the visibilty of the icon to visible since the equipment was not removed.
 		EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -144,11 +147,35 @@ EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandle
 	}
 }
 
-void UW_EquipmentSlot::SetIconImage(UTexture2D* icon)
+void UW_EquipmentSlot::SetIconImage()
 {
-	EquipmentIcon->SetBrushFromTexture(icon);
-	if(icon == nullptr)
+	
+	if (ItemReference->ItemAssetData.Icon)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("icon null"))
+		EquipmentIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 	}
+
+}
+
+void UW_EquipmentSlot::CreateItem(UDataTable* table, FName DesiredItemId )
+{
+	if (table && !DesiredItemId.IsNone())
+	{
+		//get the item info from the data table.
+		const FItemData* ItemDataRow = table->FindRow<FItemData>(DesiredItemId, DesiredItemId.ToString());
+
+		//create a new item
+		ItemReference = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+		//set the item properties
+		ItemReference->ID = ItemDataRow->ID;
+		ItemReference->ItemType = ItemDataRow->ItemType;
+		ItemReference->ItemQuality = ItemDataRow->ItemQuality;
+		ItemReference->ItemNumericaData = ItemDataRow->ItemNumericaData;
+		ItemReference->ItemTextData = ItemDataRow->ItemTextData;
+		ItemReference->ItemAssetData = ItemDataRow->ItemAssetData;
+		ItemReference->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+		ItemReference->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+		ItemReference->SetQuantity(1);
+	};
 }

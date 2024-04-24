@@ -80,14 +80,14 @@ void UAC_ExperieceSystem::SaveExperience()
 	if (UWorld* World = GetOwner()->GetWorld())
 	{
 		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
-		USave_Experience* InvSave = NewObject<USave_Experience>(this, USave_Experience::StaticClass());
+		USave_Experience* ExpSave = NewObject<USave_Experience>(this, USave_Experience::StaticClass());
 
-		if (IsValid(GameInstance) && IsValid(InvSave))
+		if (IsValid(GameInstance) && IsValid(ExpSave))
 		{
-			InvSave->sCurrentLevel = CurrentLevel;
-			InvSave->sExperienceToNextLevel = ExpToNextLevel;
-			InvSave->sExperience = CurrentExp;
-			GameInstance->SaveGameData(InvSave,nullptr,nullptr);
+			ExpSave->sCurrentLevel = CurrentLevel;
+			ExpSave->sExperienceToNextLevel = ExpToNextLevel;
+			ExpSave->sExperience = CurrentExp;
+			UGameplayStatics::SaveGameToSlot(ExpSave, GameInstance->ExperienceSlot, 0);
 			UE_LOG(LogTemp, Warning, TEXT("Experience Saved"));
 		}
 
@@ -104,11 +104,14 @@ void UAC_ExperieceSystem::LoadExperience()
 		{
 			if (UGameplayStatics::DoesSaveGameExist(GameInstance->ExperienceSlot, 0))
 			{
-				CurrentExp = GameInstance->ExperienceData->sExperience;
-				ExpToNextLevel = GameInstance->ExperienceData->sExperienceToNextLevel;
-				CurrentLevel = GameInstance->ExperienceData->sCurrentLevel;
-				UE_LOG(LogTemp, Warning, TEXT("Experience Loaded"));
-				
+				if (USave_Experience* ExpSave = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(GameInstance->ExperienceSlot, 0)))
+				{
+					CurrentExp = ExpSave->sExperience;
+					ExpToNextLevel = ExpSave->sExperienceToNextLevel;
+					CurrentLevel = ExpSave->sCurrentLevel;
+					UE_LOG(LogTemp, Warning, TEXT("Experience Loaded"));
+				}
+
 			}
 		}
 	}

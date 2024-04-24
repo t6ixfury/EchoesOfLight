@@ -11,8 +11,6 @@
 /**
  * 
  */
-class ABase_Sword;
-
 
 UCLASS()
 class ECHOESOFLIGHT_API USave_PlayerInfo : public USaveGame
@@ -20,8 +18,6 @@ class ECHOESOFLIGHT_API USave_PlayerInfo : public USaveGame
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector sPlayerLocation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FTransform sPlayerTransform;
@@ -29,16 +25,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator sPlayerRotation;
 
-	FItemSaveInfo sCurrentWeapon;
-	
-	FItemSaveInfo sCurrentAmulet;
-
-	FItemSaveInfo sCurrentNetherbad;
-
 	FCharacterStats sStatsLevels;
 
 	FItemWeaponStatistics  sCurrentWeapnStats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float sHealth;
+
+	FName CurrentDungeonLevel;
+
+	FName CurrentTownVariation;
+
 };
