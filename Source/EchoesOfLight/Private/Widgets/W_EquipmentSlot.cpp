@@ -153,6 +153,7 @@ void UW_EquipmentSlot::SetIconImage()
 	if (ItemReference->ItemAssetData.Icon)
 	{
 		EquipmentIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
+		EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
 	}
 
 }

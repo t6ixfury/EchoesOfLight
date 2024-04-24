@@ -112,11 +112,17 @@ public:
 	UPROPERTY(VisibleAnyWhere, Category = "Container | Item DataTables")
 		UDataTable* ItemConsumableDataTable;
 
-	UPROPERTY(VisibleAnyWhere, Category = "Container | Item DataTables")
+	UPROPERTY(EditAnywhere, Category = "Container | Item DataTables")
 		UDataTable* ItemWeaponDataTable;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Container | Item DataTables")
 		UDataTable* ItemArmorDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Container | Item DataTables")
+		UDataTable* ItemAmuletDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Container | Item DataTables")
+		UDataTable* ItemNetherbandDataTable;
 
 	UPROPERTY(VisibleAnyWhere, Category = "Container | Item DataTables")
 		UDataTable* ItemQuestDataTable;

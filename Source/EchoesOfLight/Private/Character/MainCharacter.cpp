@@ -336,11 +336,14 @@ void AMainCharacter::SpawnWeapon()
 
 void AMainCharacter::DespawnWeapon()
 {
-	RightHandWeapon->Destroy();
-	LeftHandWeapon->Destroy();
-	RightHandWeapon = nullptr;
-	LeftHandWeapon = nullptr;
-	isWeaponEquipped = false;
+	if (IsValid(RightHandWeapon) && IsValid(LeftHandWeapon))
+	{
+		RightHandWeapon->Destroy();
+		LeftHandWeapon->Destroy();
+		RightHandWeapon = nullptr;
+		LeftHandWeapon = nullptr;
+		isWeaponEquipped = false;
+	}
 }
 
 

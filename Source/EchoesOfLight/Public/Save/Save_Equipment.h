@@ -16,12 +16,16 @@ UCLASS()
 class ECHOESOFLIGHT_API USave_Equipment : public USaveGame
 {
 	GENERATED_BODY()
+
 public:
 
-	FName sWeaponID;
+    UPROPERTY(VisibleAnywhere, Category = "SaveGameData")
+        FName sWeaponID;
 
-	FName sAmuletID;
+    UPROPERTY(VisibleAnywhere, Category = "SaveGameData")
+        FName sAmuletID;
 
-	FName sNetherbandID;
+    UPROPERTY(VisibleAnywhere, Category = "SaveGameData")
+        FName sNetherbandID;
 
 };

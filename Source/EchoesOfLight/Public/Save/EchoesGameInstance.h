@@ -12,6 +12,7 @@
 class USave_Experience;
 class USave_PlayerInfo;
 class USave_Inventory;
+class USave_Equipment;
 
 
 DECLARE_MULTICAST_DELEGATE(FGameLoad)
@@ -30,6 +31,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		USave_Inventory* InventoryData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		USave_Equipment* EquipmentData;
 
 	FString ExperienceSlot = FString("ExperienceSlot");
 	FString PlayerInfoSlot= FString("PlayerInfoslot");

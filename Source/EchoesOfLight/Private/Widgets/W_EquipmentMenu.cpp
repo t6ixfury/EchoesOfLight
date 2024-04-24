@@ -147,12 +147,12 @@ void UW_EquipmentMenu::SaveEquipment()
 			if (!Weapon_Slot->SlotItemId.IsNone())
 			{
 				save->sWeaponID = Weapon_Slot->SlotItemId;
+
 			}
 			if (!Netherband_Slot->SlotItemId.IsNone())
 			{
-				save->sWeaponID = Netherband_Slot->SlotItemId;
+				save->sNetherbandID = Netherband_Slot->SlotItemId;
 			}
-
 			UGameplayStatics::SaveGameToSlot(save, GameInstance->EquipmentDataSlot, 0);
 		}
 
@@ -165,25 +165,31 @@ void UW_EquipmentMenu::LoadEquipmentSlots()
 	{
 		if (UGameplayStatics::DoesSaveGameExist(GameInstance->EquipmentDataSlot, 0))
 		{
+			
 			if (USave_Equipment* LoadData = Cast<USave_Equipment>(UGameplayStatics::LoadGameFromSlot(GameInstance->EquipmentDataSlot, 0)))
 			{
+				
+
 				if (IsValid(Amulet_Slot) && !LoadData->sAmuletID.IsNone() && IsValid(Amulet_Slot->AmuletDataTable))
 				{
 					Amulet_Slot->SlotItemId = LoadData->sAmuletID;
 					Amulet_Slot->CreateItem(Amulet_Slot->AmuletDataTable, Amulet_Slot->SlotItemId);
 					Amulet_Slot->SetIconImage();
+					UE_LOG(LogTemp, Warning, TEXT("AmuletSlot set"));
 				}
 				if (IsValid(Weapon_Slot) && !LoadData->sWeaponID.IsNone() && IsValid(Weapon_Slot->WeaponDataTable))
 				{
 					Weapon_Slot->SlotItemId = LoadData->sWeaponID;
 					Weapon_Slot->CreateItem(Weapon_Slot->WeaponDataTable, Weapon_Slot->SlotItemId);
 					Weapon_Slot->SetIconImage();
+					UE_LOG(LogTemp, Warning, TEXT("weapon slot  set"));
 				}
 				if (IsValid(Netherband_Slot) && !LoadData->sNetherbandID.IsNone() && IsValid(Netherband_Slot->NetherBandDataTable))
 				{
 					Netherband_Slot->SlotItemId = LoadData->sNetherbandID;
 					Netherband_Slot->CreateItem(Netherband_Slot->NetherBandDataTable, Netherband_Slot->SlotItemId);
 					Netherband_Slot->SetIconImage();
+					UE_LOG(LogTemp, Warning, TEXT("NetherSlot set"));
 				}
 			}
 		}

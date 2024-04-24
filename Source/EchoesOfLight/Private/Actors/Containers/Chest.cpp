@@ -151,6 +151,8 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 			ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
 			ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
 			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
 
 			//set the desired quantity based off the passed in data.
 			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
@@ -160,6 +162,30 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 		break;
 	
 	case EItemType::Amulet:
+		//check to see if the data table is set and the desired item is name is set
+		if (ItemAmuletDataTable && !ItemDataForCreation->DesiredItemId.IsNone())
+		{
+			//get the item info from the data table.
+			const FItemData* ItemDataRow = ItemAmuletDataTable->FindRow<FItemData>(ItemDataForCreation->DesiredItemId, ItemDataForCreation->DesiredItemId.ToString());
+
+			//create a new item
+			UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+			//set the item properties
+			ItemToAdd->ID = ItemDataRow->ID;
+			ItemToAdd->ItemType = ItemDataRow->ItemType;
+			ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+			ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+			ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+
+			//set the desired quantity based off the passed in data.
+			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
+
+			return ItemToAdd;
+		}
 		break;
 	case EItemType::Weapon:
 		if (ItemWeaponDataTable && !ItemDataForCreation->DesiredItemId.IsNone())
@@ -179,6 +205,7 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 				ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
 				ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
 				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+				ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
 				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
 
 				//set the desired quantity based off the passed in data.
@@ -189,7 +216,33 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 		}
 
 		break;
-	case EItemType::Spell:
+	case EItemType::Netherband:
+
+		//check to see if the data table is set and the desired item is name is set
+		if (ItemNetherbandDataTable && !ItemDataForCreation->DesiredItemId.IsNone())
+		{
+			//get the item info from the data table.
+			const FItemData* ItemDataRow = ItemNetherbandDataTable->FindRow<FItemData>(ItemDataForCreation->DesiredItemId, ItemDataForCreation->DesiredItemId.ToString());
+
+			//create a new item
+			UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+			//set the item properties
+			ItemToAdd->ID = ItemDataRow->ID;
+			ItemToAdd->ItemType = ItemDataRow->ItemType;
+			ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+			ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+			ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+
+			//set the desired quantity based off the passed in data.
+			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
+
+			return ItemToAdd;
+		}
+
 		break;
 	case EItemType::Consumable:
 		//check to see if the data table is set and the desired item is name is set
@@ -208,6 +261,8 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 			ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
 			ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
 			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
 
 			//set the desired quantity based off the passed in data.
 			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);

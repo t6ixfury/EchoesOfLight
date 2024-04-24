@@ -5,6 +5,7 @@
 #include "Save/Save_PlayerInfo.h"
 #include "Save/Save_Experience.h"
 #include "Save/Save_Inventory.h"
+#include "Save/Save_Equipment.h"
 
 #include "Kismet/GameplayStatics.h"
 
@@ -40,10 +41,16 @@ void UEchoesGameInstance::LoadGameData()
 	}
 	if (UGameplayStatics::DoesSaveGameExist(EquipmentDataSlot, 0))
 	{
-		if (USave_Experience* SaveExperience = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(ExperienceSlot, 0)))
+		if (USave_Equipment* SaveEquipment = Cast<USave_Equipment>(UGameplayStatics::LoadGameFromSlot(EquipmentDataSlot, 0)))
 		{
-			ExperienceData = SaveExperience;
+			EquipmentData = SaveEquipment;
 			UE_LOG(LogTemp, Warning, TEXT("equipment save exist"));
+			
+			UE_LOG(LogTemp, Warning, TEXT("Amulet id saved: %s"), *SaveEquipment->sAmuletID.ToString());
+			
+			UE_LOG(LogTemp, Warning, TEXT("weapon id saved: %s"), *SaveEquipment->sWeaponID.ToString());
+			
+			UE_LOG(LogTemp, Warning, TEXT("netherband id saved: %s"), *SaveEquipment->sNetherbandID.ToString());
 		}
 	}
 }
