@@ -25,15 +25,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FRotator sPlayerRotation;
 
+	UPROPERTY()
 	FCharacterStats sStatsLevels;
 
+	UPROPERTY()
 	FItemWeaponStatistics  sCurrentWeapnStats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float sHealth;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CurrentDungeonLevel;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName CurrentTownVariation;
 
 };

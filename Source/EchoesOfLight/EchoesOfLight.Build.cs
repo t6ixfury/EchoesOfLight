@@ -8,7 +8,8 @@ public class EchoesOfLight : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "GameplayTasks", "AIModule", "EnhancedInput", "NavigationSystem", "AudioMixer" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "GameplayTasks", "AIModule", "EnhancedInput", "NavigationSystem", "AudioMixer"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

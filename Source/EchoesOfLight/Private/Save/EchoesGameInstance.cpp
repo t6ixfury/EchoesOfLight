@@ -6,9 +6,10 @@
 #include "Save/Save_Experience.h"
 #include "Save/Save_Inventory.h"
 #include "Save/Save_Equipment.h"
+#include "Widgets/W_LoadScreen.h"
 
 #include "Kismet/GameplayStatics.h"
-
+#include "Components/ProgressBar.h"
 
 void UEchoesGameInstance::LoadGameData()
 {
@@ -62,4 +63,5 @@ void UEchoesGameInstance::Init()
 
 	LoadGameData();
 }
+
 
