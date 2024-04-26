@@ -93,6 +93,10 @@ public:
 
 	//Updates the stat progress bar for the equipment stats and the character stats
 	void UpdateStatProgressBars();
+
+	void SaveEquipment();
+
+	void LoadEquipmentSlots();
 	
 	
 	

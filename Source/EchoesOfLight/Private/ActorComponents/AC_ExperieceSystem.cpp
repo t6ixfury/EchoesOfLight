@@ -4,7 +4,8 @@
 #include "ActorComponents/AC_ExperieceSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Save/Save_Experience.h"
-
+#include "Character/MainCharacter.h"
+#include "Save/EchoesGameInstance.h"
 
 // Sets default values for this component's properties
 UAC_ExperieceSystem::UAC_ExperieceSystem()
@@ -12,6 +13,8 @@ UAC_ExperieceSystem::UAC_ExperieceSystem()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	ExperienceSlot = FString("ExperienceSlot1");
 
 	// ...
 }
@@ -21,9 +24,7 @@ UAC_ExperieceSystem::UAC_ExperieceSystem()
 void UAC_ExperieceSystem::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
+	CharacterRef = Cast<AMainCharacter>(GetOwner());
 }
 
 
@@ -37,65 +38,83 @@ void UAC_ExperieceSystem::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UAC_ExperieceSystem::AddExperience(float ExpToAdd)
 {
-	CurrentExp += ExpToAdd;
-	if (CurrentExp >= ExpToNextLevel)
+	if (CurrentLevel < 50)
 	{
-		LevelUp();
+		CurrentExp += ExpToAdd;
+		if (CurrentExp >= ExpToNextLevel)
+		{
+			LevelUp();
 
-	}
-	else
-	{
+		}
 		UpdateWidget();
-	}
+	}  
 }
 
 void UAC_ExperieceSystem::LevelUp()
 {
-	CurrentExp -= ExpToNextLevel;
-	ExpToNextLevel *= NextExpMultiplier;
-
+	if (CurrentLevel < 50)
+	{
+		CurrentLevel = FMath::Clamp(CurrentLevel + 1, 1, 50);
+		ExpToNextLevel = Levels.LevelToExperience[CurrentLevel + 1] - Levels.LevelToExperience[CurrentLevel];
+		if (CharacterRef)
+		{
+			FItemCharacerStatistics stats;
+			stats.Defense = FMath::RandRange(1, 3);
+			stats.Health = FMath::RandRange(1, 3);
+			stats.Stamina = FMath::RandRange(1, 3);
+			stats.Strength = FMath::RandRange(1, 3);
+			CharacterRef->IncreaseStats(stats);
+			SaveExperience();
+		}
+	}
+	LevelUpDelegate.Broadcast();
 }
 
 void UAC_ExperieceSystem::UpdateWidget()
 {
+	ExperienceAddedDelegate.Broadcast();
 }
 
 void UAC_ExperieceSystem::SaveExperience()
 {
-	if (UGameplayStatics::DoesSaveGameExist(ExperienceSlot, 0))
+	if (UWorld* World = GetOwner()->GetWorld())
 	{
-		if (USave_Experience* SaveToLoad = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(ExperienceSlot, 0)))
-		{
-			SaveReference = SaveToLoad;
-			SaveReference->sExperience = CurrentExp;
-			SaveReference->sCurrentLevel = CurrentLevel;
-			SaveReference->sExperienceToNextLevel = ExpToNextLevel;
-		}
-		else
-		{
-			if (USave_Experience* NewSave = Cast<USave_Experience>(UGameplayStatics::CreateSaveGameObject(Save)))
-			{
-				SaveReference = NewSave;
-				SaveReference->sExperience = CurrentExp;
-				SaveReference->sCurrentLevel = CurrentLevel;
-				SaveReference->sExperienceToNextLevel = ExpToNextLevel;
-			}
-		}
-	}
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+		USave_Experience* ExpSave = NewObject<USave_Experience>(this, USave_Experience::StaticClass());
 
-	UGameplayStatics::SaveGameToSlot(SaveReference, ExperienceSlot, 0);
+		if (IsValid(GameInstance) && IsValid(ExpSave))
+		{
+			ExpSave->sCurrentLevel = CurrentLevel;
+			ExpSave->sExperienceToNextLevel = ExpToNextLevel;
+			ExpSave->sExperience = CurrentExp;
+			UGameplayStatics::SaveGameToSlot(ExpSave, GameInstance->ExperienceSlot, 0);
+			UE_LOG(LogTemp, Warning, TEXT("Experience Saved"));
+		}
+
+	}
 }
 
 void UAC_ExperieceSystem::LoadExperience()
 {
-	if (UGameplayStatics::DoesSaveGameExist(ExperienceSlot, 0))
+
+	if (UWorld* World = GetOwner()->GetWorld())
 	{
-		if (USave_Experience* SaveToLoad = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(ExperienceSlot, 0)))
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+		if (IsValid(GameInstance))
 		{
-			CurrentExp = SaveToLoad->sExperience;
-			ExpToNextLevel = SaveToLoad->sExperienceToNextLevel;
-			CurrentLevel = SaveToLoad->sCurrentLevel;
+			if (UGameplayStatics::DoesSaveGameExist(GameInstance->ExperienceSlot, 0))
+			{
+				if (USave_Experience* ExpSave = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(GameInstance->ExperienceSlot, 0)))
+				{
+					CurrentExp = ExpSave->sExperience;
+					ExpToNextLevel = ExpSave->sExperienceToNextLevel;
+					CurrentLevel = ExpSave->sCurrentLevel;
+					UE_LOG(LogTemp, Warning, TEXT("Experience Loaded"));
+				}
+
+			}
 		}
 	}
+
 }
 

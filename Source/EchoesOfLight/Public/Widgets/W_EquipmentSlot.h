@@ -25,7 +25,7 @@ enum class EEquipmentType : uint8
 
 DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate);
 DECLARE_MULTICAST_DELEGATE(FAmuletEquippedDelegate);
-DECLARE_MULTICAST_DELEGATE_OneParam(FNetherbandEquippedDelegate, UItemBase*);
+DECLARE_MULTICAST_DELEGATE(FNetherbandEquippedDelegate);
 
 UCLASS()
 class ECHOESOFLIGHT_API UW_EquipmentSlot : public UUserWidget
@@ -40,8 +40,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equipment Type")
 		EItemType EquipmentType;
 
+	UPROPERTY(EditAnywhere, Category = "Item")
+		UDataTable* WeaponDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+		UDataTable* AmuletDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+		UDataTable* NetherBandDataTable;
+
 	UPROPERTY(EditAnywhere)
 		UItemBase* ItemReference = nullptr;
+
+	FName SlotItemId;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 		TSubclassOf<UDragItemVisual> DragItemVisualClass;
@@ -65,6 +76,10 @@ public:
 
 	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
 	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef);
+
+	void SetIconImage();
+
+	void CreateItem(UDataTable* table, FName DesiredItemId);
 
 
 	

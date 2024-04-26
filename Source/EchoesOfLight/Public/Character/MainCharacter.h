@@ -26,6 +26,7 @@ class UAC_ExperieceSystem;
 class UAC_CurrencySystem;
 class UAC_DamageSystem;
 class UAC_MainWidgetHandler;
+class USave_PlayerInfo;
 
 
 UENUM()
@@ -39,25 +40,6 @@ enum class EMovementDirection : uint8
 
 };
 
-USTRUCT()
-struct FCharacterStats
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	int32 Stamina = 10;
-
-	int32 Strength = 10;
-	
-	int32 DefensePower = 10;
-
-	int32 Constitution = 10;
-
-	int32 MaxStatValue = 99;
-
-
-};
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate)
@@ -106,7 +88,13 @@ private:
 //------------------------------Combat Variables--------------------------------------------------------------------------
 public:
 
+		UPROPERTY()
 		FCharacterStats MainCharacterStats;
+		
+		UPROPERTY()
+		float Stamina = 100;
+		UPROPERTY()
+		float CurrentStamina = Stamina;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		float ClosestDistance;
@@ -215,9 +203,35 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* EuipWeaponIA;
 
+
+
+
+	//------------------------SAVE------------------------------------------------------
+
+	UPROPERTY()
+		USave_PlayerInfo* PlayerInfoSaveReference;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save")
+		FString PlayerInfoSaveSlot;
+
+
+
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
 //---------------------------------------------------------------------------------------------------------------------------
+
+//---------------------------------------------SAVE Functions---------------------------------------
+
+	UFUNCTION()
+		void SavePlayerInfo();
+
+	UFUNCTION()
+		void LoadPlayerInfo();
+	UFUNCTION()
+		void LoadAll();
+
+	UFUNCTION(BlueprintCallable)
+		void SaveAll();
 
 
 
@@ -234,7 +248,6 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 //------------------------------Combat Functions--------------------------------------------------------------------------
 
@@ -273,9 +286,9 @@ public:
 	//Despawns Weapon and Update Equipment menu widget
 	void OnWeaponSlotRemoval();
 
-	void NetherbandEquipped(UItemBase* NetherbandItem);
+	void NetherbandEquipped();
 
-	void NetherbandUnEquipped(UItemBase* NetherbandItem);
+	void NetherbandUnEquipped();
 
 	void AmuletEquipped();
 

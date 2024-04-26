@@ -16,6 +16,8 @@
 #include "W_MainGUI.h"
 #include "Actors/Items/ItemBase.h"
 #include "ActorComponents/DialogueSystem.h"
+#include "Save/Save_PlayerInfo.h"
+#include "Save/EchoesGameInstance.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -27,6 +29,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -93,7 +96,8 @@ AMainCharacter::AMainCharacter()
 	InteractionCheckFrequency = 0.1;
 	InteractionCheckDistance = 500.0f;
 
-
+	//Save
+	PlayerInfoSaveSlot = FString("PlayerInfoSlot1");
 
 }
 
@@ -118,6 +122,14 @@ void AMainCharacter::BeginPlay()
 	}
 
 	BindEquipmentSlotDelegates();
+
+	ExperienceSystem->ExperienceAddedDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
+	ExperienceSystem->LevelUpDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
+
+	if (UEchoesGameInstance* instance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
+	{
+		LoadAll();
+	}
 }
 
 void AMainCharacter::Tick(float DeltaTime)
@@ -324,11 +336,14 @@ void AMainCharacter::SpawnWeapon()
 
 void AMainCharacter::DespawnWeapon()
 {
-	RightHandWeapon->Destroy();
-	LeftHandWeapon->Destroy();
-	RightHandWeapon = nullptr;
-	LeftHandWeapon = nullptr;
-	isWeaponEquipped = false;
+	if (IsValid(RightHandWeapon) && IsValid(LeftHandWeapon))
+	{
+		RightHandWeapon->Destroy();
+		LeftHandWeapon->Destroy();
+		RightHandWeapon = nullptr;
+		LeftHandWeapon = nullptr;
+		isWeaponEquipped = false;
+	}
 }
 
 
@@ -370,20 +385,20 @@ void AMainCharacter::OnWeaponSlotRemoval()
 	
 }
 
-void AMainCharacter::NetherbandEquipped(UItemBase* NetherbandItem)
+void AMainCharacter::NetherbandEquipped()
 {
-	if (NetherbandItem)
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
 	{
-		IncreaseStats(NetherbandItem->ItemCharacerStatistics);
+		IncreaseStats(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->ItemCharacerStatistics);
 		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
 	}
 }
 
-void AMainCharacter::NetherbandUnEquipped(UItemBase* NetherbandItem)
+void AMainCharacter::NetherbandUnEquipped()
 {
-	if (NetherbandItem)
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
 	{
-		DecreaseStats(NetherbandItem->ItemCharacerStatistics);
+		DecreaseStats(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->ItemCharacerStatistics);
 		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
 	}
 }
@@ -1048,12 +1063,21 @@ void AMainCharacter::roll()
 
 void AMainCharacter::UpdateAllWidgets()
 {
+	UE_LOG(LogTemp,Warning, TEXT("UpdateWidget"))
 	//sets health bar percantage to the 
 	if (MainWidgetHandlerComponent->GUI)
 	{
 		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
+		MainWidgetHandlerComponent->GUI->SetStaminaBarPercetage(CurrentStamina / Stamina);
+		MainWidgetHandlerComponent->GUI->SetExperienceBarPercentage(ExperienceSystem->CurrentExp / ExperienceSystem->ExpToNextLevel);
+		MainWidgetHandlerComponent->GUI->SetLevelText(FText::AsNumber(ExperienceSystem->CurrentLevel));
 	}
+
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentStats();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateCharacterStats();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateStatProgressBars();
+
 }
 
 
@@ -1086,3 +1110,90 @@ void AMainCharacter::DecreaseStats(FItemCharacerStatistics Stats)
 }
 
 
+void AMainCharacter::SavePlayerInfo()
+{
+	if (UWorld* World = GetOwner()->GetWorld())
+	{
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+
+		if (IsValid(GameInstance))
+		{
+			if (USave_PlayerInfo* Save = Cast<USave_PlayerInfo>(UGameplayStatics::CreateSaveGameObject(USave_PlayerInfo::StaticClass())))
+			{
+				Save->sHealth = DamageSystem->Health;
+				Save->sStatsLevels = MainCharacterStats;
+
+				if (LeftHandWeapon)
+				{
+					Save->sCurrentWeapnStats.AttackPower = LeftHandWeapon->BaseAttackInfo.AttackPower;
+					Save->sCurrentWeapnStats.AtttackSpeed = LeftHandWeapon->BaseAttackInfo.AtttackSpeed;
+					Save->sCurrentWeapnStats.CriticalHitRate = LeftHandWeapon->BaseAttackInfo.CriticalHitRate;
+					Save->sCurrentWeapnStats.MagicPower = LeftHandWeapon->BaseAttackInfo.MagicPower;
+					Save->sCurrentWeapnStats.Damage = LeftHandWeapon->BaseAttackInfo.Damage;
+				}
+
+				UGameplayStatics::SaveGameToSlot(Save, GameInstance->PlayerInfoSlot, 0);
+				UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
+			}
+			
+		}
+
+	}
+
+}
+
+void AMainCharacter::LoadPlayerInfo()
+{
+	if (UWorld* World = GetOwner()->GetWorld())
+	{
+		UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(World->GetGameInstance());
+
+		if (UGameplayStatics::DoesSaveGameExist(GameInstance->PlayerInfoSlot, 0))
+		{
+			//SetActorTransform(GameInstance->PlayerInfoData->sPlayerTransform);
+
+			//SetActorRotation(GameInstance->PlayerInfoData->sPlayerRotation);
+
+			MainCharacterStats = GameInstance->PlayerInfoData->sStatsLevels;
+
+			DamageSystem->Health = GameInstance->PlayerInfoData->sHealth;
+
+			if (LeftHandWeapon && RightHandWeapon)
+			{
+				LeftHandWeapon->BaseAttackInfo.AttackPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.AttackPower;
+				LeftHandWeapon->BaseAttackInfo.AtttackSpeed = GameInstance->PlayerInfoData->sCurrentWeapnStats.AtttackSpeed;
+				LeftHandWeapon->BaseAttackInfo.CriticalHitRate = GameInstance->PlayerInfoData->sCurrentWeapnStats.CriticalHitRate;
+				LeftHandWeapon->BaseAttackInfo.MagicPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.MagicPower;
+				LeftHandWeapon->BaseAttackInfo.Damage = GameInstance->PlayerInfoData->sCurrentWeapnStats.Damage;
+
+				RightHandWeapon->BaseAttackInfo.AttackPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.AttackPower;
+				RightHandWeapon->BaseAttackInfo.AtttackSpeed = GameInstance->PlayerInfoData->sCurrentWeapnStats.AtttackSpeed;
+				RightHandWeapon->BaseAttackInfo.CriticalHitRate = GameInstance->PlayerInfoData->sCurrentWeapnStats.CriticalHitRate;
+				RightHandWeapon->BaseAttackInfo.MagicPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.MagicPower;
+				RightHandWeapon->BaseAttackInfo.Damage = GameInstance->PlayerInfoData->sCurrentWeapnStats.Damage;
+			}
+			UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Loaded"));
+			UpdateAllWidgets();
+		}
+	}
+
+}
+
+void AMainCharacter::LoadAll()
+{
+	LoadPlayerInfo();
+	ExperienceSystem->LoadExperience();
+	PlayerInventory->LoadInventory();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->LoadEquipmentSlots();
+	UE_LOG(LogTemp, Warning, TEXT("load all called"));
+}
+
+void AMainCharacter::SaveAll()
+{
+	SavePlayerInfo();
+	ExperienceSystem->SaveExperience();
+	PlayerInventory->SaveInventory();
+	MainWidgetHandlerComponent->EquipmentMenuWidget->SaveEquipment();
+
+	UE_LOG(LogTemp, Warning, TEXT("Save all called"));
+}
