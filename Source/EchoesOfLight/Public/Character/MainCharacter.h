@@ -203,6 +203,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
 		class UInputAction* EuipWeaponIA;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enhanced Inputs")
+		class UInputAction* PauseIA;
 
 
 
@@ -362,6 +364,9 @@ public:
 	//Drops Item from Inventory
 	UFUNCTION()
 		void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
+
+	UFUNCTION()
+		void TogglePause();
 
 protected:
 	//Brings Up the Inventory ui

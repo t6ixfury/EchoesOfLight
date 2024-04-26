@@ -183,6 +183,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		//Action to equip weapon
 		EnhancedInputComponent->BindAction(EuipWeaponIA, ETriggerEvent::Completed, this, &AMainCharacter::SpawnWeapon);
+
+		//Action for toggle PauseMenu.
+		EnhancedInputComponent->BindAction(PauseIA, ETriggerEvent::Completed, this, &AMainCharacter::TogglePause);
 	}
 
 }
@@ -244,6 +247,15 @@ void AMainCharacter::DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop)
 		//update inventory ui
 		PlayerInventory->OnInventoryUpdated.Broadcast();
 	}
+}
+
+void AMainCharacter::TogglePause()
+{
+	if (MainWidgetHandlerComponent)
+	{
+		MainWidgetHandlerComponent->TogglePauseMenu();
+	}
+	
 }
 
 void AMainCharacter::Move(const FInputActionValue& Value)
