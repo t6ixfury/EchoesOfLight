@@ -19,6 +19,8 @@
 #include "Widgets/W_DialogueBox.h"
 #include "Widgets/W_Alert.h"
 #include "TimerManager.h"
+#include "Sound/SoundBase.h"
+#include "Widgets/W_PauseMenu.h"
 
 
 
@@ -90,6 +92,24 @@ void UAC_MainWidgetHandler::ShowAlertWidget(FText message)
 		{
 			AlertWidget->SetAlertMessageText(message);
 			AlertWidget->AddToPlayerScreen();
+
+			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, AlertDuration);
+		}
+
+	}
+}
+
+void UAC_MainWidgetHandler::ShowAlertWidget(FText message, FText Title)
+{
+	UWorld* World = GetWorld();
+	if (AlertWidgetClass && MainCharacterController && World)
+	{
+		AlertWidget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
+		if (AlertWidget)
+		{
+			AlertWidget->SetAlertMessageText(message);
+			AlertWidget->SetAlertTitleText(Title);
+			AlertWidget->AddToPlayerScreen(1000);
 
 			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, AlertDuration);
 		}
@@ -233,11 +253,56 @@ void UAC_MainWidgetHandler::CreateAllWidget()
 	}
 }
 
-
-void UAC_MainWidgetHandler::TogglePause()
+void UAC_MainWidgetHandler::OpenPauseMenu()
 {
+	PauseMenuWidget = CreateWidget<UW_PauseMenu>(MainCharacterController, PauseMenuWidgetClass);
 
+	if (PauseMenuWidget)
+	{
+		PauseMenuWidget->AddToViewport(10);
+		PauseMenuWidget->SetVisibility(ESlateVisibility::Visible);
+		MainCharacterController->SetPause(true);
+
+		FInputModeUIOnly UI;
+		MainCharacterController->bShowMouseCursor = true;
+		MainCharacterController->SetInputMode(UI);
+
+		if (PauseMenuSound)
+		{
+			UGameplayStatics::PlaySound2D(this, PauseMenuSound);
+		}
+	}
 }
+
+void UAC_MainWidgetHandler::ClosePauseMenu()
+{
+	if (PauseMenuWidget)
+	{
+		PauseMenuWidget->RemoveFromParent();
+		PauseMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+		MainCharacterController->SetPause(false);
+
+		FInputModeGameOnly Game;
+		MainCharacterController->bShowMouseCursor = false;
+		MainCharacterController->SetInputMode(Game);
+
+		PauseMenuWidget->MarkAsGarbage();
+		PauseMenuWidget = nullptr;
+	}
+}
+
+void UAC_MainWidgetHandler::TogglePauseMenu()
+{
+	if (IsValid(PauseMenuWidget))
+	{
+		ClosePauseMenu();
+	}
+	else
+	{
+		OpenPauseMenu();
+	}
+}
+
 
 void UAC_MainWidgetHandler::HideHUD()
 {	

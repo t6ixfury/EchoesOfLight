@@ -18,6 +18,8 @@ class AHUD_MainCharacter;
 class UW_DialogueGui;
 class UW_Alert;
 struct FTimerHandle;
+class UW_PauseMenu;
+class USoundBase;
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -51,6 +53,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_Interact> InteractionWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
+		TSubclassOf<UW_PauseMenu> PauseMenuWidgetClass;
+
 	UPROPERTY(BlueprintReadOnly)
 		AMainCharacter* MainCharacter;
 
@@ -64,12 +69,21 @@ public:
 		UW_Interact* InteractionWidget;
 
 	UPROPERTY()
+		UW_PauseMenu* PauseMenuWidget;
+
+	UPROPERTY()
 		UW_DialogueGui* DialogueGui;
 
 	UPROPERTY()
 		UW_MainGUI* GUI;
 	UPROPERTY()
 		UW_Alert* AlertWidget;
+
+
+//-----------------------------SOUNDS--------------------------------------------------------------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI Sounds")
+		USoundBase* PauseMenuSound;
 
 
 	UPROPERTY()
@@ -105,6 +119,7 @@ public:
 		void RemoveDialogueWidget();
 
 	void ShowAlertWidget(FText message);
+	void ShowAlertWidget(FText message, FText Title);
 
 	void RemoveAlertWidget();
 
@@ -116,7 +131,10 @@ public:
 
 	void CreateAllWidget();
 
-	void TogglePause();
+	void OpenPauseMenu();
+	void ClosePauseMenu();
+
+	void TogglePauseMenu();
 
 	void HideHUD();
 
