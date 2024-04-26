@@ -307,14 +307,19 @@ struct FCharacterStats
 
 public:
 
+	UPROPERTY()
 	int32 Stamina = 10;
 
+	UPROPERTY()
 	int32 Strength = 10;
 
+	UPROPERTY()
 	int32 DefensePower = 10;
 
+	UPROPERTY()
 	int32 Constitution = 10;
 
+	UPROPERTY()
 	int32 MaxStatValue = 99;
 
 

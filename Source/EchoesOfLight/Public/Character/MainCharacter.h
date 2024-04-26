@@ -88,10 +88,12 @@ private:
 //------------------------------Combat Variables--------------------------------------------------------------------------
 public:
 
+		UPROPERTY()
 		FCharacterStats MainCharacterStats;
 		
+		UPROPERTY()
 		float Stamina = 100;
-
+		UPROPERTY()
 		float CurrentStamina = Stamina;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -247,7 +249,6 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
 //------------------------------Combat Functions--------------------------------------------------------------------------
 
 public:
@@ -285,9 +286,9 @@ public:
 	//Despawns Weapon and Update Equipment menu widget
 	void OnWeaponSlotRemoval();
 
-	void NetherbandEquipped(UItemBase* NetherbandItem);
+	void NetherbandEquipped();
 
-	void NetherbandUnEquipped(UItemBase* NetherbandItem);
+	void NetherbandUnEquipped();
 
 	void AmuletEquipped();
 

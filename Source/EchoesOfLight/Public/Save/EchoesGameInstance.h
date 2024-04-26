@@ -13,7 +13,9 @@ class USave_Experience;
 class USave_PlayerInfo;
 class USave_Inventory;
 class USave_Equipment;
+class UMaster_SaveGame;
 class UW_LoadScreen;
+class AGameInfo;
 
 
 DECLARE_MULTICAST_DELEGATE(FGameLoad)
@@ -37,20 +39,39 @@ public:
 		USave_Equipment* EquipmentData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UMaster_SaveGame* GameInfoData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UW_LoadScreen* LoadScreen;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<UW_LoadScreen> LoadScreenClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FName> TownLevels;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FName> DungeonLevels;
+
+	UPROPERTY()
+		AGameInfo* GameInfo;
+
+
 	FString ExperienceSlot = FString("ExperienceSlot");
 	FString PlayerInfoSlot= FString("PlayerInfoslot");
 	FString InventoryDataSlot = FString("InventoryDataSlot");
 	FString EquipmentDataSlot = FString("EquipmentDataSlot");
+	FString GameInfoDataSlot = FString("GameInfoDataSlot");
 
 	void LoadGameData();
 
+	void SetTownAndDungeonNames();
+
+	void SetGameInfo();
+
 
 	virtual void Init() override;
+	virtual void OnWorldChanged(UWorld* OldWorld, UWorld* NewWorld) override;
 
 
 

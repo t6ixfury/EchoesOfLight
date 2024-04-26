@@ -138,7 +138,7 @@ EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandle
 		break;
 	case EItemType::Netherband:
 
-		NetherBandChange.Broadcast(ItemReference);
+		NetherBandChange.Broadcast();
 		return EItemType::Netherband;
 		break;
 	default:

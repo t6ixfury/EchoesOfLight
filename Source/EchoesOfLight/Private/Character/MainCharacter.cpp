@@ -385,20 +385,20 @@ void AMainCharacter::OnWeaponSlotRemoval()
 	
 }
 
-void AMainCharacter::NetherbandEquipped(UItemBase* NetherbandItem)
+void AMainCharacter::NetherbandEquipped()
 {
-	if (NetherbandItem)
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
 	{
-		IncreaseStats(NetherbandItem->ItemCharacerStatistics);
+		IncreaseStats(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->ItemCharacerStatistics);
 		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
 	}
 }
 
-void AMainCharacter::NetherbandUnEquipped(UItemBase* NetherbandItem)
+void AMainCharacter::NetherbandUnEquipped()
 {
-	if (NetherbandItem)
+	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
 	{
-		DecreaseStats(NetherbandItem->ItemCharacerStatistics);
+		DecreaseStats(MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference->ItemCharacerStatistics);
 		MainWidgetHandlerComponent->EquipmentMenuWidget->UpdateEquipmentWidget();
 	}
 }
@@ -1121,8 +1121,6 @@ void AMainCharacter::SavePlayerInfo()
 			if (USave_PlayerInfo* Save = Cast<USave_PlayerInfo>(UGameplayStatics::CreateSaveGameObject(USave_PlayerInfo::StaticClass())))
 			{
 				Save->sHealth = DamageSystem->Health;
-				Save->sPlayerTransform = GetActorTransform();
-				Save->sPlayerRotation = GetActorRotation();
 				Save->sStatsLevels = MainCharacterStats;
 
 				if (LeftHandWeapon)
@@ -1152,9 +1150,9 @@ void AMainCharacter::LoadPlayerInfo()
 
 		if (UGameplayStatics::DoesSaveGameExist(GameInstance->PlayerInfoSlot, 0))
 		{
-			SetActorTransform(GameInstance->PlayerInfoData->sPlayerTransform);
+			//SetActorTransform(GameInstance->PlayerInfoData->sPlayerTransform);
 
-			SetActorRotation(GameInstance->PlayerInfoData->sPlayerRotation);
+			//SetActorRotation(GameInstance->PlayerInfoData->sPlayerRotation);
 
 			MainCharacterStats = GameInstance->PlayerInfoData->sStatsLevels;
 

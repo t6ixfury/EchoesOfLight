@@ -4,10 +4,9 @@
 #include "Widgets/W_StartScreen.h"
 #include "Components/Button.h"
 #include "Save/EchoesGameInstance.h"
-#include "Save/Save_PlayerInfo.h"
 #include "Kismet/GameplayStatics.h"
-#include "Widgets/W_LoadScreen.h"
-#include "Components/ProgressBar.h"
+#include "Managers/GameInfo.h"
+
 
 
 void UW_StartScreen::NativeConstruct()
@@ -34,22 +33,9 @@ void UW_StartScreen::Start()
 	if (UEchoesGameInstance* GameInstance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GameInstance exist"));
-		if (IsValid(GameInstance->PlayerInfoData))
+		if (GameInstance->GameInfo)
 		{
-			if (!GameInstance->PlayerInfoData->CurrentTownVariation.IsNone())
-			{
-
-				LevelBeingLoaded = GameInstance->PlayerInfoData->CurrentTownVariation;
-				UGameplayStatics::OpenLevel(this, LevelBeingLoaded);
-				UE_LOG(LogTemp, Warning, TEXT("trying to open level from save data"));
-
-			}
-		}
-		else
-		{
-			LevelBeingLoaded = FirstLevel;
-			UGameplayStatics::OpenLevel(GetWorld(), FirstLevel);
-			UE_LOG(LogTemp, Warning, TEXT("Opening first level"));
+			UGameplayStatics::OpenLevel(this, GameInstance->TownLevels[GameInstance->GameInfo->CurrentTownIndex]);
 		}
 	}
 

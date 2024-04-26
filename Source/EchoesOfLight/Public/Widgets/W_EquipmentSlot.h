@@ -25,7 +25,7 @@ enum class EEquipmentType : uint8
 
 DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate);
 DECLARE_MULTICAST_DELEGATE(FAmuletEquippedDelegate);
-DECLARE_MULTICAST_DELEGATE_OneParam(FNetherbandEquippedDelegate, UItemBase*);
+DECLARE_MULTICAST_DELEGATE(FNetherbandEquippedDelegate);
 
 UCLASS()
 class ECHOESOFLIGHT_API UW_EquipmentSlot : public UUserWidget

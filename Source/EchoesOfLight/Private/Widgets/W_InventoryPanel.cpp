@@ -110,7 +110,7 @@ void UW_InventoryPanel::WasEquipmentAddedToInventory(EItemType EquipmentType, UI
 		PlayerCharacter->OnWeaponSlotRemoval();
 		break;
 	case EItemType::Netherband:
-		PlayerCharacter->NetherbandUnEquipped(EquipmentItem);
+		PlayerCharacter->NetherbandUnEquipped();
 		break;
 	default:
 		break;

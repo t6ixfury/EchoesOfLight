@@ -19,12 +19,6 @@ class ECHOESOFLIGHT_API USave_PlayerInfo : public USaveGame
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FTransform sPlayerTransform;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRotator sPlayerRotation;
-
 	UPROPERTY()
 	FCharacterStats sStatsLevels;
 
@@ -35,9 +29,9 @@ public:
 	float sHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName CurrentDungeonLevel;
+	FName sCurrentDungeonLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName CurrentTownVariation;
+	FName sCurrentTownVariation;
 
 };

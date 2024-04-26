@@ -19,6 +19,17 @@ class ECHOESOFLIGHT_API UMaster_SaveGame : public USaveGame
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName sCurrentDungeonLevel;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName sCurrentTownVariation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 sCurrentTownIndex;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 sCurrentDungeonIndex;
 	
 };

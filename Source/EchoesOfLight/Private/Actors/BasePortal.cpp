@@ -5,6 +5,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Character/MainCharacter.h"
 #include "Components/BoxComponent.h"
+#include "Save/EchoesGameInstance.h"
+#include "Managers/GameInfo.h"
+#include "Character/MainCharacter.h"
 
 
 
@@ -38,8 +41,20 @@ void ABasePortal::BeginPlay()
 
 void ABasePortal::LoadLevel(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (AMainCharacter* character = Cast<AMainCharacter>(OtherActor))
+	{
+		character->SaveAll();
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Load Level Function"));
-	UGameplayStatics::OpenLevel(this, LevelToLoad);
+	if (UEchoesGameInstance* GameInstance = Cast< UEchoesGameInstance>(GetWorld()->GetGameInstance()))
+	{
+		if (GameInstance->GameInfo)
+		{
+			UGameplayStatics::OpenLevel(GetWorld(), GameInstance->DungeonLevels[GameInstance->GameInfo->CurrentDungeonIndex]);
+		}
+	}
+
+	
 }
 
 // Called every frame
