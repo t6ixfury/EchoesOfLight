@@ -48,6 +48,7 @@ void UAC_ExperieceSystem::AddExperience(float ExpToAdd)
 		}
 		UpdateWidget();
 	}  
+
 }
 
 void UAC_ExperieceSystem::LevelUp()

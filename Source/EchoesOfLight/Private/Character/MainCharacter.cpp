@@ -124,6 +124,7 @@ void AMainCharacter::BeginPlay()
 	BindEquipmentSlotDelegates();
 
 	ExperienceSystem->ExperienceAddedDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
+	ExperienceSystem->ExperienceAddedDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
 	ExperienceSystem->LevelUpDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
 
 	if (UEchoesGameInstance* instance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
@@ -523,6 +524,14 @@ void AMainCharacter::UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats)
 		}
 
 
+	}
+}
+
+void AMainCharacter::ExperienceWasAdded()
+{
+	if (MainWidgetHandlerComponent)
+	{
+		MainWidgetHandlerComponent->ShowExperienceAlertWidget(FText::FromString("EXP 100+"));
 	}
 }
 

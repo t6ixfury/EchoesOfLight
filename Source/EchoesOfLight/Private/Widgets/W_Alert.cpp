@@ -14,3 +14,17 @@ void UW_Alert::SetAlertMessageText(FText message)
 {
 	AlertMessageText->SetText(message);
 }
+
+float UW_Alert::PlayAlertAnimation()
+{
+	if (FadeIn)
+	{
+		PlayAnimation(FadeIn);
+
+		float time = FadeIn->GetEndTime();
+
+		return time;
+	}
+
+	return 0;
+}

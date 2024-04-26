@@ -21,6 +21,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundBase.h"
 #include "Widgets/W_PauseMenu.h"
+#include "Components/WidgetComponent.h"
 
 
 
@@ -87,15 +88,47 @@ void UAC_MainWidgetHandler::ShowAlertWidget(FText message)
 	UWorld* World = GetWorld();
 	if (AlertWidgetClass && MainCharacterController && World)
 	{
-		AlertWidget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, ExperienceAlertWidgetClass);
+		if (Widget)
+		{
+			AlertWidget = Widget;
+			AlertWidget->SetAlertMessageText(message);
+			AlertWidget->AddToPlayerScreen();
+			float time = AlertWidget->PlayAlertAnimation();
+
+			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);
+		}
+
+	}
+}
+
+void UAC_MainWidgetHandler::ShowExperienceAlertWidget(FText message)
+{
+	UWorld* World = GetWorld();
+	if (MainCharacterController && World)
+	{
+		// Check if an alert widget already exists, and if so, remove it immediately.
 		if (AlertWidget)
 		{
+			AlertWidget->RemoveFromParent();
+			AlertWidget->MarkAsGarbage();
+			AlertWidget = nullptr;
+			World->GetTimerManager().ClearTimer(AlertTimer);
+		}
+
+		// Create a new widget.
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, ExperienceAlertWidgetClass);
+		if (Widget)
+		{
+			AlertWidget = Widget;
 			AlertWidget->SetAlertMessageText(message);
 			AlertWidget->AddToPlayerScreen();
 
-			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, AlertDuration);
-		}
+			float time = AlertWidget->PlayAlertAnimation();
 
+			// Set a timer to remove the widget after the animation.
+			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);
+		}
 	}
 }
 
@@ -104,14 +137,16 @@ void UAC_MainWidgetHandler::ShowAlertWidget(FText message, FText Title)
 	UWorld* World = GetWorld();
 	if (AlertWidgetClass && MainCharacterController && World)
 	{
-		AlertWidget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
-		if (AlertWidget)
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, ExperienceAlertWidgetClass);
+		if (Widget)
 		{
+			AlertWidget = Widget;
 			AlertWidget->SetAlertMessageText(message);
 			AlertWidget->SetAlertTitleText(Title);
-			AlertWidget->AddToPlayerScreen(1000);
+			AlertWidget->AddToPlayerScreen();
+			float time = AlertWidget->PlayAlertAnimation();
 
-			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, AlertDuration);
+			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);
 		}
 
 	}
@@ -122,7 +157,10 @@ void UAC_MainWidgetHandler::RemoveAlertWidget()
 	if (AlertWidget)
 	{
 		AlertWidget->RemoveFromParent();
+		AlertWidget->MarkAsGarbage();
 		AlertWidget = nullptr;
+		
+		GetWorld()->GetTimerManager().ClearTimer(AlertTimer);
 	}
 }
 
@@ -251,6 +289,7 @@ void UAC_MainWidgetHandler::CreateAllWidget()
 		InteractionWidget->AddToViewport(-1);
 		InteractionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
+
 }
 
 void UAC_MainWidgetHandler::OpenPauseMenu()
