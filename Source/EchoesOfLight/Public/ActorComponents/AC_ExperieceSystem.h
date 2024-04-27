@@ -74,8 +74,8 @@ public:
 	}
 };
 
-DECLARE_MULTICAST_DELEGATE(FLeveledUpDelegate)
-DECLARE_MULTICAST_DELEGATE(FExperienceAddedDelegate)
+DECLARE_MULTICAST_DELEGATE_OneParam(FLeveledUpDelegate, int32)
+DECLARE_MULTICAST_DELEGATE_OneParam(FExperienceAddedDelegate, float)
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 

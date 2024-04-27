@@ -24,9 +24,15 @@ public:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Alert Widget | Data")
 		UTextBlock* AlertMessageText;
 
+
+	UPROPERTY(Transient, BlueprintReadOnly, meta = (BindWidgetAnim))
+		UWidgetAnimation* FadeIn;
+
 	void SetAlertTitleText(FText title);
 
 	void SetAlertMessageText(FText message);
+
+	float PlayAlertAnimation();
 
 	
 };

@@ -46,8 +46,9 @@ void UAC_ExperieceSystem::AddExperience(float ExpToAdd)
 			LevelUp();
 
 		}
-		UpdateWidget();
+		ExperienceAddedDelegate.Broadcast(ExpToAdd);
 	}  
+
 }
 
 void UAC_ExperieceSystem::LevelUp()
@@ -55,7 +56,7 @@ void UAC_ExperieceSystem::LevelUp()
 	if (CurrentLevel < 50)
 	{
 		CurrentLevel = FMath::Clamp(CurrentLevel + 1, 1, 50);
-		ExpToNextLevel = Levels.LevelToExperience[CurrentLevel + 1] - Levels.LevelToExperience[CurrentLevel];
+		ExpToNextLevel = FMath::Clamp(Levels.LevelToExperience[CurrentLevel + 1] - Levels.LevelToExperience[CurrentLevel], 0 , 10000000);
 		if (CharacterRef)
 		{
 			FItemCharacerStatistics stats;
@@ -67,12 +68,12 @@ void UAC_ExperieceSystem::LevelUp()
 			SaveExperience();
 		}
 	}
-	LevelUpDelegate.Broadcast();
+	LevelUpDelegate.Broadcast(CurrentLevel);
 }
 
 void UAC_ExperieceSystem::UpdateWidget()
 {
-	ExperienceAddedDelegate.Broadcast();
+	
 }
 
 void UAC_ExperieceSystem::SaveExperience()

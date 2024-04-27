@@ -123,8 +123,8 @@ void AMainCharacter::BeginPlay()
 
 	BindEquipmentSlotDelegates();
 
-	ExperienceSystem->ExperienceAddedDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
-	ExperienceSystem->LevelUpDelegate.AddUObject(this, &AMainCharacter::UpdateAllWidgets);
+	ExperienceSystem->ExperienceAddedDelegate.AddUObject(this, &AMainCharacter::ExperienceWasAdded);
+	ExperienceSystem->LevelUpDelegate.AddUObject(this, &AMainCharacter::OnLevelUp);
 
 	if (UEchoesGameInstance* instance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
 	{
@@ -523,6 +523,34 @@ void AMainCharacter::UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats)
 		}
 
 
+	}
+}
+
+void AMainCharacter::ExperienceWasAdded(float ExpAdded)
+{
+	if (MainWidgetHandlerComponent)
+	{
+		FString ExpMessage = FString::Printf(TEXT("EXP %d+"), static_cast<int32>(ExpAdded));
+		MainWidgetHandlerComponent->ShowExperienceAlertWidget(FText::FromString(ExpMessage));
+		UpdateAllWidgets();
+	}
+}
+
+void AMainCharacter::OnLevelUp(int32 NewLevel)
+{
+	if (MainWidgetHandlerComponent)
+	{
+		FString ExpMessage = FString::Printf(TEXT("%d"), NewLevel);
+		MainWidgetHandlerComponent->ShowLevelAlertWidget(FText::FromString(ExpMessage));
+		UpdateAllWidgets();
+	}
+}
+
+void AMainCharacter::DebugLevelUP()
+{
+	if (ExperienceSystem)
+	{
+		ExperienceSystem->LevelUp();
 	}
 }
 

@@ -299,6 +299,17 @@ public:
 	//Update the stats of the dual weapons. True value increases stats and false value decreases stats.
 	void UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats);
 
+	//------------------------------Delegates--------------------------------------------------------------------------
+
+public:
+
+	UFUNCTION(Blueprintcallable)
+	void ExperienceWasAdded(float ExpAdded);
+	
+	void OnLevelUp(int32 NewLevel);
+
+	UFUNCTION(Blueprintcallable)
+	void DebugLevelUP();
 
 protected:
 	//Performs the basic attack of the character.
