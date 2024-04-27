@@ -304,7 +304,12 @@ public:
 public:
 
 	UFUNCTION(Blueprintcallable)
-	void ExperienceWasAdded();
+	void ExperienceWasAdded(float ExpAdded);
+	
+	void OnLevelUp(int32 NewLevel);
+
+	UFUNCTION(Blueprintcallable)
+	void DebugLevelUP();
 
 protected:
 	//Performs the basic attack of the character.

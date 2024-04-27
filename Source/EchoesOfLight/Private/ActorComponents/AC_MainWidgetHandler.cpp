@@ -152,6 +152,33 @@ void UAC_MainWidgetHandler::ShowAlertWidget(FText message, FText Title)
 	}
 }
 
+void UAC_MainWidgetHandler::ShowLevelAlertWidget(FText message)
+{
+	UWorld* World = GetWorld();
+	if (LevelAlertWidgetClass && MainCharacterController && World)
+	{
+		if (LevelWidget)
+		{
+			LevelWidget->RemoveFromParent();
+			LevelWidget->MarkAsGarbage();
+			LevelWidget = nullptr;
+			World->GetTimerManager().ClearTimer(LevelAlertTimer);
+		}
+
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, LevelAlertWidgetClass);
+		if (Widget)
+		{
+			LevelWidget = Widget;
+			LevelWidget->SetAlertMessageText(message);
+			LevelWidget->AddToPlayerScreen();
+			float time = LevelWidget->PlayAlertAnimation();
+
+			World->GetTimerManager().SetTimer(LevelAlertTimer, this, &UAC_MainWidgetHandler::RemoveLevelAlertWidget, time);
+		}
+
+	}
+}
+
 void UAC_MainWidgetHandler::RemoveAlertWidget()
 {
 	if (AlertWidget)
@@ -160,6 +187,18 @@ void UAC_MainWidgetHandler::RemoveAlertWidget()
 		AlertWidget->MarkAsGarbage();
 		AlertWidget = nullptr;
 		
+		GetWorld()->GetTimerManager().ClearTimer(LevelAlertTimer);
+	}
+}
+
+void UAC_MainWidgetHandler::RemoveLevelAlertWidget()
+{
+	if (LevelWidget)
+	{
+		LevelWidget->RemoveFromParent();
+		LevelWidget->MarkAsGarbage();
+		LevelWidget = nullptr;
+
 		GetWorld()->GetTimerManager().ClearTimer(AlertTimer);
 	}
 }

@@ -45,6 +45,9 @@ public:
 		TSubclassOf<UW_Alert> AlertWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
+		TSubclassOf<UW_Alert> LevelAlertWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_Alert> ExperienceAlertWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
@@ -58,6 +61,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget classes")
 		TSubclassOf<UW_PauseMenu> PauseMenuWidgetClass;
+
+
 
 	//used for spawning the experience alert
 	UPROPERTY()
@@ -86,6 +91,9 @@ public:
 	UPROPERTY()
 		UW_Alert* AlertWidget;
 
+	UPROPERTY()
+		UW_Alert* LevelWidget;
+
 
 //-----------------------------SOUNDS--------------------------------------------------------------------------------------------
 
@@ -102,6 +110,8 @@ public:
 	//Timers
 
 	FTimerHandle AlertTimer;
+
+	FTimerHandle LevelAlertTimer;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS
@@ -131,7 +141,11 @@ public:
 	void ShowExperienceAlertWidget(FText message);
 	void ShowAlertWidget(FText message, FText Title);
 
+	void ShowLevelAlertWidget(FText message);
+
 	void RemoveAlertWidget();
+
+	void RemoveLevelAlertWidget();
 
 	void ShowInteractionWidget() const;
 	void HideInteractionWidget() const;
