@@ -35,10 +35,64 @@ public:
 	UTextBlock* ItemType;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* DamageValue;
+		UTextBlock* StaminaRestorationAmountText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* ArmorRating;
+		UTextBlock* StaminaRestorationAmountValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* HealthRestorationAmountText;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* HealthRestorationAmountValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* AttackPowerValue;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* AttackPower;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* MagicPowerValue;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* MagicPower;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* CriticalHitValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* CriticalHit;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* AttackSpeedValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* AttackSpeed;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* HealthValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* Health;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* StaminaValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* Stamina;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* StrengthValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* Strength;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* DefenseValue;
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* Defense;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* UsageText;
@@ -47,13 +101,10 @@ public:
 	UTextBlock* ItemDescription;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* MaxStackSize;
+		UTextBlock* WeaponStatText;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* SellValue;
-
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* StackWeight;
+		UTextBlock* CharacterStatText;
 
 protected:
 

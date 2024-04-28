@@ -37,8 +37,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 	TSubclassOf<UInventoryToolTip> ToolTipClass;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta= (BindWidget))
-	UBorder* ItemBorder;
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UImage* ItemIcon;

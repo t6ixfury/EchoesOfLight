@@ -34,32 +34,7 @@ void UW_InventorySlot::NativeConstruct()
 
 	if (ItemReference)
 	{
-		//set border of Item slot item based on quality.
-		switch (ItemReference->ItemQuality)
-		{
-		case EItemQuality::Shoddy:
-			ItemBorder->SetBrushColor(FLinearColor::Gray);
-			break;
-
-		case EItemQuality::Common:
-			ItemBorder->SetBrushColor(FLinearColor::Green);
-			break;
-
-		case EItemQuality::Quality:
-			ItemBorder->SetBrushColor(FLinearColor::Blue);
-			break;
-
-		case EItemQuality::Masterwork:
-			ItemBorder->SetBrushColor(FLinearColor(0.5f, 0.0f, 0.5f, 1.0f));//purple
-			break;
-
-		case EItemQuality::GrandMaster:
-			ItemBorder->SetBrushColor(FLinearColor(1.0f, 0.84f, 0.0f, 1.0f));//gold
-			break;
-
-		default:
-			break;
-		}
+		
 		//set Item icon image
 		ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 		
@@ -109,7 +84,6 @@ void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 
 		//set visuals of drag widget.
 		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
-		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
 		DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
 
 		//creates a object out of the dragged Item
