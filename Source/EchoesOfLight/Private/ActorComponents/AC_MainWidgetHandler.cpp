@@ -137,7 +137,7 @@ void UAC_MainWidgetHandler::ShowAlertWidget(FText message, FText Title)
 	UWorld* World = GetWorld();
 	if (AlertWidgetClass && MainCharacterController && World)
 	{
-		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, ExperienceAlertWidgetClass);
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
 		if (Widget)
 		{
 			AlertWidget = Widget;
