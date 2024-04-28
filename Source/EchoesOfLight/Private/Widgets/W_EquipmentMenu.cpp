@@ -174,8 +174,13 @@ void UW_EquipmentMenu::LoadEquipmentSlots()
 				{
 					Amulet_Slot->SlotItemId = LoadData->sAmuletID;
 					Amulet_Slot->CreateItem(Amulet_Slot->AmuletDataTable, Amulet_Slot->SlotItemId);
-					Amulet_Slot->SetIconImage();
-					Amulet_Slot->AmuletChange.Broadcast();
+
+					if (Amulet_Slot->ItemReference)
+					{
+						Amulet_Slot->SetIconImage();
+				
+						Amulet_Slot->AmuletChange.Broadcast();
+					}
 					UE_LOG(LogTemp, Warning, TEXT("AmuletSlot set"));
 				}
 				if (IsValid(Weapon_Slot) && !LoadData->sWeaponID.IsNone() && IsValid(Weapon_Slot->WeaponDataTable))
@@ -183,6 +188,7 @@ void UW_EquipmentMenu::LoadEquipmentSlots()
 					Weapon_Slot->SlotItemId = LoadData->sWeaponID;
 					Weapon_Slot->CreateItem(Weapon_Slot->WeaponDataTable, Weapon_Slot->SlotItemId);
 					Weapon_Slot->SetIconImage();
+					
 					Weapon_Slot->WeaponChange.Broadcast();
 					UE_LOG(LogTemp, Warning, TEXT("weapon slot  set"));
 				}
@@ -191,6 +197,7 @@ void UW_EquipmentMenu::LoadEquipmentSlots()
 					Netherband_Slot->SlotItemId = LoadData->sNetherbandID;
 					Netherband_Slot->CreateItem(Netherband_Slot->NetherBandDataTable, Netherband_Slot->SlotItemId);
 					Netherband_Slot->SetIconImage();
+				
 					Netherband_Slot->NetherBandChange.Broadcast();
 					UE_LOG(LogTemp, Warning, TEXT("NetherSlot set"));
 				}

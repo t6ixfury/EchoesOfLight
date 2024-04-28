@@ -9,7 +9,7 @@
 
 class UW_InventorySlot;
 class UTextBlock;
-
+class UItemBase;
 
 /**
  * 
@@ -27,6 +27,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	UW_InventorySlot* InventorySlotBeingHovered;
+	
+
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ItemName;
@@ -116,5 +118,8 @@ protected:
 public:
 
 	virtual void NativeConstruct() override;
+
+
+
 
 };

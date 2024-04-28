@@ -6,6 +6,10 @@
 #include "Actors/Items/ItemBase.h"
 #include "ActorComponents/AC_Inventory.h"
 #include "Widgets/DragItemVisual.h"
+#include "Character/MainCharacter.h"
+#include "Widgets/W_EquipmentMenu.h"
+#include "ActorComponents/AC_MainWidgetHandler.h"
+#include "Widgets/W_InventoryPanel.h"
 
 //engine
 #include "Components/Image.h"  
@@ -25,7 +29,20 @@ bool UW_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 
 	if (ItemBeingDroppedOnWidget->SourceItem->ItemType == EquipmentType)
 	{
-		ItemReference = ItemBeingDroppedOnWidget->SourceItem;
+		AMainCharacter* PlayerCharacter = Cast<AMainCharacter>(GetOwningPlayerPawn());
+		if (ItemReference && PlayerCharacter)
+		{
+
+			ItemBeingDroppedOnWidget->SourceInventory->HandleAddItem(ItemReference);
+			
+			PlayerCharacter->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->WasEquipmentAddedToInventory(EquipmentType, ItemReference);
+			ItemReference = nullptr;
+		}
+
+		if(ItemReference == nullptr)
+		{
+			ItemReference = ItemBeingDroppedOnWidget->SourceItem;
+		}
 
 		if (ItemReference)
 		{
@@ -37,20 +54,13 @@ bool UW_EquipmentSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 
 			//Remove the now equipped equipment item from inventory.
 			ItemBeingDroppedOnWidget->SourceInventory->RemoveSingleInstanceOfItem(ItemBeingDroppedOnWidget->SourceItem);
-			if (EquipmentIcon)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("equip icon not null"))
-				//set the icon image for the equipment slot and set to visisble.
-				EquipmentIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
-				EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
-				return true;
-			}
+
+			//set the icon image for the equipment slot and set to visisble.
+			EquipmentIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
+			EquipmentIcon->SetVisibility(ESlateVisibility::Visible);
+			return true;
 		}
-
 	}
-
-
-
 	return false;
 }
 
@@ -122,6 +132,12 @@ void UW_EquipmentSlot::NativeOnDragCancelled(const FDragDropEvent& InDragDropEve
 	}
 }
 
+void UW_EquipmentSlot::NativeOnInitialized()
+{
+	Super::NativeOnInitialized();
+	
+}
+
 EItemType  UW_EquipmentSlot::EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef)
 {
 	switch (EquipmentTypeToBeHandled)
@@ -165,18 +181,34 @@ void UW_EquipmentSlot::CreateItem(UDataTable* table, FName DesiredItemId )
 		//get the item info from the data table.
 		const FItemData* ItemDataRow = table->FindRow<FItemData>(DesiredItemId, DesiredItemId.ToString());
 
+		UItemBase* newItem = NewObject<UItemBase>(this, UItemBase::StaticClass());
 		//create a new item
 		ItemReference = NewObject<UItemBase>(this, UItemBase::StaticClass());
 
 		//set the item properties
-		ItemReference->ID = ItemDataRow->ID;
-		ItemReference->ItemType = ItemDataRow->ItemType;
-		ItemReference->ItemQuality = ItemDataRow->ItemQuality;
-		ItemReference->ItemNumericaData = ItemDataRow->ItemNumericaData;
-		ItemReference->ItemTextData = ItemDataRow->ItemTextData;
-		ItemReference->ItemAssetData = ItemDataRow->ItemAssetData;
-		ItemReference->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
-		ItemReference->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
-		ItemReference->SetQuantity(1);
+		newItem->ID = ItemDataRow->ID;
+		newItem->ItemType = ItemDataRow->ItemType;
+		newItem->ItemQuality = ItemDataRow->ItemQuality;
+		newItem->ItemNumericaData = ItemDataRow->ItemNumericaData;
+		newItem->ItemTextData = ItemDataRow->ItemTextData;
+		newItem->ItemAssetData = ItemDataRow->ItemAssetData;
+		newItem->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+		newItem->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+		newItem->SetQuantity(1);
+
+		ItemReference = newItem;
+
+
 	};
+}
+
+
+UItemBase* UW_EquipmentSlot::GetItemReference()
+{
+	if (ItemReference)
+	{
+		return ItemReference;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("EQuipment slot is null"))
+	return nullptr;
 }

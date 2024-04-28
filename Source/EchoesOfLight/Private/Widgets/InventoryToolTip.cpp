@@ -12,7 +12,7 @@
 void UInventoryToolTip::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	if (InventorySlotBeingHovered)
 	{
 		if (const UItemBase* ItemBeingHovered = InventorySlotBeingHovered->GetItemReference())
@@ -185,3 +185,5 @@ void UInventoryToolTip::NativeConstruct()
 	}
 	
 }
+
+
