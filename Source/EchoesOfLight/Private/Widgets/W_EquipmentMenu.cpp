@@ -11,6 +11,10 @@
 #include "Widgets/ItemDragDropOperation.h"
 #include "Save/EchoesGameInstance.h"
 #include "Save/Save_Equipment.h"
+#include "Widgets/W_InventoryPanel.h"
+#include <ActorComponents/AC_Inventory.h>
+#include "Actors/Items/ItemBase.h"
+#include "Structures/Structs.h"
 
 
 //engine
@@ -203,6 +207,111 @@ void UW_EquipmentMenu::LoadEquipmentSlots()
 				}
 			}
 		}
+	}
+}
+
+void UW_EquipmentMenu::RemoveAmulet()
+{
+	if (Amulet_Slot->ItemReference)
+	{
+		FS_DamageInfo AmuletStats;
+
+		AmuletStats.AttackPower = Amulet_Slot->ItemReference->ItemWeaponStatistics.AttackPower;
+		AmuletStats.MagicPower = Amulet_Slot->ItemReference->ItemWeaponStatistics.MagicPower;
+		AmuletStats.CriticalHitRate = Amulet_Slot->ItemReference->ItemWeaponStatistics.CriticalHitRate;
+		AmuletStats.AtttackSpeed = Amulet_Slot->ItemReference->ItemWeaponStatistics.AtttackSpeed;
+
+		MainCharacter->UpdateDualWeaponStats(AmuletStats, false);
+		
+		InventoryWidget->InventoryReference->HandleAddItem(Amulet_Slot->ItemReference);
+
+		Amulet_Slot->ItemReference = nullptr;
+		Amulet_Slot->EquipmentIcon = nullptr;
+		
+	}
+}
+
+void UW_EquipmentMenu::RemoveNetherBand()
+{
+	if (Netherband_Slot->ItemReference)
+	{
+		MainCharacter->DecreaseStats(Netherband_Slot->ItemReference->ItemCharacerStatistics);
+
+		InventoryWidget->InventoryReference->HandleAddItem(Netherband_Slot->ItemReference);
+
+		Netherband_Slot->ItemReference = nullptr;
+		Netherband_Slot->EquipmentIcon = nullptr;
+	}
+}
+
+void UW_EquipmentMenu::RemoveWeapon()
+{
+	if (Weapon_Slot->ItemReference && MainCharacter->LeftHandWeapon)
+	{
+		MainCharacter->UpdateDualWeaponStats(MainCharacter->LeftHandWeapon->BaseAttackInfo, false);
+
+		InventoryWidget->InventoryReference->HandleAddItem(Weapon_Slot->ItemReference);
+
+		MainCharacter->DespawnWeapon();
+
+		MainCharacter->LeftHandWeapon = nullptr;
+		MainCharacter->RightHandWeapon = nullptr;
+	}
+}
+
+void UW_EquipmentMenu::AddAmulet(UItemBase* item)
+{
+	if (item)
+	{
+		FS_DamageInfo AmuletStats;
+
+		AmuletStats.AttackPower = item->ItemWeaponStatistics.AttackPower;
+		AmuletStats.MagicPower = item->ItemWeaponStatistics.MagicPower;
+		AmuletStats.CriticalHitRate = item->ItemWeaponStatistics.CriticalHitRate;
+		AmuletStats.AtttackSpeed = item->ItemWeaponStatistics.AtttackSpeed;
+
+		MainCharacter->UpdateDualWeaponStats(AmuletStats, true);
+
+		InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(item);
+
+		Amulet_Slot->ItemReference = item;
+		Amulet_Slot->SetIconImage();
+	}
+}
+
+void UW_EquipmentMenu::AddNetherBand(UItemBase* item)
+{
+	if (item)
+	{
+		MainCharacter->IncreaseStats(item->ItemCharacerStatistics);
+
+		InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(item);
+
+		Netherband_Slot->ItemReference = item;
+		Netherband_Slot->SetIconImage();
+	}
+}
+
+void UW_EquipmentMenu::AddWeapon(UItemBase* item)
+{
+	if (item && MainCharacter->LeftHandWeapon == nullptr)
+	{
+
+		FS_DamageInfo WeaponStats;
+
+		WeaponStats.AttackPower = item->ItemWeaponStatistics.AttackPower;
+		WeaponStats.MagicPower = item->ItemWeaponStatistics.MagicPower;
+		WeaponStats.CriticalHitRate = item->ItemWeaponStatistics.CriticalHitRate;
+		WeaponStats.AtttackSpeed = item->ItemWeaponStatistics.AtttackSpeed;
+
+		MainCharacter->UpdateDualWeaponStats(WeaponStats, true);
+
+		InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(item);
+
+		Weapon_Slot->ItemReference = item;
+
+		MainCharacter->SpawnWeapon();
+
 	}
 }
 

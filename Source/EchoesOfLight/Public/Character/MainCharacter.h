@@ -296,6 +296,8 @@ public:
 
 	void AmuletUnEquipped();
 
+	void EquipEquipment(UItemBase* item);
+
 	//Update the stats of the dual weapons. True value increases stats and false value decreases stats.
 	void UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats);
 

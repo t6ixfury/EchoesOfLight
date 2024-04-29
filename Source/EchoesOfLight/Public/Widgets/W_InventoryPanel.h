@@ -14,6 +14,7 @@ class UAC_Inventory;
 class UW_InventorySlot;
 enum class EItemType :uint8;
 class UItemBase;
+class UW_ItemMenu;
 
 /**
  * 

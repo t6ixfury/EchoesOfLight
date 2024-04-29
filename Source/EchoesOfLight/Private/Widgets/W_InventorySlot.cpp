@@ -6,6 +6,7 @@
 #include "Widgets/InventoryToolTip.h"
 #include "Widgets/DragItemVisual.h"
 #include "Widgets/ItemDragDropOperation.h"
+#include "Widgets/W_ItemMenu.h"
 
 //engine
 #include "Components/Image.h"
@@ -62,6 +63,25 @@ FReply UW_InventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 	}
 
 	//sub menu on right click happens here.
+	if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		UW_ItemMenu* ItemMenu = CreateWidget<UW_ItemMenu>(this, RightClickMenuClass);
+		if (ItemMenu)
+		{
+			ItemMenu->item = ItemReference;
+
+			// Set the position of the menu at the mouse cursor
+			const FVector2D CursorPos = InMouseEvent.GetLastScreenSpacePosition();
+			ItemMenu->SetPositionInViewport(CursorPos, true);
+
+			// Add the widget to the viewport if needed
+			ItemMenu->AddToViewport(15);
+
+			ItemMenu->SetFocus();
+
+			return FReply::Handled();
+		}
+	}
 	
 	return Reply.Unhandled();
 

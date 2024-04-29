@@ -14,6 +14,8 @@ class UInventoryToolTip;
 class UImage;
 class UBorder;
 class UTextBlock;
+class UW_ItemMenu;
+
 
 /**
  * 
@@ -36,6 +38,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 	TSubclassOf<UInventoryToolTip> ToolTipClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
+		TSubclassOf<UW_ItemMenu> RightClickMenuClass;
 
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))

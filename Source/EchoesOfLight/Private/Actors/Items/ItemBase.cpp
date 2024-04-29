@@ -3,6 +3,12 @@
 
 #include "Actors/Items/ItemBase.h"
 #include "ActorComponents/AC_Inventory.h"
+#include "ActorComponents/AC_MainWidgetHandler.h"
+#include "Widgets/W_EquipmentMenu.h"
+#include "Widgets/W_EquipmentSlot.h"
+#include "Character/MainCharacter.h"
+#include "ActorComponents/AC_DamageSystem.h"
+#include "Widgets/W_InventoryPanel.h"
 
 UItemBase::UItemBase() : bIsCopy(false), bIsPickup(false)
 {
@@ -54,7 +60,41 @@ void UItemBase::SetQuantity(const int32 NewQuantity)
 
 void UItemBase::Use(AMainCharacter* Character)
 {
-	//implement later
+	if (Character)
+	{
+		switch (ItemType)
+		{
+		case EItemType::Amulet:
+			
+			break;
+
+		case EItemType::Weapon:
+
+			
+			break;
+
+		case EItemType::Netherband:
+
+			break;
+
+		case EItemType::Spell:
+			break;
+
+		case EItemType::Consumable:
+
+			Character->DamageSystem->Heal(ItemStatistics.HealthRestorationAmount);
+			Character->CurrentStamina = FMath::Clamp((Character->CurrentStamina + ItemStatistics.StaminaRestorationAmount), 0, Character->Stamina);
+			Character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(this);
+			break;
+
+		case EItemType::Quest:
+			break;
+
+		case EItemType::Mudane:
+
+			break;
+		}
+	}
 }
 
 

@@ -456,6 +456,50 @@ void AMainCharacter::AmuletUnEquipped()
 	}
 }
 
+void AMainCharacter::EquipEquipment(UItemBase* item)
+{
+	if (item)
+	{
+		switch (item->ItemType)
+		{
+		case EItemType::Amulet:
+			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->RemoveAmulet();
+			}
+			else
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->AddAmulet(item);
+			}
+				break;
+		case EItemType::Weapon:
+			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->RemoveWeapon();
+			}
+			else
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->AddWeapon(item);
+			}
+			break;
+		case EItemType::Netherband:
+
+			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Netherband_Slot->ItemReference)
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->RemoveNetherBand();
+			}
+			else
+			{
+				MainWidgetHandlerComponent->EquipmentMenuWidget->AddNetherBand(item);
+			}
+			break;
+		
+		default:
+			break;
+		}
+	}
+}
+
 void AMainCharacter::UpdateDualWeaponStats(FS_DamageInfo stats, bool AddToStats)
 {
 	if (LeftHandWeapon && RightHandWeapon)
