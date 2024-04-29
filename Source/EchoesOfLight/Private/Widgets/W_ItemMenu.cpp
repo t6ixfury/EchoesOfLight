@@ -18,8 +18,12 @@ void UW_ItemMenu::NativeOnInitialized()
 	bIsFocusable = true;
 
 	UseButton->OnClicked.AddDynamic(this, &UW_ItemMenu::UseItem);
-	EquipButton->OnClicked.AddDynamic(this, &UW_ItemMenu::UseItem);
-	DeleteButton->OnClicked.AddDynamic(this, &UW_ItemMenu::UseItem);
+	EquipButton->OnClicked.AddDynamic(this, &UW_ItemMenu::Equip);
+	DeleteButton->OnClicked.AddDynamic(this, &UW_ItemMenu::Delete);
+
+	EquipButton->SetVisibility(ESlateVisibility::Collapsed);
+	EquipButtonText->SetVisibility(ESlateVisibility::Collapsed);
+	
 }
 
 void UW_ItemMenu::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -34,6 +38,9 @@ void UW_ItemMenu::UseItem()
 	if (item && character)
 	{
 		item->Use(character);
+		UE_LOG(LogTemp, Warning, TEXT("UseItem Called"))
+
+
 	}
 
 }
@@ -44,6 +51,8 @@ void UW_ItemMenu::Equip()
 	if (item && character)
 	{
 		character->EquipEquipment(item);
+		character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->RefreshInventory();
+		UE_LOG(LogTemp, Warning, TEXT("Equip Called"))
 	}
 }
 
@@ -54,10 +63,14 @@ void UW_ItemMenu::Delete()
 		if (item->ItemNumericaData.bisStackable)
 		{
 			character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->InventoryReference->RemoveAmountOfItem(item, item->ItemNumericaData.MaxStackSize);
+			character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->RefreshInventory();
+			UE_LOG(LogTemp, Warning, TEXT("delete Called amount specified"))
 		}
 		else 
 		{
 			character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(item);
+			character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->RefreshInventory();
+			UE_LOG(LogTemp, Warning, TEXT("delete Called single instance"))
 		}
 		
 	}

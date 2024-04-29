@@ -239,6 +239,7 @@ void UW_EquipmentMenu::RemoveNetherBand()
 
 		InventoryWidget->InventoryReference->HandleAddItem(Netherband_Slot->ItemReference);
 
+
 		Netherband_Slot->ItemReference = nullptr;
 		Netherband_Slot->EquipmentIcon = nullptr;
 	}
@@ -307,8 +308,9 @@ void UW_EquipmentMenu::AddWeapon(UItemBase* item)
 		MainCharacter->UpdateDualWeaponStats(WeaponStats, true);
 
 		InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(item);
-
 		Weapon_Slot->ItemReference = item;
+
+		Weapon_Slot->SetIconImage();
 
 		MainCharacter->SpawnWeapon();
 

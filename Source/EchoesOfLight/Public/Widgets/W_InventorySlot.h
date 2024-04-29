@@ -49,6 +49,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory Slot", meta = (BindWidget))
 	UTextBlock* ItemQuantity;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
+	UW_ItemMenu* ItemMenu;
+
+
 
 
 
@@ -72,6 +76,7 @@ public:
 	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
 
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime)  override;
 
 
 

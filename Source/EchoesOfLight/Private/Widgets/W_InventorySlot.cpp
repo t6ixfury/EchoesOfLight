@@ -12,6 +12,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Border.h"
+#include "Components/Button.h"
 
 
 
@@ -26,6 +27,7 @@ void UW_InventorySlot::NativeOnInitialized()
 		ToolTip->InventorySlotBeingHovered = this;
 
 		SetToolTip(ToolTip);
+		
 	};
 }
 
@@ -65,10 +67,30 @@ FReply UW_InventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 	//sub menu on right click happens here.
 	if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
-		UW_ItemMenu* ItemMenu = CreateWidget<UW_ItemMenu>(this, RightClickMenuClass);
 		if (ItemMenu)
 		{
+			ItemMenu->RemoveFromViewport();
+
+			ItemMenu = nullptr;
+		}
+
+		ItemMenu = CreateWidget<UW_ItemMenu>(this, RightClickMenuClass);
+
+		if (ItemMenu)
+		{
+			if (GetToolTip())
+			{
+				GetToolTip()->SetVisibility(ESlateVisibility::Collapsed);
+			}
+
+
 			ItemMenu->item = ItemReference;
+
+			if (ItemReference->ItemType != EItemType::Consumable )
+			{
+				ItemMenu->UseButton->SetVisibility(ESlateVisibility::Collapsed);
+				ItemMenu->UseButtonText->SetVisibility(ESlateVisibility::Collapsed);
+			}
 
 			// Set the position of the menu at the mouse cursor
 			const FVector2D CursorPos = InMouseEvent.GetLastScreenSpacePosition();
@@ -91,6 +113,11 @@ FReply UW_InventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 void UW_InventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
+
+	if (GetToolTip())
+	{
+		GetToolTip()->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -123,6 +150,12 @@ void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 		OutOperation = DragItemOperation;
 
 	}
+}
+
+void UW_InventorySlot::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
 }
 
 bool UW_InventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)

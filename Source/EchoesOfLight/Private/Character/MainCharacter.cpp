@@ -466,10 +466,12 @@ void AMainCharacter::EquipEquipment(UItemBase* item)
 			if (MainWidgetHandlerComponent->EquipmentMenuWidget->Amulet_Slot->ItemReference)
 			{
 				MainWidgetHandlerComponent->EquipmentMenuWidget->RemoveAmulet();
+				
 			}
 			else
 			{
 				MainWidgetHandlerComponent->EquipmentMenuWidget->AddAmulet(item);
+
 			}
 				break;
 		case EItemType::Weapon:
