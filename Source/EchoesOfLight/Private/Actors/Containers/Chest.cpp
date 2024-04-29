@@ -153,6 +153,7 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
 			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
 			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+			ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
 
 			//set the desired quantity based off the passed in data.
 			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
@@ -180,7 +181,7 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
 			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
 			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
-
+			ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
 			//set the desired quantity based off the passed in data.
 			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
 
@@ -207,6 +208,7 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
 				ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
 				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+				ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
 
 				//set the desired quantity based off the passed in data.
 				ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
@@ -236,6 +238,8 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
 			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
 			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+			ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
+
 
 			//set the desired quantity based off the passed in data.
 			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
@@ -263,6 +267,7 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
 			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
 			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+			ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
 
 			//set the desired quantity based off the passed in data.
 			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);

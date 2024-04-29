@@ -11,6 +11,7 @@ class ABase_Sword;
 class UItemBase;
 class UDragItemVisual;
 enum class EItemType:uint8;
+class UInventoryToolTip;
 
 
 
@@ -50,12 +51,17 @@ public:
 		UDataTable* NetherBandDataTable;
 
 	UPROPERTY(EditAnywhere)
-		UItemBase* ItemReference = nullptr;
-
+		UItemBase* ItemReference;
+	
+	UPROPERTY()
 	FName SlotItemId;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Inventory Slot")
 		TSubclassOf<UDragItemVisual> DragItemVisualClass;
+
+
+	UPROPERTY(EditAnywhere, Category = "Equipment Slot")
+		UInventoryToolTip* ToolTip;
 
 	FWeaponEquippedDelegate WeaponChange;
 
@@ -74,12 +80,19 @@ public:
 
 	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
+	virtual void NativeOnInitialized() override;
+
 	//Handles Logic for when an equipment item is added to it perspective spot and calls the correct delegate.
 	EItemType EventItemEquipped(EItemType EquipmentTypeToBeHandled, UItemBase* ItemRef);
 
 	void SetIconImage();
 
 	void CreateItem(UDataTable* table, FName DesiredItemId);
+
+	UItemBase* GetItemReference();
+
+
+
 
 
 	

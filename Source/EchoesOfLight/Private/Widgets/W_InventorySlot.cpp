@@ -6,11 +6,13 @@
 #include "Widgets/InventoryToolTip.h"
 #include "Widgets/DragItemVisual.h"
 #include "Widgets/ItemDragDropOperation.h"
+#include "Widgets/W_ItemMenu.h"
 
 //engine
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Components/Border.h"
+#include "Components/Button.h"
 
 
 
@@ -25,6 +27,7 @@ void UW_InventorySlot::NativeOnInitialized()
 		ToolTip->InventorySlotBeingHovered = this;
 
 		SetToolTip(ToolTip);
+		
 	};
 }
 
@@ -34,32 +37,7 @@ void UW_InventorySlot::NativeConstruct()
 
 	if (ItemReference)
 	{
-		//set border of Item slot item based on quality.
-		switch (ItemReference->ItemQuality)
-		{
-		case EItemQuality::Shoddy:
-			ItemBorder->SetBrushColor(FLinearColor::Gray);
-			break;
-
-		case EItemQuality::Common:
-			ItemBorder->SetBrushColor(FLinearColor::Green);
-			break;
-
-		case EItemQuality::Quality:
-			ItemBorder->SetBrushColor(FLinearColor::Blue);
-			break;
-
-		case EItemQuality::Masterwork:
-			ItemBorder->SetBrushColor(FLinearColor(0.5f, 0.0f, 0.5f, 1.0f));//purple
-			break;
-
-		case EItemQuality::GrandMaster:
-			ItemBorder->SetBrushColor(FLinearColor(1.0f, 0.84f, 0.0f, 1.0f));//gold
-			break;
-
-		default:
-			break;
-		}
+		
 		//set Item icon image
 		ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
 		
@@ -87,6 +65,45 @@ FReply UW_InventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 	}
 
 	//sub menu on right click happens here.
+	if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		if (ItemMenu)
+		{
+			ItemMenu->RemoveFromViewport();
+
+			ItemMenu = nullptr;
+		}
+
+		ItemMenu = CreateWidget<UW_ItemMenu>(this, RightClickMenuClass);
+
+		if (ItemMenu)
+		{
+			if (GetToolTip())
+			{
+				GetToolTip()->SetVisibility(ESlateVisibility::Collapsed);
+			}
+
+
+			ItemMenu->item = ItemReference;
+
+			if (ItemReference->ItemType != EItemType::Consumable )
+			{
+				ItemMenu->UseButton->SetVisibility(ESlateVisibility::Collapsed);
+				ItemMenu->UseButtonText->SetVisibility(ESlateVisibility::Collapsed);
+			}
+
+			// Set the position of the menu at the mouse cursor
+			const FVector2D CursorPos = InMouseEvent.GetLastScreenSpacePosition();
+			ItemMenu->SetPositionInViewport(CursorPos, true);
+
+			// Add the widget to the viewport if needed
+			ItemMenu->AddToViewport(15);
+
+			ItemMenu->SetFocus();
+
+			return FReply::Handled();
+		}
+	}
 	
 	return Reply.Unhandled();
 
@@ -96,6 +113,11 @@ FReply UW_InventorySlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
 void UW_InventorySlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
+
+	if (GetToolTip())
+	{
+		GetToolTip()->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -109,7 +131,6 @@ void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 
 		//set visuals of drag widget.
 		DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->ItemAssetData.Icon);
-		DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
 		DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
 
 		//creates a object out of the dragged Item
@@ -129,6 +150,12 @@ void UW_InventorySlot::NativeOnDragDetected(const FGeometry& InGeometry, const F
 		OutOperation = DragItemOperation;
 
 	}
+}
+
+void UW_InventorySlot::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
 }
 
 bool UW_InventorySlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)

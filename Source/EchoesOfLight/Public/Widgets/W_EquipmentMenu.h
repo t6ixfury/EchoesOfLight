@@ -12,6 +12,7 @@ class UW_InventoryPanel;
 class UW_EquipmentSlot;
 class UW_StatBox;
 class AMainCharacter;
+class UItemBase;
 /**
  * 
  */
@@ -97,6 +98,18 @@ public:
 	void SaveEquipment();
 
 	void LoadEquipmentSlots();
+	
+	void RemoveAmulet();
+
+	void RemoveNetherBand();
+
+	void RemoveWeapon();
+
+	void AddAmulet(UItemBase* item);
+
+	void AddNetherBand(UItemBase* item);
+
+	void AddWeapon(UItemBase* item);
 	
 	
 	

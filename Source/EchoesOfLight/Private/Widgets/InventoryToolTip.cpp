@@ -12,7 +12,7 @@
 void UInventoryToolTip::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	if (InventorySlotBeingHovered)
 	{
 		if (const UItemBase* ItemBeingHovered = InventorySlotBeingHovered->GetItemReference())
@@ -21,12 +21,99 @@ void UInventoryToolTip::NativeConstruct()
 			switch (ItemBeingHovered->ItemType)
 			{
 			case EItemType::Amulet:
+				ItemType->SetText(FText::FromString("Amulet"));
+				CharacterStatText->SetVisibility(ESlateVisibility::Collapsed);
+
+
+				AttackPower->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.AttackPower));
+				CriticalHit->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.CriticalHitRate));
+				MagicPower->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.MagicPower));
+				AttackSpeed->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.AtttackSpeed));
+
+
+				//Remove Character stats visibility
+				HealthValue->SetVisibility(ESlateVisibility::Collapsed);
+				StrengthValue->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaValue->SetVisibility(ESlateVisibility::Collapsed);
+				DefenseValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				Health->SetVisibility(ESlateVisibility::Collapsed);
+				Defense->SetVisibility(ESlateVisibility::Collapsed);
+				Stamina->SetVisibility(ESlateVisibility::Collapsed);
+				Strength->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove stamina
+				StaminaRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove health
+				HealthRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				HealthRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
+
+
 				break;
 
 			case EItemType::Weapon:
+
+				ItemType->SetText(FText::FromString("Weapon"));
+
+
+				AttackPower->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.AttackPower));
+				CriticalHit->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.CriticalHitRate));
+				MagicPower->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.MagicPower));
+				AttackSpeed->SetText(FText::AsNumber(ItemBeingHovered->ItemWeaponStatistics.AtttackSpeed));
+
+				CharacterStatText->SetVisibility(ESlateVisibility::Collapsed);
+
+				//Remove Character stats visibility
+				HealthValue->SetVisibility(ESlateVisibility::Collapsed);
+				StrengthValue->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaValue->SetVisibility(ESlateVisibility::Collapsed);
+				DefenseValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				Health->SetVisibility(ESlateVisibility::Collapsed);
+				Defense->SetVisibility(ESlateVisibility::Collapsed);
+				Stamina->SetVisibility(ESlateVisibility::Collapsed);
+				Strength->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove stamina
+				StaminaRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove health
+				HealthRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				HealthRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
 				break;
 
 			case EItemType::Netherband:
+
+
+				Health->SetText(FText::AsNumber(ItemBeingHovered->ItemCharacerStatistics.Health));
+				Defense->SetText(FText::AsNumber(ItemBeingHovered->ItemCharacerStatistics.Defense));
+				Stamina->SetText(FText::AsNumber(ItemBeingHovered->ItemCharacerStatistics.Stamina));
+				Strength->SetText(FText::AsNumber(ItemBeingHovered->ItemCharacerStatistics.Strength));
+
+				WeaponStatText->SetVisibility(ESlateVisibility::Collapsed);
+
+				//Remove WeaponStats visibility
+				AttackPowerValue->SetVisibility(ESlateVisibility::Collapsed);
+				CriticalHitValue->SetVisibility(ESlateVisibility::Collapsed);
+				MagicPowerValue->SetVisibility(ESlateVisibility::Collapsed);
+				AttackSpeedValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				AttackPower->SetVisibility(ESlateVisibility::Collapsed);
+				CriticalHit->SetVisibility(ESlateVisibility::Collapsed);
+				MagicPower->SetVisibility(ESlateVisibility::Collapsed);
+				AttackSpeed->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove stamina
+				StaminaRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove health
+				HealthRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				HealthRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
+
 				break;
 
 			case EItemType::Spell:
@@ -34,9 +121,39 @@ void UInventoryToolTip::NativeConstruct()
 
 			case EItemType::Consumable:
 				ItemType->SetText(FText::FromString("Consumable"));
-				DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-				ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
-				SellValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				StaminaRestorationAmountValue->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.StaminaRestorationAmount));
+				HealthRestorationAmountValue->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.HealthRestorationAmount));
+
+
+				WeaponStatText->SetVisibility(ESlateVisibility::Collapsed);
+
+				//Remove WeaponStats visibility
+				AttackPowerValue->SetVisibility(ESlateVisibility::Collapsed);
+				CriticalHitValue->SetVisibility(ESlateVisibility::Collapsed);
+				MagicPowerValue->SetVisibility(ESlateVisibility::Collapsed);
+				AttackSpeedValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				AttackPower->SetVisibility(ESlateVisibility::Collapsed);
+				CriticalHit->SetVisibility(ESlateVisibility::Collapsed);
+				MagicPower->SetVisibility(ESlateVisibility::Collapsed);
+				AttackSpeed->SetVisibility(ESlateVisibility::Collapsed);
+
+				CharacterStatText->SetVisibility(ESlateVisibility::Collapsed);
+
+				//Remove Character stats visibility
+				HealthValue->SetVisibility(ESlateVisibility::Collapsed);
+				StrengthValue->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaValue->SetVisibility(ESlateVisibility::Collapsed);
+				DefenseValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				Health->SetVisibility(ESlateVisibility::Collapsed);
+				Defense->SetVisibility(ESlateVisibility::Collapsed);
+				Stamina->SetVisibility(ESlateVisibility::Collapsed);
+				Strength->SetVisibility(ESlateVisibility::Collapsed);
+
+
+
 				break;
 
 			case EItemType::Quest:
@@ -44,10 +161,14 @@ void UInventoryToolTip::NativeConstruct()
 
 			case EItemType::Mudane:
 				ItemType->SetText(FText::FromString("Mundane Item"));
-				DamageValue->SetVisibility(ESlateVisibility::Collapsed);
-				ArmorRating->SetVisibility(ESlateVisibility::Collapsed);
-				UsageText->SetVisibility(ESlateVisibility::Collapsed);
-				SellValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove stamina
+				StaminaRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				StaminaRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
+
+				//remove health
+				HealthRestorationAmountText->SetVisibility(ESlateVisibility::Collapsed);
+				HealthRestorationAmountValue->SetVisibility(ESlateVisibility::Collapsed);
 				break;
 
 			default:
@@ -56,25 +177,13 @@ void UInventoryToolTip::NativeConstruct()
 
 			//set all fields with item data.
 			ItemName->SetText(ItemBeingHovered->ItemTextData.Name);
-			DamageValue->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.DamageValue));
-			ArmorRating->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.ArmorRating));
 			UsageText->SetText(ItemBeingHovered->ItemTextData.UsageText);
 			ItemDescription->SetText(ItemBeingHovered->ItemTextData.Description);
-			StackWeight->SetText(FText::AsNumber(ItemBeingHovered->GetItemSingleWeight()));
-			SellValue->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.SellValue));
-
-
-			if (ItemBeingHovered->ItemNumericaData.bisStackable)
-			{
-				MaxStackSize->SetText(FText::AsNumber(ItemBeingHovered->ItemNumericaData.MaxStackSize));
-			}
-			else
-			{
-				MaxStackSize->SetVisibility(ESlateVisibility::Collapsed);
-			}
 
 
 		}
 	}
 	
 }
+
+
