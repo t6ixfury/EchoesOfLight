@@ -84,7 +84,16 @@ void UItemBase::Use(AMainCharacter* Character)
 
 			Character->DamageSystem->Heal(ItemStatistics.HealthRestorationAmount);
 			Character->CurrentStamina = FMath::Clamp((Character->CurrentStamina + ItemStatistics.StaminaRestorationAmount), 0, Character->Stamina);
-			Character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(this);
+			Character->UpdateAllWidgets();
+			if (Quantity > 1)
+			{
+				Character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->InventoryReference->RemoveAmountOfItem(this, Quantity-1);
+			}
+			else
+			{
+				Character->MainWidgetHandlerComponent->EquipmentMenuWidget->InventoryWidget->InventoryReference->RemoveSingleInstanceOfItem(this);
+			}
+			
 			break;
 
 		case EItemType::Quest:

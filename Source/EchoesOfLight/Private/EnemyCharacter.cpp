@@ -29,12 +29,6 @@ AEnemyCharacter::AEnemyCharacter()
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 	CurrentDamageState = E_EnemyDamageStates::ApplyDamage;
 
-	BaseAttackInfo.Damage = NormalAttackDamage;
-	BaseAttackInfo.bCanBeBlocked = true;
-	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
-	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
-	BaseAttackInfo.Experience = 100.0f;
-
 
 }
 
@@ -44,6 +38,12 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (DamageSystem)
 	{
+		UpdateStats();
+
+		DamageSystem->MaxHealth = DamageSystem->MaxHealth * (static_cast<float>(level) * 2.0f);
+
+		DamageSystem->Health = DamageSystem->MaxHealth;
+
 		if (DeathMontage)
 		{
 			DamageSystem->On_Death.AddDynamic(this, &AEnemyCharacter::SetDeath);
@@ -257,4 +257,14 @@ void AEnemyCharacter::SetEnemyWidgets()
 		}
 	}
 	
+}
+
+void AEnemyCharacter::UpdateStats()
+{
+	BaseAttackInfo.Damage = NormalAttackDamage * (static_cast<float>(level) * 2);
+	BaseAttackInfo.bCanBeBlocked = true;
+	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
+	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
+	BaseAttackInfo.Experience = 100.0f;
+	BaseAttackInfo.Experience = BaseAttackInfo.Experience * (static_cast<float>(level) * 2.1f);
 }

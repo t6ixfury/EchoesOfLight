@@ -75,6 +75,8 @@ void ADungeonRoom::SpawnAllEnemies()
 					//check is spawn was successful and if so add it to the array and increment Numbers of enemies spawned;
 					if (Enemy)
 					{
+						Enemy->level = EnemyLevels;
+						Enemy->UpdateStats();
 						EnemiesSpawned.Add(Enemy);
 						NumberOfEnemiesSpawned += 1;
 						OnEnemySpawned.Broadcast(Enemy);

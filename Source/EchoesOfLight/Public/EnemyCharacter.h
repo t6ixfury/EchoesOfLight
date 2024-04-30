@@ -67,8 +67,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* BaseAttack;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
 		FS_DamageInfo BaseAttackInfo;
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+		int32 level = 1;
 
 	//animation checks
 
@@ -132,6 +136,7 @@ public:
 	
 		virtual void SetMovementSpeed(float NewMaxSpeed) override;
 
+		void UpdateStats();
 
 protected:
 
@@ -154,6 +159,8 @@ protected:
 	void CanPlayHitReactMontage();
 
 	void SetEnemyWidgets();
+
+
 
 
 };

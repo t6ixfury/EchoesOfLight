@@ -130,6 +130,7 @@ void AMainCharacter::BeginPlay()
 	if (UEchoesGameInstance* instance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
 	{
 		LoadAll();
+		UpdateAllWidgets();
 	}
 }
 
@@ -330,6 +331,10 @@ void AMainCharacter::SpawnWeapon()
 
 			if (RightHandWeapon && LeftHandWeapon)
 			{
+
+				LeftHandWeapon->BaseAttackInfo.Damage = LeftHandWeapon->BaseAttackInfo.Damage * (ExperienceSystem->CurrentLevel + LeftHandWeapon->BaseAttackInfo.AttackPower);
+				RightHandWeapon->BaseAttackInfo.Damage = RightHandWeapon->BaseAttackInfo.Damage * (ExperienceSystem->CurrentLevel + RightHandWeapon->BaseAttackInfo.AttackPower);
+
 				// Attach the weapon to the socket
 				RightHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandWeaponSlotName);
 				LeftHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, leftHandWeaponSlotName);
@@ -587,6 +592,18 @@ void AMainCharacter::OnLevelUp(int32 NewLevel)
 {
 	if (MainWidgetHandlerComponent)
 	{
+
+		DamageSystem->MaxHealth = DamageSystem->MaxHealth * static_cast<float>(MainCharacterStats.Constitution);
+
+		DamageSystem->Health = DamageSystem->MaxHealth;
+
+		Stamina = Stamina * static_cast<float>(MainCharacterStats.Stamina);
+
+		CurrentStamina = Stamina;
+
+		DamageSystem->DamageResistance = DamageSystem->DamageResistance * static_cast<float>(MainCharacterStats.DefensePower);
+
+
 		FString ExpMessage = FString::Printf(TEXT("%d"), NewLevel);
 		MainWidgetHandlerComponent->ShowLevelAlertWidget(FText::FromString(ExpMessage));
 		UpdateAllWidgets();

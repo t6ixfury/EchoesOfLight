@@ -59,7 +59,7 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 	{
 	case E_Damage_State::DoDamage:
 	{
-		float newHealth = SetHealth(DamageInfo.Damage);
+		float newHealth = SetHealth(DamageInfo.Damage - DamageResistance);
 
 		if (newHealth <= 0)
 		{
@@ -124,6 +124,8 @@ E_Damage_State UAC_DamageSystem::CanBeDamaged(bool shouldDamageInvincible, bool 
 float UAC_DamageSystem::SetHealth(float amount)
 {
 	Health = FMath::Clamp((Health - amount), 0, MaxHealth);
+
+	UE_LOG(LogTemp, Warning, TEXT("Damage Amount: %f"), amount);
 
 	return Health;
 }

@@ -42,6 +42,9 @@ public:
 		bool bCanBeParried;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float DamageResistance = 1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		 E_Damage_State DamageState;
 
 

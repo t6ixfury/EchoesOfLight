@@ -30,7 +30,8 @@ public:
 		int32 MaxStatValue = 99;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		float Damage = 0;
+		float Damage = 1;
+
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		float Experience = 0;
