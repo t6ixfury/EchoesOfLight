@@ -11,6 +11,8 @@
 #include "Widgets/W_DialogueBox.h"
 #include "Widgets/W_DialogueGui.h"
 #include "EnhancedInputComponent.h" 
+#include "Actors/Items/ItemBase.h"
+#include "ActorComponents/AC_Inventory.h"
 
 
 
@@ -87,6 +89,129 @@ void AVillager::EndInteract()
 
 		}
 	}
+
+	if (!ItemName.IsNone())
+	{
+		switch (Itemtype)
+		{
+		case EItemType::Amulet:
+
+			if (ItemAmuletDataTable)
+			{
+				//get the item info from the data table.
+				const FItemData* ItemDataRow = ItemAmuletDataTable->FindRow<FItemData>(ItemName, ItemName.ToString());
+
+				//create a new item
+				UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+				//set the item properties
+				ItemToAdd->ID = ItemDataRow->ID;
+				ItemToAdd->ItemType = ItemDataRow->ItemType;
+				ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+				ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+				ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+				ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+				ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
+
+				//set the desired quantity based off the passed in data.
+				ItemToAdd->SetQuantity(ItemQuantity);
+
+				CharacterRef->PlayerInventory->HandleAddItem(ItemToAdd);
+			}
+			break;
+		case EItemType::Weapon:
+
+			if (ItemWeaponDataTable)
+			{
+				//get the item info from the data table.
+				const FItemData* ItemDataRow = ItemWeaponDataTable->FindRow<FItemData>(ItemName, ItemName.ToString());
+
+				//create a new item
+				UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+				//set the item properties
+				ItemToAdd->ID = ItemDataRow->ID;
+				ItemToAdd->ItemType = ItemDataRow->ItemType;
+				ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+				ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+				ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+				ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+				ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
+
+				//set the desired quantity based off the passed in data.
+				ItemToAdd->SetQuantity(ItemQuantity);
+
+				CharacterRef->PlayerInventory->HandleAddItem(ItemToAdd);
+			}
+
+			break;
+		case EItemType::Netherband:
+
+			if (ItemNetherbandDataTable)
+			{
+				//get the item info from the data table.
+				const FItemData* ItemDataRow = ItemNetherbandDataTable->FindRow<FItemData>(ItemName, ItemName.ToString());
+
+				//create a new item
+				UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+				//set the item properties
+				ItemToAdd->ID = ItemDataRow->ID;
+				ItemToAdd->ItemType = ItemDataRow->ItemType;
+				ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+				ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+				ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+				ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+				ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
+
+				//set the desired quantity based off the passed in data.
+				ItemToAdd->SetQuantity(ItemQuantity);
+
+				CharacterRef->PlayerInventory->HandleAddItem(ItemToAdd);
+			}
+
+			break;
+		case EItemType::Consumable:
+
+			if (ItemConsumbableDataTable)
+			{
+				//get the item info from the data table.
+				const FItemData* ItemDataRow = ItemConsumbableDataTable->FindRow<FItemData>(ItemName, ItemName.ToString());
+
+				//create a new item
+				UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+				//set the item properties
+				ItemToAdd->ID = ItemDataRow->ID;
+				ItemToAdd->ItemType = ItemDataRow->ItemType;
+				ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+				ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+				ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+				ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+				ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+				ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+				ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
+
+				//set the desired quantity based off the passed in data.
+				ItemToAdd->SetQuantity(ItemQuantity);
+
+				CharacterRef->PlayerInventory->HandleAddItem(ItemToAdd);
+			}
+			break;
+		
+		 default:
+			break;
+		}
+
+		CharacterRef->SaveAll();
+	}
+
 }
 
 void AVillager::Interact(AMainCharacter* PlayerCharacter)

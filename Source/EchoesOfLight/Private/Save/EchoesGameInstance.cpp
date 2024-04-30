@@ -91,10 +91,10 @@ void UEchoesGameInstance::SetTownAndDungeonNames()
 	DungeonLevels.Add(FName("Dungeon_3"));
 	DungeonLevels.Add(FName("Dungeon_4"));
 	DungeonLevels.Add(FName("Dungeon_5"));
-	DungeonLevels.Add(FName("Dungeon_6"));
-	DungeonLevels.Add(FName("Dungeon_7"));
-	DungeonLevels.Add(FName("Dungeon_8"));
-	DungeonLevels.Add(FName("Dungeon_9"));
+	DungeonLevels.Add(FName("Dungeon_06"));
+	DungeonLevels.Add(FName("Dungeon_07"));
+	DungeonLevels.Add(FName("Dungeon_08"));
+	DungeonLevels.Add(FName("Dungeon_09"));
 	DungeonLevels.Add(FName("Dungeon_10"));
 
 }

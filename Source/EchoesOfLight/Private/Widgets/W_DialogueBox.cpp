@@ -23,19 +23,20 @@ FReply UW_DialogueBox::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEv
 
 void UW_DialogueBox::GoToTheNextDialogueSentence()
 {
-	if (sentences.Num() > SentencesIndex + 1 )
-	{
-		SentencesIndex += 1;
-		SetDialogueText(sentences[SentencesIndex]);
-		UE_LOG(LogTemp, Warning, TEXT("nextdialogue"))
-
-	}
-	if ((sentences.Num() - 1 == SentencesIndex + 1) && (sentences.Num() == SentencesIndex + 2))
-	{
-		bHasDialogueText = false;
-		SentencesIndex = 0;
-		sentences.Empty();
-	}
+    if (SentencesIndex < sentences.Num() - 1)
+    {
+        SentencesIndex++;
+        SetDialogueText(sentences[SentencesIndex]);
+        UE_LOG(LogTemp, Warning, TEXT("Displaying next dialogue: %s"), *sentences[SentencesIndex]);
+    }
+    else
+    {
+        // We've reached the last sentence, so handle the end of dialogue
+        bHasDialogueText = false;
+        SentencesIndex = 0;
+        sentences.Empty();
+        UE_LOG(LogTemp, Warning, TEXT("Dialogue ended."));
+    }
 }
 
 
