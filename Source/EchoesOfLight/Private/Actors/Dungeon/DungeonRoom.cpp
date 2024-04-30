@@ -91,23 +91,51 @@ FVector ADungeonRoom::FindSpawnPoint()
 	if (SpawnArea)
 	{
 		FVector BoxExtent = SpawnArea->GetScaledBoxExtent();
-
 		FVector BoxCenter = SpawnArea->GetComponentLocation();
+		FVector SpawnPoint;
 
-		FVector SpawnPoint = FVector(
-			FMath::RandRange(-BoxExtent.X, BoxExtent.X),
-			FMath::RandRange(-BoxExtent.Y, BoxExtent.Y),
-			FMath::RandRange(-BoxExtent.Z, BoxExtent.Z)
-		);
+		// Define the collision parameters
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this); // Optionally ignore this actor in collision check
 
-		SpawnPoint += BoxCenter;
+		FCollisionShape MyColSphere = FCollisionShape::MakeSphere(50.0f); // Adjust size as necessary for the character
 
-		return SpawnPoint;
+		bool bFoundSpawnPoint = false;
+		const int MaxAttempts = 10; // Maximum number of attempts to find a spawn location
+
+		for (int Attempt = 0; Attempt < MaxAttempts; ++Attempt)
+		{
+			// Generate a random spawn point
+			SpawnPoint = FVector(
+				FMath::RandRange(-BoxExtent.X, BoxExtent.X),
+				FMath::RandRange(-BoxExtent.Y, BoxExtent.Y),
+				FMath::RandRange(-BoxExtent.Z, BoxExtent.Z)
+			) + BoxCenter;
+
+			FHitResult Hit; // This will store the result of the collision check
+			if (!GetWorld()->SweepSingleByChannel(
+				Hit,
+				SpawnPoint,
+				SpawnPoint + FVector(0.1f, 0.1f, 0.1f), // Small move to ensure we are doing a sweep
+				FQuat::Identity,
+				ECC_GameTraceChannel1, // The collision channel to check against, change as needed
+				MyColSphere,
+				CollisionParams
+			))
+			{
+				bFoundSpawnPoint = true;
+				break;
+			}
+
+		}
+
+		if (bFoundSpawnPoint)
+		{
+			return SpawnPoint;
+		}
 	}
-	else
-	{
-		return FVector();
-	}
+
+	return FVector(); // Return a default FVector if no spawn point is found or no SpawnArea is set
 }
 
 bool ADungeonRoom::IsSpawnLocationValid(FVector TestLocation)

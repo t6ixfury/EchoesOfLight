@@ -33,6 +33,7 @@ AEnemyCharacter::AEnemyCharacter()
 	BaseAttackInfo.bCanBeBlocked = true;
 	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
 	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
+	BaseAttackInfo.Experience = 100.0f;
 
 
 }
@@ -146,9 +147,10 @@ float AEnemyCharacter::NormalAttack()
 
 void AEnemyCharacter::Death()
 {
-	OnDeath.Broadcast(this);
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+
+	DamageSystem->bisDead = true;
 
 
 	if (EnemyAnimInstance && DeathMontage)
@@ -174,10 +176,6 @@ void AEnemyCharacter::SetDamagable()
 
 void AEnemyCharacter::RemoveActor()
 {
-	if (DamageSystem)
-	{
-		DamageSystem->bisDead = true;
-	}
 	this->K2_DestroyActor();
 }
 
@@ -228,7 +226,7 @@ void AEnemyCharacter::CapsuleTraceForEnemy()
 	}
 }
 
-void AEnemyCharacter::SetDeath()
+void AEnemyCharacter::SetDeath(AEnemyCharacter* enemy)
 {
 	AEnemyBaseController* AIController = Cast<AEnemyBaseController>(this->GetController());
 

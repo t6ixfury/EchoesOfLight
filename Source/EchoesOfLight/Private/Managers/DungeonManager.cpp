@@ -7,6 +7,8 @@
 #include "EnemyCharacter.h"
 #include "Actors/Containers/Chest.h"
 #include "Actors/Items/AutoCollectPickup.h"
+#include "ActorComponents/AC_DamageSystem.h"
+#include "Character/MainCharacter.h"
 
 //engine
 #include "Kismet/GameplayStatics.h"
@@ -66,7 +68,10 @@ void ADungeonManager::GetAllChest()
 void ADungeonManager::BeginPlay()
 {
 	Super::BeginPlay();
-
+	if (AMainCharacter* character = Cast<AMainCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn()))
+	{
+		PlayerCharacter = character;
+	}
 	GetLevelDungeonRooms();
 	GetAllChest();
 	UE_LOG(LogTemp, Warning, TEXT("Number of Enemies in dungeon: %d"), NumberOfEnemiesInDungeon);
@@ -77,7 +82,7 @@ void ADungeonManager::HandleEnemyDeath(AEnemyCharacter* NewEnemy)
 	UE_LOG(LogTemp, Warning, TEXT("Handle Enemy Death Called"));
 	NumberOfEnemiesInDungeon = FMath::Clamp(NumberOfEnemiesInDungeon - 1, 0, 100);
 	UE_LOG(LogTemp, Warning, TEXT("Number of Enemies in dungeon: %d"), NumberOfEnemiesInDungeon);
-	if (NumberOfEnemiesInDungeon < 1)
+	if (NumberOfEnemiesInDungeon < 3 )
 	{
 		UWorld* World = GetWorld();
 		if (World && DungeonKey && NewEnemy)
@@ -94,9 +99,11 @@ void ADungeonManager::HandleEnemyDeath(AEnemyCharacter* NewEnemy)
 
 void ADungeonManager::HandleEnemySpawned(AEnemyCharacter* NewEnemy)
 {
-	if (NewEnemy)
+	if (NewEnemy && PlayerCharacter && !NewEnemy->bIsIntialized)
 	{
-		NewEnemy->OnDeath.AddUObject(this, &ADungeonManager::HandleEnemyDeath);
+		NewEnemy->DamageSystem->On_Death.AddDynamic(this, &ADungeonManager::HandleEnemyDeath);
+		NewEnemy->DamageSystem->On_Death.AddDynamic(PlayerCharacter, &AMainCharacter::GetExpFromKill);
+		NewEnemy->bIsIntialized = true;
 		NumberOfEnemiesInDungeon += 1;
 		UE_LOG(LogTemp, Warning, TEXT("Handle EnemySpawn Called"));
 	}

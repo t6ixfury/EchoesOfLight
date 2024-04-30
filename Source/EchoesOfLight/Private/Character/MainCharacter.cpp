@@ -18,6 +18,7 @@
 #include "ActorComponents/DialogueSystem.h"
 #include "Save/Save_PlayerInfo.h"
 #include "Save/EchoesGameInstance.h"
+#include "EnemyCharacter.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -299,7 +300,7 @@ void AMainCharacter::SpawnWeapon()
 	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference == nullptr || 
 		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Null pointer from weapon slot."))
+		//UE_LOG(LogTemp, Warning, TEXT("Null pointer from weapon slot."))
 		return;
 	}
 	if (!isWeaponEquipped)
@@ -361,7 +362,7 @@ void AMainCharacter::DespawnWeapon()
 
 void AMainCharacter::OnWeaponEquipmentChange()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Weapon Broadcast fired."));
+	//UE_LOG(LogTemp, Warning, TEXT("Weapon Broadcast fired."));
 	if(isWeaponEquipped)
 	{
 		DespawnWeapon();
@@ -814,6 +815,15 @@ bool AMainCharacter::TakeIncomingDamage(FS_DamageInfo DamageInfo)
 	return hasTakenDamage;
 }
 
+void AMainCharacter::GetExpFromKill(AEnemyCharacter* enemy)
+{
+	if (enemy)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GetExpFromKill was called"))
+		ExperienceSystem->AddExperience(enemy->BaseAttackInfo.Experience);
+	}
+}
+
 void AMainCharacter::SetDamagable()
 {
 	if (DamageSystem)
@@ -874,7 +884,7 @@ void AMainCharacter::PerformInteractionCheck()
 				//this make sure that we will not interact with an item outside a specific bound. InteractionCheckDistance in this case.
 				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Hit actor found"))
+					//UE_LOG(LogTemp, Warning, TEXT("Hit actor found"))
 					FoundInteractable(TraceHit.GetActor());
 					return;
 				}
@@ -1097,7 +1107,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Forward Roll"))
+			//UE_LOG(LogTemp, Warning, TEXT("Forward Roll"))
 			break;
 		case EMovementDirection::Backward:
 			isMontagePlaying = true;
@@ -1107,7 +1117,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Backward");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Backward Roll"))
+		//	UE_LOG(LogTemp, Warning, TEXT("Backward Roll"))
 			break;
 		case EMovementDirection::Right:
 			isMontagePlaying = true;
@@ -1117,7 +1127,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Right");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Right Roll"))
+			//UE_LOG(LogTemp, Warning, TEXT("Right Roll"))
 			break;
 		case EMovementDirection::Left:
 			isMontagePlaying = true;
@@ -1137,7 +1147,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Stationary Roll"))
+			//UE_LOG(LogTemp, Warning, TEXT("Stationary Roll"))
 			break;
 		default:
 			break;
@@ -1219,7 +1229,7 @@ void AMainCharacter::SavePlayerInfo()
 				}
 
 				UGameplayStatics::SaveGameToSlot(Save, GameInstance->PlayerInfoSlot, 0);
-				UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
+			//UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
 			}
 			
 		}
@@ -1258,7 +1268,7 @@ void AMainCharacter::LoadPlayerInfo()
 				RightHandWeapon->BaseAttackInfo.MagicPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.MagicPower;
 				RightHandWeapon->BaseAttackInfo.Damage = GameInstance->PlayerInfoData->sCurrentWeapnStats.Damage;
 			}
-			UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Loaded"));
+			//UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Loaded"));
 			UpdateAllWidgets();
 		}
 	}
@@ -1271,7 +1281,7 @@ void AMainCharacter::LoadAll()
 	ExperienceSystem->LoadExperience();
 	PlayerInventory->LoadInventory();
 	MainWidgetHandlerComponent->EquipmentMenuWidget->LoadEquipmentSlots();
-	UE_LOG(LogTemp, Warning, TEXT("load all called"));
+	//UE_LOG(LogTemp, Warning, TEXT("load all called"));
 }
 
 void AMainCharacter::SaveAll()
@@ -1281,5 +1291,5 @@ void AMainCharacter::SaveAll()
 	PlayerInventory->SaveInventory();
 	MainWidgetHandlerComponent->EquipmentMenuWidget->SaveEquipment();
 
-	UE_LOG(LogTemp, Warning, TEXT("Save all called"));
+	//UE_LOG(LogTemp, Warning, TEXT("Save all called"));
 }

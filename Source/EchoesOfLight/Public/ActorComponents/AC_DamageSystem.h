@@ -8,6 +8,7 @@
 #include "Interfaces/Interface_Damagable.h"
 #include "AC_DamageSystem.generated.h"
 
+class AEnemyCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class ECHOESOFLIGHT_API UAC_DamageSystem : public UActorComponent
@@ -76,7 +77,7 @@ public:
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoDamage);
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOn_Death);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOn_Death, AEnemyCharacter*, Enemy);
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOn_Damage_Response);
 

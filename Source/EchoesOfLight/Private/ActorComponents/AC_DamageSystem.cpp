@@ -2,6 +2,7 @@
 
 
 #include "ActorComponents/AC_DamageSystem.h"
+#include "EnemyCharacter.h"
 #include "Structures/S_DamageInfo.h"
 
 
@@ -63,7 +64,14 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 		if (newHealth <= 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("inside health check"));
-			On_Death.Broadcast();
+
+			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(GetOwner()))
+			{
+				if (!enemy->DamageSystem->bisDead)
+				{
+					On_Death.Broadcast(enemy);
+				}
+			}
 		}
 		else
 		{

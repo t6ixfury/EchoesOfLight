@@ -2,6 +2,8 @@
 
 
 #include "ActorComponents/AC_Inventory.h"
+#include "Character/MainCharacter.h"
+#include "ActorComponents/AC_MainWidgetHandler.h"
 #include "Actors/Items/ItemBase.h"
 #include "Save/Save_Inventory.h"
 #include "Kismet/GameplayStatics.h"
@@ -404,6 +406,14 @@ void UAC_Inventory::AddNewItem(UItemBase* Item, const int32 ItemAmountToAdd)
 	NewItem->OwningInventory = this;
 	//set the Item quantity
 	NewItem->SetQuantity(ItemAmountToAdd);
+
+	if (AMainCharacter* character = Cast<AMainCharacter>(GetOwner()))
+	{
+
+		FString itemInfo = FString::Format(TEXT("Item Added: %s x%d"), { FText::FromString(NewItem->ID.ToString()).ToString(), NewItem->Quantity });
+
+		character->MainWidgetHandlerComponent->ShowAlertWidget(FText::FromString(NewItem->ID.ToString()), FText::FromString("Item Added:"));
+	}
 
 	//add new item to inventory
 	InventoryContents.Add(NewItem);

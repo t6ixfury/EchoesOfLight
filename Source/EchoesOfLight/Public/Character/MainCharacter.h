@@ -27,6 +27,7 @@ class UAC_CurrencySystem;
 class UAC_DamageSystem;
 class UAC_MainWidgetHandler;
 class USave_PlayerInfo;
+class AEnemyCharacter;
 
 
 UENUM()
@@ -275,6 +276,9 @@ public:
 	//Handles the incoming damage of an enemy
 	UFUNCTION( Category = "Damagable Interface Functions")
 	virtual bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo) override;
+
+	UFUNCTION()
+		void GetExpFromKill(AEnemyCharacter* enemy);
 
 
 //------------------------------Equipment system functions--------------------------------------------------------------------------

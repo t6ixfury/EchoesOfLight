@@ -75,6 +75,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checks")
 		bool bCanPlayhitReact;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checks")
+		bool bIsIntialized = false;
+
 //-------------------------DELEGATES------------------------------------------------------------
 
 	DECLARE_DELEGATE(FOnEnemyHit);
@@ -139,7 +142,7 @@ protected:
 
 	//set state of the enemy character to death
 	UFUNCTION()
-		void SetDeath();
+		void SetDeath(AEnemyCharacter* enemy);
 
 	//This function set the bisInvincible variable in damage system back to false;
 	UFUNCTION()

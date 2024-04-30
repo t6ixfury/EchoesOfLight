@@ -33,6 +33,9 @@ public:
 		float Damage = 0;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float Experience = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		E_Damage_Type DamageType;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
