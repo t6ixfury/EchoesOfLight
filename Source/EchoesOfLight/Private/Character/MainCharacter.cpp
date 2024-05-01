@@ -19,6 +19,7 @@
 #include "Save/Save_PlayerInfo.h"
 #include "Save/EchoesGameInstance.h"
 #include "EnemyCharacter.h"
+#include "Managers/GameInfo.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -131,6 +132,8 @@ void AMainCharacter::BeginPlay()
 	{
 		LoadAll();
 		UpdateAllWidgets();
+		SaveAll();
+		instance->GameInfo->SaveGameInfo(instance);
 	}
 }
 
@@ -1182,8 +1185,13 @@ void AMainCharacter::UpdateAllWidgets()
 	{
 		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
-		MainWidgetHandlerComponent->GUI->SetStaminaBarPercetage(CurrentStamina / Stamina);
-		MainWidgetHandlerComponent->GUI->SetExperienceBarPercentage(ExperienceSystem->CurrentExp / ExperienceSystem->ExpToNextLevel);
+
+		float StaminaPercentage = CurrentStamina / Stamina;
+		MainWidgetHandlerComponent->GUI->SetStaminaBarPercetage(StaminaPercentage);
+
+		float ExperiencePercentage = ExperienceSystem->ExpGainedForNewLevel / ExperienceSystem->NeededExp;
+		MainWidgetHandlerComponent->GUI->SetExperienceBarPercentage(ExperiencePercentage);
+		//float ExperiencePercentage = ExperienceSystem->CurrentExp - ExperienceSystem->Levels.LevelToExperience[ExperienceSystem->ExpToNextLevel - 1] / (ExperienceSystem->ExpToNextLevel - ExperienceSystem->CurrentExp);
 		MainWidgetHandlerComponent->GUI->SetLevelText(FText::AsNumber(ExperienceSystem->CurrentLevel));
 	}
 
@@ -1266,6 +1274,10 @@ void AMainCharacter::LoadPlayerInfo()
 			//SetActorTransform(GameInstance->PlayerInfoData->sPlayerTransform);
 
 			//SetActorRotation(GameInstance->PlayerInfoData->sPlayerRotation);
+
+			
+
+			GameInstance->PlayerInfoData = Cast<USave_PlayerInfo>(UGameplayStatics::LoadGameFromSlot(GameInstance->PlayerInfoSlot, 0));
 
 			MainCharacterStats = GameInstance->PlayerInfoData->sStatsLevels;
 

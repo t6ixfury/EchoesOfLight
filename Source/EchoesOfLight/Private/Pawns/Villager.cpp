@@ -90,8 +90,10 @@ void AVillager::EndInteract()
 		}
 	}
 
-	if (!ItemName.IsNone())
+	if (!ItemName.IsNone() && !bHasBeenTalkedTo)
 	{
+
+		bHasBeenTalkedTo = true;
 		switch (Itemtype)
 		{
 		case EItemType::Amulet:
@@ -332,9 +334,12 @@ void AVillager::BeginPlay()
 void AVillager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (Dialogue->bIsTalking && CharacterRef->MainWidgetHandlerComponent->DialogueGui->DialogueBox->bHasDialogueText)
+	if (Dialogue->bIsTalking && CharacterRef->MainWidgetHandlerComponent->DialogueGui)
 	{
-		SetVillagerRotation(DeltaTime);
+		if (Dialogue->bIsTalking && CharacterRef->MainWidgetHandlerComponent->DialogueGui->DialogueBox->bHasDialogueText)
+		{
+			SetVillagerRotation(DeltaTime);
+		}
 	}
 	if (CharacterRef)
 	{

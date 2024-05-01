@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 //game
 #include "Actors/Dungeon/DungeonDoor.h"
@@ -87,10 +87,10 @@ void ADungeonDoor::Interact(AMainCharacter* PlayerCharacter)
 	}
 	else
 	{
-		if (IsValid(PlayerCharacter))
+		if (IsValid(PlayerCharacter) && !bIsDoorOpen)
 		{
 			PlayerCharacter->MainWidgetHandlerComponent->HideInteractionWidget();
-			PlayerCharacter->MainWidgetHandlerComponent->ShowAlertWidget(FText::FromString("You do not have the dungeon key!\nHint: Try killing the rest of the enemies."));
+			PlayerCharacter->MainWidgetHandlerComponent->ShowAlertWidget(AlertMessage);
 			UE_LOG(LogTemp, Warning, TEXT("Alert"));
 		}
 	}

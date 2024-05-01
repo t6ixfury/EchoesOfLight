@@ -22,13 +22,13 @@ public:
 	UPROPERTY()
 		FName CurrentDungeonLevel;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 CurrentDungeonIndex = 0;
 
 	UPROPERTY()
 		FName CurrentTownLevel;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 CurrentTownIndex= 0;
 
 	UFUNCTION()

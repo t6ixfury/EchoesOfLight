@@ -182,6 +182,8 @@ void UAC_Inventory::LoadInventory()
 
 		if (UGameplayStatics::DoesSaveGameExist(GameInstance->InventoryDataSlot, 0))
 		{
+			GameInstance->InventoryData = Cast<USave_Inventory>(UGameplayStatics::LoadGameFromSlot(GameInstance->InventoryDataSlot, 0));
+
 			InventoryContents.Empty();
 			for (FItemSaveInfo info : GameInstance->InventoryData->sInventoryContents)
 			{

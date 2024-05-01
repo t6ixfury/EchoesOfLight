@@ -12,6 +12,7 @@
 class UEnemyHealthBar;
 class UAC_DamageSystem;
 class UWidgetComponent;
+class AMainCharacter;
 
 UCLASS()
 class ECHOESOFLIGHT_API AEnemyCharacter : public ACharacter, public IInterface_Damagable, public IInterface_EnemyAi
@@ -69,6 +70,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
 		FS_DamageInfo BaseAttackInfo;
+
+	UPROPERTY()
+		AMainCharacter* PlayerCharacter;
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
@@ -159,6 +163,8 @@ protected:
 	void CanPlayHitReactMontage();
 
 	void SetEnemyWidgets();
+
+	void SetPlayerCharacter();
 
 
 

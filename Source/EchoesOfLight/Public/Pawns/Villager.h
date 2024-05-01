@@ -39,6 +39,10 @@ public:
 	ADialogueCamera* DialogueCamera;
 	bool bisDoneRotating = false;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
+	bool bHasBeenTalkedTo = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue | Item")
 		FName ItemName;
 

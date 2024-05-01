@@ -26,7 +26,7 @@ public:
 	FItemWeaponStatistics  sCurrentWeapnStats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float sHealth;
+	float sHealth = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName sCurrentDungeonLevel;

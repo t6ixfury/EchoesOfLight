@@ -11,6 +11,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Widgets/EnemyHealthBar.h"
+#include "Character/MainCharacter.h"
+
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -50,6 +52,13 @@ void AEnemyCharacter::BeginPlay()
 
 		}
 	}
+	SetPlayerCharacter();
+
+
+	DamageSystem->On_Death.AddDynamic(PlayerCharacter, &AMainCharacter::GetExpFromKill);
+
+
+
 	//sets the health bar percentage.
 	SetEnemyWidgets();
 
@@ -257,6 +266,15 @@ void AEnemyCharacter::SetEnemyWidgets()
 		}
 	}
 	
+}
+
+void AEnemyCharacter::SetPlayerCharacter()
+{
+	AMainCharacter* character = Cast<AMainCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (character)
+	{
+		PlayerCharacter = character;
+	}
 }
 
 void AEnemyCharacter::UpdateStats()

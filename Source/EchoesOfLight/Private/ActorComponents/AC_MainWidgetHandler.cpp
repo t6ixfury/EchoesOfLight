@@ -22,6 +22,7 @@
 #include "Sound/SoundBase.h"
 #include "Widgets/W_PauseMenu.h"
 #include "Components/WidgetComponent.h"
+#include "Components/TextBlock.h"
 
 
 
@@ -99,12 +100,14 @@ void UAC_MainWidgetHandler::ShowAlertWidget(FText message)
 
 	if (AlertWidgetClass && MainCharacterController && World)
 	{
-		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, ExperienceAlertWidgetClass);
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
 		if (Widget)
 		{
 			AlertWidget = Widget;
 			AlertWidget->SetAlertMessageText(message);
 			AlertWidget->AddToPlayerScreen();
+			AlertWidget->AlertTitleText->SetVisibility(ESlateVisibility::Collapsed);
+	
 			float time = AlertWidget->PlayAlertAnimation();
 
 			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);

@@ -102,7 +102,7 @@ void ADungeonManager::HandleEnemySpawned(AEnemyCharacter* NewEnemy)
 	if (NewEnemy && PlayerCharacter && !NewEnemy->bIsIntialized)
 	{
 		NewEnemy->DamageSystem->On_Death.AddDynamic(this, &ADungeonManager::HandleEnemyDeath);
-		NewEnemy->DamageSystem->On_Death.AddDynamic(PlayerCharacter, &AMainCharacter::GetExpFromKill);
+		//NewEnemy->DamageSystem->On_Death.AddDynamic(PlayerCharacter, &AMainCharacter::GetExpFromKill);
 		NewEnemy->bIsIntialized = true;
 		NumberOfEnemiesInDungeon += 1;
 		UE_LOG(LogTemp, Warning, TEXT("Handle EnemySpawn Called"));

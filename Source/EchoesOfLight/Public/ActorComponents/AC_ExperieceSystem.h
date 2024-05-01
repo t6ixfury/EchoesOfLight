@@ -90,13 +90,24 @@ public:
 		FCharacterLevels Levels;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
-		float ExpToNextLevel = Levels.LevelToExperience[2] - Levels.LevelToExperience[1];
+		float ExpToNextLevel = Levels.LevelToExperience[2];
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
-		float CurrentExp = Levels.LevelToExperience[1];
+		float LastLevelExp = Levels.LevelToExperience[1];
+
+	UPROPERTY(BlueprintReadWrite, Category = "Experience")
+		float NeededExp = ExpToNextLevel - LastLevelExp;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Experience")
+		float ExpGainedForNewLevel = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Experience")
+		float CurrentExp = 0;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
 		int32 CurrentLevel = 1;
+
+
 
 	UPROPERTY(BlueprintReadWrite, Category = "Experience")
 		float NextExpMultiplier;
