@@ -4,6 +4,7 @@
 #include "ActorComponents/AC_DamageSystem.h"
 #include "EnemyCharacter.h"
 #include "Structures/S_DamageInfo.h"
+#include "Character/MainCharacter.h"
 
 
 // Sets default values for this component's properties
@@ -71,6 +72,10 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 				{
 					On_Death.Broadcast(enemy);
 				}
+			}
+			else
+			{
+				On_Death.Broadcast(nullptr);
 			}
 		}
 		else

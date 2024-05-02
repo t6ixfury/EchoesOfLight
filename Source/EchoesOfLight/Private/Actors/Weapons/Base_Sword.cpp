@@ -8,6 +8,13 @@
 #include "Interfaces/Interface_Damagable.h"
 #include "Character/MainCharacter.h"
 #include "Actors/Items/ItemBase.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "EnemyCharacter.h"
+
+
+
+
 
 
 
@@ -94,13 +101,12 @@ void ABase_Sword::BaseAttack()
 
         if (HitResult.GetActor())
         {
-           // UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+           //UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
             IInterface_Damagable* HitActor = Cast<IInterface_Damagable>(HitResult.GetActor());
 
             if (HitActor)
             {
                 HitActor->TakeIncomingDamage(BaseAttackInfo);
-                //UE_LOG(LogTemp, Warning, TEXT("hit actor found"))
             }
 
         }
@@ -140,5 +146,13 @@ void ABase_Sword::InitializeWeapon()
 
 
 
+    }
+}
+
+void ABase_Sword::SetEnemyPhysics()
+{
+    if (EnemyPrimitiveComponent)
+    {
+        EnemyPrimitiveComponent->SetSimulatePhysics(false);
     }
 }

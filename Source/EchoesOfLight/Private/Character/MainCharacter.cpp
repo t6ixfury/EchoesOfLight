@@ -148,9 +148,15 @@ void AMainCharacter::Tick(float DeltaTime)
 	}
 	GetCharacterMovementDirection();
 
-	if (DialogueSystem->bIsTalking)
+	if (DamageSystem->Health <= 1)
 	{
+		if (!bIsDying)
+		{
+			bIsDying = true;
+			Death();
+		}
 	}
+
 
 
 }
@@ -334,6 +340,8 @@ void AMainCharacter::SpawnWeapon()
 
 			if (RightHandWeapon && LeftHandWeapon)
 			{
+				CurrentState = ECharacterState::Combat;
+				CharacterStateChangeDelegate.Broadcast();
 
 				LeftHandWeapon->BaseAttackInfo.Damage = LeftHandWeapon->BaseAttackInfo.Damage * (ExperienceSystem->CurrentLevel + LeftHandWeapon->BaseAttackInfo.AttackPower);
 				RightHandWeapon->BaseAttackInfo.Damage = RightHandWeapon->BaseAttackInfo.Damage * (ExperienceSystem->CurrentLevel + RightHandWeapon->BaseAttackInfo.AttackPower);
@@ -359,6 +367,8 @@ void AMainCharacter::DespawnWeapon()
 {
 	if (IsValid(RightHandWeapon) && IsValid(LeftHandWeapon))
 	{
+		CurrentState = ECharacterState::NonCombat;
+		CharacterStateChangeDelegate.Broadcast();
 		RightHandWeapon->Destroy();
 		LeftHandWeapon->Destroy();
 		RightHandWeapon = nullptr;
@@ -367,6 +377,12 @@ void AMainCharacter::DespawnWeapon()
 	}
 }
 
+
+void AMainCharacter::OnDeathAnimationtimerEnd(AEnemyCharacter* Enemy)
+{
+	UE_LOG(LogTemp,Warning, TEXT("Death Called in character"))
+	OnDeathAnimationEnd();
+}
 
 void AMainCharacter::OnWeaponEquipmentChange()
 {
@@ -831,6 +847,8 @@ bool AMainCharacter::TakeIncomingDamage(FS_DamageInfo DamageInfo)
 			MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
 		}
 
+		UE_LOG(LogTemp, Warning, TEXT("take damage character."))
+
 	}
 	return hasTakenDamage;
 }
@@ -841,6 +859,38 @@ void AMainCharacter::GetExpFromKill(AEnemyCharacter* enemy)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("GetExpFromKill was called"))
 		ExperienceSystem->AddExperience(enemy->BaseAttackInfo.Experience);
+	}
+}
+
+void AMainCharacter::Death()
+{
+	if (DeathMonatage)
+	{
+		// Get the animation instance and play the death montage
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			// Play the death animation montage
+			float time = AnimInstance->Montage_Play(DeathMonatage, 1.f);
+
+			DamageSystem->bisDead = true;
+
+				
+			FTimerHandle deathtimer;
+			GetWorld()->GetTimerManager().SetTimer(deathtimer, this, &AMainCharacter::OnDeathAnimationEnd, time, false);
+		}
+
+	}
+}
+
+void AMainCharacter::OnDeathAnimationEnd()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FString CurrentLevelName = World->GetMapName();
+		CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		UGameplayStatics::OpenLevel(World, *CurrentLevelName);
 	}
 }
 

@@ -20,7 +20,7 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TimeTillDamagable = 0.25f;
-	NormalAttackDamage = 10.f;
+	NormalAttackDamage = 2.f;
 	TimeTillHitReactAction = 1.5f;
 	bCanPlayhitReact = true;
 

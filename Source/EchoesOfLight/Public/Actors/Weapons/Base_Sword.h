@@ -42,6 +42,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon Properties | Item Reference")
 		UItemBase* WeaponItemReference;
+	UPROPERTY()
+	UPrimitiveComponent* EnemyPrimitiveComponent;
 
 protected:
 	// Called when the game starts or when spawned
@@ -55,6 +57,8 @@ public:
 	void BaseAttack();
 
 	void InitializeWeapon();
+	void SetEnemyPhysics();
+	
 
 
 };
