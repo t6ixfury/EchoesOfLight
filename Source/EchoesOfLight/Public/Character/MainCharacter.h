@@ -8,6 +8,8 @@
 #include "Interfaces/Interface_Damagable.h"
 #include "Interfaces/Interface_Interaction.h"
 #include "Structures/Structs.h"
+#include "Enums/Enums.h"
+
 #include "MainCharacter.generated.h"
 
 
@@ -27,6 +29,7 @@ class UAC_CurrencySystem;
 class UAC_DamageSystem;
 class UAC_MainWidgetHandler;
 class USave_PlayerInfo;
+class AEnemyCharacter;
 
 
 UENUM()
@@ -42,7 +45,9 @@ enum class EMovementDirection : uint8
 
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
-DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate)
+DECLARE_MULTICAST_DELEGATE(FWeaponEquippedDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterStateDelegate);
+
 
 UCLASS(config=game)
 class ECHOESOFLIGHT_API AMainCharacter : public ACharacter, public IInterface_Damagable
@@ -88,9 +93,12 @@ private:
 //------------------------------Combat Variables--------------------------------------------------------------------------
 public:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		ECharacterState CurrentState = ECharacterState::NonCombat;
+
 		UPROPERTY()
 		FCharacterStats MainCharacterStats;
-		
+		bool bIsDying = false;
 		UPROPERTY()
 		float Stamina = 100;
 		UPROPERTY()
@@ -147,6 +155,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* RollMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
+		class UAnimMontage* DeathMonatage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 		EMovementDirection MovementDirection;
@@ -216,6 +227,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save")
 		FString PlayerInfoSaveSlot;
 
+//-----------------------------------delegates--------------------------------------------
+
+
+	FCharacterStateDelegate CharacterStateChangeDelegate;
+	
 
 
 //---------------------------------------------------------------------------------------------------------------------------
@@ -276,6 +292,15 @@ public:
 	UFUNCTION( Category = "Damagable Interface Functions")
 	virtual bool TakeIncomingDamage(struct FS_DamageInfo DamageInfo) override;
 
+	UFUNCTION()
+		void GetExpFromKill(AEnemyCharacter* enemy);
+
+	UFUNCTION()
+		void Death();
+
+	UFUNCTION()
+	void OnDeathAnimationEnd();
+	void OnDeathAnimationtimerEnd(AEnemyCharacter* Enemy);
 
 //------------------------------Equipment system functions--------------------------------------------------------------------------
 	UFUNCTION()
@@ -422,4 +447,6 @@ public:
 
 	// Returns the Characters Inventory.
 	FORCEINLINE UAC_Inventory* GetInventory() const { return PlayerInventory; };
+
+	FORCEINLINE ECharacterState GetCharacterState() const { return CurrentState; };
 };

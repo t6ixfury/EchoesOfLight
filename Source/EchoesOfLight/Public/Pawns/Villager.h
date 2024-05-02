@@ -10,6 +10,8 @@
 class UDialogueSystem;
 class ADialogueCamera;
 class AMainCharcter;
+class UItemBase;
+enum class EItemType:uint8;
 
 
 UCLASS()
@@ -36,6 +38,32 @@ public:
 
 	ADialogueCamera* DialogueCamera;
 	bool bisDoneRotating = false;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue")
+	bool bHasBeenTalkedTo = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue | Item")
+		FName ItemName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue | Item")
+		EItemType Itemtype;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dialogue | Item")
+		int32 ItemQuantity = 1;
+
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue | Item DataTables")
+		UDataTable* ItemWeaponDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue | Item DataTables")
+		UDataTable* ItemAmuletDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue | Item DataTables")
+		UDataTable* ItemNetherbandDataTable;
+
+	UPROPERTY(EditAnywhere, Category = "Dialogue | Item DataTables")
+		UDataTable* ItemConsumbableDataTable;
 
 //---------------------------------------------------------------------------------------------------------------------------
 //	FUNCTIONS

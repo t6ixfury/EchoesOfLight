@@ -22,6 +22,7 @@
 #include "Sound/SoundBase.h"
 #include "Widgets/W_PauseMenu.h"
 #include "Components/WidgetComponent.h"
+#include "Components/TextBlock.h"
 
 
 
@@ -85,15 +86,28 @@ void UAC_MainWidgetHandler::RemoveDialogueWidget()
 
 void UAC_MainWidgetHandler::ShowAlertWidget(FText message)
 {
+
 	UWorld* World = GetWorld();
+
+	// Check if an alert widget already exists, and if so, remove it immediately.
+	if (AlertWidget)
+	{
+		AlertWidget->RemoveFromParent();
+		AlertWidget->MarkAsGarbage();
+		AlertWidget = nullptr;
+		World->GetTimerManager().ClearTimer(AlertTimer);
+	}
+
 	if (AlertWidgetClass && MainCharacterController && World)
 	{
-		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, ExperienceAlertWidgetClass);
+		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);
 		if (Widget)
 		{
 			AlertWidget = Widget;
 			AlertWidget->SetAlertMessageText(message);
 			AlertWidget->AddToPlayerScreen();
+			AlertWidget->AlertTitleText->SetVisibility(ESlateVisibility::Collapsed);
+	
 			float time = AlertWidget->PlayAlertAnimation();
 
 			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);
@@ -126,8 +140,10 @@ void UAC_MainWidgetHandler::ShowExperienceAlertWidget(FText message)
 
 			float time = AlertWidget->PlayAlertAnimation();
 
+			FTimerHandle exptimer;
+
 			// Set a timer to remove the widget after the animation.
-			World->GetTimerManager().SetTimer(AlertTimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);
+			World->GetTimerManager().SetTimer(exptimer, this, &UAC_MainWidgetHandler::RemoveAlertWidget, time);
 		}
 	}
 }
@@ -135,6 +151,16 @@ void UAC_MainWidgetHandler::ShowExperienceAlertWidget(FText message)
 void UAC_MainWidgetHandler::ShowAlertWidget(FText message, FText Title)
 {
 	UWorld* World = GetWorld();
+
+	// Check if an alert widget already exists, and if so, remove it immediately.
+	if (AlertWidget)
+	{
+		AlertWidget->RemoveFromParent();
+		AlertWidget->MarkAsGarbage();
+		AlertWidget = nullptr;
+		World->GetTimerManager().ClearTimer(AlertTimer);
+	}
+
 	if (AlertWidgetClass && MainCharacterController && World)
 	{
 		UW_Alert* Widget = CreateWidget<UW_Alert>(MainCharacterController, AlertWidgetClass);

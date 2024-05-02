@@ -27,19 +27,19 @@ class ECHOESOFLIGHT_API UEchoesGameInstance : public UGameInstance
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USave_Experience* ExperienceData;
+		USave_Experience* ExperienceData = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USave_PlayerInfo* PlayerInfoData;
+		USave_PlayerInfo* PlayerInfoData = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USave_Inventory* InventoryData;
+		USave_Inventory* InventoryData = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		USave_Equipment* EquipmentData;
+		USave_Equipment* EquipmentData = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UMaster_SaveGame* GameInfoData;
+		UMaster_SaveGame* GameInfoData = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UW_LoadScreen* LoadScreen;
@@ -53,8 +53,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<FName> DungeonLevels;
 
-	UPROPERTY()
-		AGameInfo* GameInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AGameInfo* GameInfo = nullptr;
 
 
 	FString ExperienceSlot = FString("ExperienceSlot");

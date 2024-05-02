@@ -12,6 +12,7 @@
 class UEnemyHealthBar;
 class UAC_DamageSystem;
 class UWidgetComponent;
+class AMainCharacter;
 
 UCLASS()
 class ECHOESOFLIGHT_API AEnemyCharacter : public ACharacter, public IInterface_Damagable, public IInterface_EnemyAi
@@ -67,13 +68,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages")
 		class UAnimMontage* BaseAttack;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properites")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
 		FS_DamageInfo BaseAttackInfo;
+
+	UPROPERTY()
+		AMainCharacter* PlayerCharacter;
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attributes")
+		int32 level = 1;
 
 	//animation checks
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checks")
 		bool bCanPlayhitReact;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Checks")
+		bool bIsIntialized = false;
 
 //-------------------------DELEGATES------------------------------------------------------------
 
@@ -129,6 +140,7 @@ public:
 	
 		virtual void SetMovementSpeed(float NewMaxSpeed) override;
 
+		void UpdateStats();
 
 protected:
 
@@ -139,7 +151,7 @@ protected:
 
 	//set state of the enemy character to death
 	UFUNCTION()
-		void SetDeath();
+		void SetDeath(AEnemyCharacter* enemy);
 
 	//This function set the bisInvincible variable in damage system back to false;
 	UFUNCTION()
@@ -151,6 +163,10 @@ protected:
 	void CanPlayHitReactMontage();
 
 	void SetEnemyWidgets();
+
+	void SetPlayerCharacter();
+
+
 
 
 };

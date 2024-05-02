@@ -100,6 +100,15 @@ enum class EItemType : uint8
 	Powerup UMETA(DisplayName = "Powerup")
 };
 
+
+UENUM()
+enum class ECharacterState : uint8
+{
+	Combat UMETA(DisplayName = "Combat"),
+	NonCombat UMETA(DisplayName = "Non-Combat")
+	
+};
+
 /*
 END OF ITEM ENUMS
 */

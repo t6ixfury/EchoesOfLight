@@ -11,6 +11,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Widgets/EnemyHealthBar.h"
+#include "Character/MainCharacter.h"
+
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -18,7 +20,7 @@ AEnemyCharacter::AEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TimeTillDamagable = 0.25f;
-	NormalAttackDamage = 10.f;
+	NormalAttackDamage = 2.f;
 	TimeTillHitReactAction = 1.5f;
 	bCanPlayhitReact = true;
 
@@ -29,11 +31,6 @@ AEnemyCharacter::AEnemyCharacter()
 	DamageSystem = CreateDefaultSubobject<UAC_DamageSystem>(TEXT("Damage System"));
 	CurrentDamageState = E_EnemyDamageStates::ApplyDamage;
 
-	BaseAttackInfo.Damage = NormalAttackDamage;
-	BaseAttackInfo.bCanBeBlocked = true;
-	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
-	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
-
 
 }
 
@@ -43,12 +40,25 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (DamageSystem)
 	{
+		UpdateStats();
+
+		DamageSystem->MaxHealth = DamageSystem->MaxHealth * (static_cast<float>(level) * 2.0f);
+
+		DamageSystem->Health = DamageSystem->MaxHealth;
+
 		if (DeathMontage)
 		{
 			DamageSystem->On_Death.AddDynamic(this, &AEnemyCharacter::SetDeath);
 
 		}
 	}
+	SetPlayerCharacter();
+
+
+	DamageSystem->On_Death.AddDynamic(PlayerCharacter, &AMainCharacter::GetExpFromKill);
+
+
+
 	//sets the health bar percentage.
 	SetEnemyWidgets();
 
@@ -146,9 +156,10 @@ float AEnemyCharacter::NormalAttack()
 
 void AEnemyCharacter::Death()
 {
-	OnDeath.Broadcast(this);
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	UAnimInstance* EnemyAnimInstance = MeshComp ? MeshComp->GetAnimInstance() : nullptr;
+
+	DamageSystem->bisDead = true;
 
 
 	if (EnemyAnimInstance && DeathMontage)
@@ -174,10 +185,6 @@ void AEnemyCharacter::SetDamagable()
 
 void AEnemyCharacter::RemoveActor()
 {
-	if (DamageSystem)
-	{
-		DamageSystem->bisDead = true;
-	}
 	this->K2_DestroyActor();
 }
 
@@ -228,7 +235,7 @@ void AEnemyCharacter::CapsuleTraceForEnemy()
 	}
 }
 
-void AEnemyCharacter::SetDeath()
+void AEnemyCharacter::SetDeath(AEnemyCharacter* enemy)
 {
 	AEnemyBaseController* AIController = Cast<AEnemyBaseController>(this->GetController());
 
@@ -259,4 +266,23 @@ void AEnemyCharacter::SetEnemyWidgets()
 		}
 	}
 	
+}
+
+void AEnemyCharacter::SetPlayerCharacter()
+{
+	AMainCharacter* character = Cast<AMainCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (character)
+	{
+		PlayerCharacter = character;
+	}
+}
+
+void AEnemyCharacter::UpdateStats()
+{
+	BaseAttackInfo.Damage = NormalAttackDamage * (static_cast<float>(level) * 2);
+	BaseAttackInfo.bCanBeBlocked = true;
+	BaseAttackInfo.DamageType = E_Damage_Type::Melee;
+	BaseAttackInfo.DamageResponse = E_Damage_Response::None;
+	BaseAttackInfo.Experience = 100.0f;
+	BaseAttackInfo.Experience = BaseAttackInfo.Experience * (static_cast<float>(level) * 2.1f);
 }

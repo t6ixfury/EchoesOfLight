@@ -41,10 +41,13 @@ void UAC_ExperieceSystem::AddExperience(float ExpToAdd)
 	if (CurrentLevel < 50)
 	{
 		CurrentExp += ExpToAdd;
-		if (CurrentExp >= ExpToNextLevel)
+		ExpGainedForNewLevel += ExpToAdd;
+
+		UE_LOG(LogTemp, Warning, TEXT("Current Experience : %f"), CurrentExp);
+
+		if (ExpGainedForNewLevel >= NeededExp)
 		{
 			LevelUp();
-
 		}
 		ExperienceAddedDelegate.Broadcast(ExpToAdd);
 	}  
@@ -55,8 +58,13 @@ void UAC_ExperieceSystem::LevelUp()
 {
 	if (CurrentLevel < 50)
 	{
+		LastLevelExp = Levels.LevelToExperience[CurrentLevel];
 		CurrentLevel = FMath::Clamp(CurrentLevel + 1, 1, 50);
-		ExpToNextLevel = FMath::Clamp(Levels.LevelToExperience[CurrentLevel + 1] - Levels.LevelToExperience[CurrentLevel], 0 , 10000000);
+		ExpToNextLevel = Levels.LevelToExperience[CurrentLevel + 1];
+		NeededExp = ExpToNextLevel - LastLevelExp;
+		ExpGainedForNewLevel = 0;
+
+		UE_LOG(LogTemp, Warning, TEXT("Experience  to next level : %f"), ExpToNextLevel);
 		if (CharacterRef)
 		{
 			FItemCharacerStatistics stats;

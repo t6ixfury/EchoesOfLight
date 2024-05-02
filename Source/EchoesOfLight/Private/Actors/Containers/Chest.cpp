@@ -276,6 +276,31 @@ UItemBase* AChest::CreateItem(FChestItemData* ItemDataForCreation)
 		}
 		break;
 	case EItemType::Quest:
+
+		if (ItemQuestDataTable && !ItemDataForCreation->DesiredItemId.IsNone())
+		{
+			//get the item info from the data table.
+			const FItemData* ItemDataRow = ItemQuestDataTable->FindRow<FItemData>(ItemDataForCreation->DesiredItemId, ItemDataForCreation->DesiredItemId.ToString());
+
+			//create a new item
+			UItemBase* ItemToAdd = NewObject<UItemBase>(this, UItemBase::StaticClass());
+
+			//set the item properties
+			ItemToAdd->ID = ItemDataRow->ID;
+			ItemToAdd->ItemType = ItemDataRow->ItemType;
+			ItemToAdd->ItemQuality = ItemDataRow->ItemQuality;
+			ItemToAdd->ItemNumericaData = ItemDataRow->ItemNumericaData;
+			ItemToAdd->ItemTextData = ItemDataRow->ItemTextData;
+			ItemToAdd->ItemAssetData = ItemDataRow->ItemAssetData;
+			ItemToAdd->ItemCharacerStatistics = ItemDataRow->ItemCharacerStatistics;
+			ItemToAdd->ItemWeaponStatistics = ItemDataRow->ItemWeaponStatistics;
+			ItemToAdd->ItemStatistics = ItemDataRow->ItemStatistics;
+
+			//set the desired quantity based off the passed in data.
+			ItemDataForCreation->DesiredQuantiy <= 0 ? ItemToAdd->SetQuantity(1) : ItemToAdd->SetQuantity(ItemDataForCreation->DesiredQuantiy);
+
+			return ItemToAdd;
+		}
 		break;
 
 	default:

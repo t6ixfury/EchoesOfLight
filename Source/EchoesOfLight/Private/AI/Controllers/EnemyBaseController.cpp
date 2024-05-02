@@ -40,11 +40,11 @@ void AEnemyBaseController::BeginPlay()
 		RunBehaviorTree(AiBehaviorTree);
 		if (UseBlackboard(AiBehaviorTree->BlackboardAsset, AiBlackboard))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Successfully initialized the blackboard for AI."));
+		
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to initialize the blackboard for AI."));
+		
 		}
 
 	}
@@ -114,10 +114,10 @@ void AEnemyBaseController::AICanSenseActor(AActor* SensedActor)
 			{
 				if (AIHandleAiSenseConversion(ActorStimuli.Type) == E_EnemyAI_Sense::Sight)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Sight sense was successfully triggered for actor: %s"), *SensedActor->GetName());
+					//UE_LOG(LogTemp, Warning, TEXT("Sight sense was successfully triggered for actor: %s"), *SensedActor->GetName());
 					if (ActorStimuli.WasSuccessfullySensed())
 					{
-						UE_LOG(LogTemp, Warning, TEXT("Sight sense true"))
+						//UE_LOG(LogTemp, Warning, TEXT("Sight sense true"))
 						AIHandleSenseSight(SensedActor);
 					}
 
@@ -125,7 +125,7 @@ void AEnemyBaseController::AICanSenseActor(AActor* SensedActor)
 				
 				else if (AIHandleAiSenseConversion(ActorStimuli.Type) == E_EnemyAI_Sense::Hearing)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Hearing sense was successfully triggered for actor: %s"), *SensedActor->GetName());
+					//UE_LOG(LogTemp, Warning, TEXT("Hearing sense was successfully triggered for actor: %s"), *SensedActor->GetName());
 					if (ActorStimuli.WasSuccessfullySensed())
 					{
 						AIHandleSenseHearing(ActorStimuli.StimulusLocation);
@@ -182,9 +182,9 @@ void AEnemyBaseController::AIHandleSenseSight(AActor* SensedActor)
 			if (SensedActor == GetPlayerCharacterInWorld(GetWorld()))
 			{
 				SetStateAsAttacking(SensedActor);
-				UE_LOG(LogTemp, Warning, TEXT("Current state: %s"), *UEnum::GetValueAsString(CurrentState));
+				//UE_LOG(LogTemp, Warning, TEXT("Current state: %s"), *UEnum::GetValueAsString(CurrentState));
 
-				UE_LOG(LogTemp, Warning, TEXT("SetStateAsAttacking: % d"), *SensedActor->GetName(), static_cast<uint8>(CurrentState));
+				//UE_LOG(LogTemp, Warning, TEXT("SetStateAsAttacking: % d"), *SensedActor->GetName(), static_cast<uint8>(CurrentState));
 			}
 			break;
 

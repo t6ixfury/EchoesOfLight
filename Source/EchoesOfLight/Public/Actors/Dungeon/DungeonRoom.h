@@ -47,14 +47,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		USceneComponent* Root;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Parameters")
 		UBoxComponent* SpawnArea;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawn Parameters")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dungeon Parameters")
 		int32 NumberOfEnemiesSpawned = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Parameters")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Parameters")
 		TArray<FEnemySpawnArray> EnemyTypesToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dungeon Parameters")
+		int32 EnemyLevels = 1;
+
+	
 
 
 

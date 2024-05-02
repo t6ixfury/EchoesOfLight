@@ -20,7 +20,7 @@ void UEchoesGameInstance::LoadGameData()
 		if (USave_PlayerInfo* SaveInfo = Cast<USave_PlayerInfo>(UGameplayStatics::LoadGameFromSlot(PlayerInfoSlot, 0)))
 		{
 			PlayerInfoData = SaveInfo;
-			UE_LOG(LogTemp, Warning, TEXT("player info save exist"));
+			//UE_LOG(LogTemp, Warning, TEXT("player info save exist"));
 		}
 	}
 
@@ -29,7 +29,7 @@ void UEchoesGameInstance::LoadGameData()
 		if (USave_Inventory* SaveInventory = Cast<USave_Inventory>(UGameplayStatics::LoadGameFromSlot(InventoryDataSlot, 0)))
 		{
 			InventoryData = SaveInventory;
-			UE_LOG(LogTemp, Warning, TEXT("inv save exist"));
+			//UE_LOG(LogTemp, Warning, TEXT("inv save exist"));
 		}
 	}
 	
@@ -39,7 +39,7 @@ void UEchoesGameInstance::LoadGameData()
 		if (USave_Experience* SaveExperience = Cast<USave_Experience>(UGameplayStatics::LoadGameFromSlot(ExperienceSlot, 0)))
 		{
 			ExperienceData = SaveExperience; 
-			UE_LOG(LogTemp, Warning, TEXT("exp save exist"));
+		//	UE_LOG(LogTemp, Warning, TEXT("exp save exist"));
 		}
 	}
 	if (UGameplayStatics::DoesSaveGameExist(EquipmentDataSlot, 0))
@@ -91,10 +91,10 @@ void UEchoesGameInstance::SetTownAndDungeonNames()
 	DungeonLevels.Add(FName("Dungeon_3"));
 	DungeonLevels.Add(FName("Dungeon_4"));
 	DungeonLevels.Add(FName("Dungeon_5"));
-	DungeonLevels.Add(FName("Dungeon_6"));
-	DungeonLevels.Add(FName("Dungeon_7"));
-	DungeonLevels.Add(FName("Dungeon_8"));
-	DungeonLevels.Add(FName("Dungeon_9"));
+	DungeonLevels.Add(FName("Dungeon_06"));
+	DungeonLevels.Add(FName("Dungeon_07"));
+	DungeonLevels.Add(FName("Dungeon_08"));
+	DungeonLevels.Add(FName("Dungeon_09"));
 	DungeonLevels.Add(FName("Dungeon_10"));
 
 }

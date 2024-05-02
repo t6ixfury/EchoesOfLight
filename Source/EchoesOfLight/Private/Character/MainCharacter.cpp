@@ -18,6 +18,8 @@
 #include "ActorComponents/DialogueSystem.h"
 #include "Save/Save_PlayerInfo.h"
 #include "Save/EchoesGameInstance.h"
+#include "EnemyCharacter.h"
+#include "Managers/GameInfo.h"
 
 //engine
 #include "Engine/LocalPlayer.h"
@@ -129,6 +131,9 @@ void AMainCharacter::BeginPlay()
 	if (UEchoesGameInstance* instance = Cast<UEchoesGameInstance>(GetWorld()->GetGameInstance()))
 	{
 		LoadAll();
+		UpdateAllWidgets();
+		SaveAll();
+		instance->GameInfo->SaveGameInfo(instance);
 	}
 }
 
@@ -143,9 +148,15 @@ void AMainCharacter::Tick(float DeltaTime)
 	}
 	GetCharacterMovementDirection();
 
-	if (DialogueSystem->bIsTalking)
+	if (DamageSystem->Health <= 1)
 	{
+		if (!bIsDying)
+		{
+			bIsDying = true;
+			Death();
+		}
 	}
+
 
 
 }
@@ -299,7 +310,7 @@ void AMainCharacter::SpawnWeapon()
 	if (MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference == nullptr || 
 		MainWidgetHandlerComponent->EquipmentMenuWidget->Weapon_Slot->ItemReference->ItemAssetData.DualSword == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Null pointer from weapon slot."))
+		//UE_LOG(LogTemp, Warning, TEXT("Null pointer from weapon slot."))
 		return;
 	}
 	if (!isWeaponEquipped)
@@ -329,6 +340,12 @@ void AMainCharacter::SpawnWeapon()
 
 			if (RightHandWeapon && LeftHandWeapon)
 			{
+				CurrentState = ECharacterState::Combat;
+				CharacterStateChangeDelegate.Broadcast();
+
+				LeftHandWeapon->BaseAttackInfo.Damage = LeftHandWeapon->BaseAttackInfo.Damage * (ExperienceSystem->CurrentLevel + LeftHandWeapon->BaseAttackInfo.AttackPower);
+				RightHandWeapon->BaseAttackInfo.Damage = RightHandWeapon->BaseAttackInfo.Damage * (ExperienceSystem->CurrentLevel + RightHandWeapon->BaseAttackInfo.AttackPower);
+
 				// Attach the weapon to the socket
 				RightHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, RightHandWeaponSlotName);
 				LeftHandWeapon->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, leftHandWeaponSlotName);
@@ -350,6 +367,8 @@ void AMainCharacter::DespawnWeapon()
 {
 	if (IsValid(RightHandWeapon) && IsValid(LeftHandWeapon))
 	{
+		CurrentState = ECharacterState::NonCombat;
+		CharacterStateChangeDelegate.Broadcast();
 		RightHandWeapon->Destroy();
 		LeftHandWeapon->Destroy();
 		RightHandWeapon = nullptr;
@@ -359,9 +378,15 @@ void AMainCharacter::DespawnWeapon()
 }
 
 
+void AMainCharacter::OnDeathAnimationtimerEnd(AEnemyCharacter* Enemy)
+{
+	UE_LOG(LogTemp,Warning, TEXT("Death Called in character"))
+	OnDeathAnimationEnd();
+}
+
 void AMainCharacter::OnWeaponEquipmentChange()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Weapon Broadcast fired."));
+	//UE_LOG(LogTemp, Warning, TEXT("Weapon Broadcast fired."));
 	if(isWeaponEquipped)
 	{
 		DespawnWeapon();
@@ -586,6 +611,18 @@ void AMainCharacter::OnLevelUp(int32 NewLevel)
 {
 	if (MainWidgetHandlerComponent)
 	{
+
+		DamageSystem->MaxHealth = DamageSystem->MaxHealth * static_cast<float>(MainCharacterStats.Constitution);
+
+		DamageSystem->Health = DamageSystem->MaxHealth;
+
+		Stamina = Stamina * static_cast<float>(MainCharacterStats.Stamina);
+
+		CurrentStamina = Stamina;
+
+		DamageSystem->DamageResistance = DamageSystem->DamageResistance * static_cast<float>(MainCharacterStats.DefensePower);
+
+
 		FString ExpMessage = FString::Printf(TEXT("%d"), NewLevel);
 		MainWidgetHandlerComponent->ShowLevelAlertWidget(FText::FromString(ExpMessage));
 		UpdateAllWidgets();
@@ -810,8 +847,51 @@ bool AMainCharacter::TakeIncomingDamage(FS_DamageInfo DamageInfo)
 			MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
 		}
 
+		UE_LOG(LogTemp, Warning, TEXT("take damage character."))
+
 	}
 	return hasTakenDamage;
+}
+
+void AMainCharacter::GetExpFromKill(AEnemyCharacter* enemy)
+{
+	if (enemy)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GetExpFromKill was called"))
+		ExperienceSystem->AddExperience(enemy->BaseAttackInfo.Experience);
+	}
+}
+
+void AMainCharacter::Death()
+{
+	if (DeathMonatage)
+	{
+		// Get the animation instance and play the death montage
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			// Play the death animation montage
+			float time = AnimInstance->Montage_Play(DeathMonatage, 1.f);
+
+			DamageSystem->bisDead = true;
+
+				
+			FTimerHandle deathtimer;
+			GetWorld()->GetTimerManager().SetTimer(deathtimer, this, &AMainCharacter::OnDeathAnimationEnd, time, false);
+		}
+
+	}
+}
+
+void AMainCharacter::OnDeathAnimationEnd()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FString CurrentLevelName = World->GetMapName();
+		CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+		UGameplayStatics::OpenLevel(World, *CurrentLevelName);
+	}
 }
 
 void AMainCharacter::SetDamagable()
@@ -874,7 +954,7 @@ void AMainCharacter::PerformInteractionCheck()
 				//this make sure that we will not interact with an item outside a specific bound. InteractionCheckDistance in this case.
 				if (TraceHit.GetActor() != InteractionData.CurrentInteractable)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Hit actor found"))
+					//UE_LOG(LogTemp, Warning, TEXT("Hit actor found"))
 					FoundInteractable(TraceHit.GetActor());
 					return;
 				}
@@ -1097,7 +1177,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Forward Roll"))
+			//UE_LOG(LogTemp, Warning, TEXT("Forward Roll"))
 			break;
 		case EMovementDirection::Backward:
 			isMontagePlaying = true;
@@ -1107,7 +1187,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Backward");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Backward Roll"))
+		//	UE_LOG(LogTemp, Warning, TEXT("Backward Roll"))
 			break;
 		case EMovementDirection::Right:
 			isMontagePlaying = true;
@@ -1117,7 +1197,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Right");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Right Roll"))
+			//UE_LOG(LogTemp, Warning, TEXT("Right Roll"))
 			break;
 		case EMovementDirection::Left:
 			isMontagePlaying = true;
@@ -1137,7 +1217,7 @@ void AMainCharacter::roll()
 			SectionIndex = RollMontage->GetSectionIndex("Roll_Forward");
 			montageDuration = RollMontage->GetSectionLength(SectionIndex);
 			GetWorldTimerManager().SetTimer(AttackTimer, this, &AMainCharacter::setIsMontagePlaying, montageDuration, false);
-			UE_LOG(LogTemp, Warning, TEXT("Stationary Roll"))
+			//UE_LOG(LogTemp, Warning, TEXT("Stationary Roll"))
 			break;
 		default:
 			break;
@@ -1155,8 +1235,13 @@ void AMainCharacter::UpdateAllWidgets()
 	{
 		float newHealth = DamageSystem->Health / DamageSystem->MaxHealth;
 		MainWidgetHandlerComponent->GUI->SetHealthBarPercentage(newHealth);
-		MainWidgetHandlerComponent->GUI->SetStaminaBarPercetage(CurrentStamina / Stamina);
-		MainWidgetHandlerComponent->GUI->SetExperienceBarPercentage(ExperienceSystem->CurrentExp / ExperienceSystem->ExpToNextLevel);
+
+		float StaminaPercentage = CurrentStamina / Stamina;
+		MainWidgetHandlerComponent->GUI->SetStaminaBarPercetage(StaminaPercentage);
+
+		float ExperiencePercentage = ExperienceSystem->ExpGainedForNewLevel / ExperienceSystem->NeededExp;
+		MainWidgetHandlerComponent->GUI->SetExperienceBarPercentage(ExperiencePercentage);
+		//float ExperiencePercentage = ExperienceSystem->CurrentExp - ExperienceSystem->Levels.LevelToExperience[ExperienceSystem->ExpToNextLevel - 1] / (ExperienceSystem->ExpToNextLevel - ExperienceSystem->CurrentExp);
 		MainWidgetHandlerComponent->GUI->SetLevelText(FText::AsNumber(ExperienceSystem->CurrentLevel));
 	}
 
@@ -1219,7 +1304,7 @@ void AMainCharacter::SavePlayerInfo()
 				}
 
 				UGameplayStatics::SaveGameToSlot(Save, GameInstance->PlayerInfoSlot, 0);
-				UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
+			//UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Saved"));
 			}
 			
 		}
@@ -1240,6 +1325,10 @@ void AMainCharacter::LoadPlayerInfo()
 
 			//SetActorRotation(GameInstance->PlayerInfoData->sPlayerRotation);
 
+			
+
+			GameInstance->PlayerInfoData = Cast<USave_PlayerInfo>(UGameplayStatics::LoadGameFromSlot(GameInstance->PlayerInfoSlot, 0));
+
 			MainCharacterStats = GameInstance->PlayerInfoData->sStatsLevels;
 
 			DamageSystem->Health = GameInstance->PlayerInfoData->sHealth;
@@ -1258,7 +1347,7 @@ void AMainCharacter::LoadPlayerInfo()
 				RightHandWeapon->BaseAttackInfo.MagicPower = GameInstance->PlayerInfoData->sCurrentWeapnStats.MagicPower;
 				RightHandWeapon->BaseAttackInfo.Damage = GameInstance->PlayerInfoData->sCurrentWeapnStats.Damage;
 			}
-			UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Loaded"));
+			//UE_LOG(LogTemp, Warning, TEXT("PlayerInfo Loaded"));
 			UpdateAllWidgets();
 		}
 	}
@@ -1271,7 +1360,7 @@ void AMainCharacter::LoadAll()
 	ExperienceSystem->LoadExperience();
 	PlayerInventory->LoadInventory();
 	MainWidgetHandlerComponent->EquipmentMenuWidget->LoadEquipmentSlots();
-	UE_LOG(LogTemp, Warning, TEXT("load all called"));
+	//UE_LOG(LogTemp, Warning, TEXT("load all called"));
 }
 
 void AMainCharacter::SaveAll()
@@ -1281,5 +1370,5 @@ void AMainCharacter::SaveAll()
 	PlayerInventory->SaveInventory();
 	MainWidgetHandlerComponent->EquipmentMenuWidget->SaveEquipment();
 
-	UE_LOG(LogTemp, Warning, TEXT("Save all called"));
+	//UE_LOG(LogTemp, Warning, TEXT("Save all called"));
 }

@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door properties")
 		FName DungeonKeyName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door properties")
+		FText AlertMessage = FText::FromString("You do not have the dungeon key!\nHint: Try killing the rest of the enemies.");
+
 	FRotator TargetLeftDoorRotation;
 	FRotator TargetRightDoorRotation;
 
@@ -72,6 +75,7 @@ public:
 
 	virtual void Interact(AMainCharacter* PlayerCharacter) override;
 
+	UFUNCTION(BlueprintCallable)
 	void OperateDoor();
 
 	void UpdateInteractable();

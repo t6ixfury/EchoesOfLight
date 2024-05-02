@@ -2,7 +2,9 @@
 
 
 #include "ActorComponents/AC_DamageSystem.h"
+#include "EnemyCharacter.h"
 #include "Structures/S_DamageInfo.h"
+#include "Character/MainCharacter.h"
 
 
 // Sets default values for this component's properties
@@ -58,12 +60,23 @@ bool UAC_DamageSystem::TakeDamage(FS_DamageInfo DamageInfo)
 	{
 	case E_Damage_State::DoDamage:
 	{
-		float newHealth = SetHealth(DamageInfo.Damage);
+		float newHealth = SetHealth(DamageInfo.Damage - DamageResistance);
 
 		if (newHealth <= 0)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("inside health check"));
-			On_Death.Broadcast();
+
+			if (AEnemyCharacter* enemy = Cast<AEnemyCharacter>(GetOwner()))
+			{
+				if (!enemy->DamageSystem->bisDead)
+				{
+					On_Death.Broadcast(enemy);
+				}
+			}
+			else
+			{
+				On_Death.Broadcast(nullptr);
+			}
 		}
 		else
 		{
@@ -116,6 +129,8 @@ E_Damage_State UAC_DamageSystem::CanBeDamaged(bool shouldDamageInvincible, bool 
 float UAC_DamageSystem::SetHealth(float amount)
 {
 	Health = FMath::Clamp((Health - amount), 0, MaxHealth);
+
+	UE_LOG(LogTemp, Warning, TEXT("Damage Amount: %f"), amount);
 
 	return Health;
 }
